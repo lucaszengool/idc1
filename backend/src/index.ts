@@ -13,6 +13,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 // Security middleware
 app.use(helmet());
@@ -73,11 +74,11 @@ const startServer = async () => {
     console.log('Database models synchronized.');
 
     // Start server
-    app.listen(PORT, () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
+    app.listen(Number(PORT), HOST, () => {
+      console.log(`🚀 Server is running on ${HOST}:${PORT}`);
       console.log(`📊 DCOPS Budget Management System API`);
-      console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-      console.log(`📚 API base URL: http://localhost:${PORT}/api`);
+      console.log(`🔗 Health check: http://${HOST}:${PORT}/health`);
+      console.log(`📚 API base URL: http://${HOST}:${PORT}/api`);
     });
   } catch (error) {
     console.error('Unable to start server:', error);
