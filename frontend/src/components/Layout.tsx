@@ -20,7 +20,9 @@ const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 const { Option } = Select;
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+  ? `${process.env.REACT_APP_API_BASE_URL}/api`
+  : 'http://localhost:3001/api';
 
 interface AppLayoutProps {
   children: React.ReactNode;
