@@ -75,7 +75,7 @@ const startServer = async () => {
     console.log('Model associations defined.');
 
     // Sync database models (create tables if they don't exist)
-    await sequelize.sync({ alter: false }); // Set to true for development
+    await sequelize.sync({ force: false, alter: true }); // Create tables and modify structure if needed
     console.log('Database models synchronized.');
 
     // Start server
