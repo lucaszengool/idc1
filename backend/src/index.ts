@@ -7,6 +7,7 @@ import sequelize from './config/database';
 import corsMiddleware from './middleware/cors';
 import { errorHandler } from './middleware/errorHandler';
 import routes from './routes';
+import { defineAssociations } from './models';
 
 // Load environment variables
 dotenv.config();
@@ -68,6 +69,10 @@ const startServer = async () => {
     // Test database connection
     await sequelize.authenticate();
     console.log('Database connection has been established successfully.');
+
+    // Define model associations
+    defineAssociations();
+    console.log('Model associations defined.');
 
     // Sync database models (create tables if they don't exist)
     await sequelize.sync({ alter: false }); // Set to true for development

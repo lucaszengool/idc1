@@ -4,32 +4,39 @@ exports.getTotalStatistics = exports.getStatisticsByOwner = exports.getStatistic
 const models_1 = require("../models");
 const getDashboard = async (req, res) => {
     try {
+        const currentYear = new Date().getFullYear().toString();
+        // Get total budget for current year
+        const totalBudgetRecord = await models_1.TotalBudget.findOne({
+            where: { budgetYear: currentYear }
+        });
         // Get all projects with their executions
         const projects = await models_1.Project.findAll({
             include: [{ model: models_1.BudgetExecution, as: 'executions' }],
         });
         // Calculate statistics
-        let totalBudget = 0;
+        const totalBudgetAmount = totalBudgetRecord ? parseFloat(totalBudgetRecord.totalAmount.toString()) : 0;
+        let allocatedBudget = 0;
         let totalExecuted = 0;
         const categoryStats = [];
         const highRiskProjects = [];
         const categoryMap = new Map();
         projects.forEach((project) => {
-            const budgetAmount = parseFloat(project.budgetAmount);
-            totalBudget += budgetAmount;
+            const budgetAmount = parseFloat(project.budgetOccupied || project.budgetAmount || 0);
+            allocatedBudget += budgetAmount;
             const executions = project.executions || [];
             const executedAmount = executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount), 0);
             totalExecuted += executedAmount;
             const executionRate = budgetAmount > 0 ? (executedAmount / budgetAmount) * 100 : 0;
             // Track category stats
-            if (categoryMap.has(project.category)) {
-                const cat = categoryMap.get(project.category);
+            const category = project.category || project.projectType || '未分类';
+            if (categoryMap.has(category)) {
+                const cat = categoryMap.get(category);
                 cat.totalBudget += budgetAmount;
                 cat.projectCount += 1;
             }
             else {
-                categoryMap.set(project.category, {
-                    category: project.category,
+                categoryMap.set(category, {
+                    category,
                     totalBudget: budgetAmount,
                     projectCount: 1,
                 });
@@ -55,12 +62,15 @@ const getDashboard = async (req, res) => {
             order: [['createdAt', 'DESC']],
             limit: 5,
         });
-        const remainingBudget = totalBudget - totalExecuted;
-        const executionRate = totalBudget > 0 ? (totalExecuted / totalBudget) * 100 : 0;
+        const availableBudget = totalBudgetAmount - allocatedBudget;
+        const remainingBudget = allocatedBudget - totalExecuted;
+        const executionRate = allocatedBudget > 0 ? (totalExecuted / allocatedBudget) * 100 : 0;
         res.json({
             success: true,
             data: {
-                总预算: totalBudget,
+                总预算: totalBudgetAmount,
+                已分配预算: allocatedBudget,
+                可支配预算: availableBudget,
                 已执行金额: totalExecuted,
                 剩余预算: remainingBudget,
                 预算执行率: parseFloat(executionRate.toFixed(2)),

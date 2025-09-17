@@ -12,10 +12,12 @@ const database_1 = __importDefault(require("./config/database"));
 const cors_1 = __importDefault(require("./middleware/cors"));
 const errorHandler_1 = require("./middleware/errorHandler");
 const routes_1 = __importDefault(require("./routes"));
+const models_1 = require("./models");
 // Load environment variables
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || '0.0.0.0';
 // Security middleware
 app.use((0, helmet_1.default)());
 // CORS middleware
@@ -59,15 +61,18 @@ const startServer = async () => {
         // Test database connection
         await database_1.default.authenticate();
         console.log('Database connection has been established successfully.');
+        // Define model associations
+        (0, models_1.defineAssociations)();
+        console.log('Model associations defined.');
         // Sync database models (create tables if they don't exist)
         await database_1.default.sync({ alter: false }); // Set to true for development
         console.log('Database models synchronized.');
         // Start server
-        app.listen(PORT, () => {
-            console.log(`🚀 Server is running on port ${PORT}`);
+        app.listen(Number(PORT), HOST, () => {
+            console.log(`🚀 Server is running on ${HOST}:${PORT}`);
             console.log(`📊 DCOPS Budget Management System API`);
-            console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-            console.log(`📚 API base URL: http://localhost:${PORT}/api`);
+            console.log(`🔗 Health check: http://${HOST}:${PORT}/health`);
+            console.log(`📚 API base URL: http://${HOST}:${PORT}/api`);
         });
     }
     catch (error) {

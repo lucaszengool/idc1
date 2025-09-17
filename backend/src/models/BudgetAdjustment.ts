@@ -81,6 +81,4 @@ BudgetAdjustment.init({
   timestamps: true,
 });
 
-BudgetAdjustment.belongsTo(Project, { foreignKey: 'originalProjectId', as: 'originalProject' });
-
 export default BudgetAdjustment;

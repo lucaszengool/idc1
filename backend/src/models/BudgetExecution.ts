@@ -70,6 +70,6 @@ BudgetExecution.init({
 });
 
 BudgetExecution.belongsTo(Project, { foreignKey: 'projectId', as: 'project' });
-Project.hasMany(BudgetExecution, { foreignKey: 'projectId', as: 'executions' });
+Project.hasMany(BudgetExecution, { foreignKey: 'projectId', as: 'executions', onDelete: 'CASCADE' });
 
 export default BudgetExecution;

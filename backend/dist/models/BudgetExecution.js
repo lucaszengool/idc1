@@ -49,6 +49,6 @@ BudgetExecution.init({
     timestamps: true,
 });
 BudgetExecution.belongsTo(Project_1.default, { foreignKey: 'projectId', as: 'project' });
-Project_1.default.hasMany(BudgetExecution, { foreignKey: 'projectId', as: 'executions' });
+Project_1.default.hasMany(BudgetExecution, { foreignKey: 'projectId', as: 'executions', onDelete: 'CASCADE' });
 exports.default = BudgetExecution;
 //# sourceMappingURL=BudgetExecution.js.map

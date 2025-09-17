@@ -25,7 +25,7 @@ export const createAdjustment = async (req: Request, res: Response) => {
 
     const executions = originalProject.get('executions') as BudgetExecution[];
     const totalExecuted = executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0);
-    const remainingBudget = parseFloat(originalProject.budgetAmount.toString()) - totalExecuted;
+    const remainingBudget = parseFloat((originalProject.budgetAmount || 0).toString()) - totalExecuted;
 
     if (parseFloat(adjustmentAmount) > remainingBudget) {
       return res.status(400).json({ 

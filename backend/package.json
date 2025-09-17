@@ -27,7 +27,8 @@
     "multer": "^2.0.2",
     "pg": "^8.16.3",
     "recharts": "^3.2.0",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

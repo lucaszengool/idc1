@@ -56,6 +56,5 @@ BudgetAdjustment.init({
     tableName: 'budget_adjustments',
     timestamps: true,
 });
-BudgetAdjustment.belongsTo(Project_1.default, { foreignKey: 'originalProjectId', as: 'originalProject' });
 exports.default = BudgetAdjustment;
 //# sourceMappingURL=BudgetAdjustment.js.map
