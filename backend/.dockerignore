@@ -9,5 +9,3 @@ README.md
 .nyc_output
 coverage
 .cache
-src
-tsconfig.json
