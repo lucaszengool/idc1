@@ -86,7 +86,6 @@ MonthlyExecution.init({
   ],
 });
 
-MonthlyExecution.belongsTo(Project, { foreignKey: 'projectId', as: 'project' });
-Project.hasMany(MonthlyExecution, { foreignKey: 'projectId', as: 'monthlyExecutions', onDelete: 'CASCADE' });
+// Associations are defined in models/index.ts
 
 export default MonthlyExecution;

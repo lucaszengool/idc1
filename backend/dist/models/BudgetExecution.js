@@ -48,7 +48,6 @@ BudgetExecution.init({
     tableName: 'budget_executions',
     timestamps: true,
 });
-BudgetExecution.belongsTo(ProjectUpdated_1.default, { foreignKey: 'projectId', as: 'project' });
-ProjectUpdated_1.default.hasMany(BudgetExecution, { foreignKey: 'projectId', as: 'executions', onDelete: 'CASCADE' });
+// Associations are defined in models/index.ts
 exports.default = BudgetExecution;
 //# sourceMappingURL=BudgetExecution.js.map

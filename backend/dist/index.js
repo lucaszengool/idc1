@@ -98,13 +98,14 @@ const initializeDatabase = async () => {
                 await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
             }
         }
-        // Define model associations
-        (0, models_1.defineAssociations)();
-        console.log('Model associations defined.');
-        // Sync database models (create tables if they don't exist)
-        // Temporarily force recreate to fix schema conflicts
+        // Sync database models BEFORE defining associations to avoid conflicts
+        console.log('Syncing database models...');
         await database_1.default.sync({ force: true });
         console.log('Database models synchronized with force recreate.');
+        // Define model associations after sync
+        console.log('Defining model associations...');
+        (0, models_1.defineAssociations)();
+        console.log('Model associations defined successfully.');
     }
     catch (error) {
         console.error('Database initialization error:', error);
