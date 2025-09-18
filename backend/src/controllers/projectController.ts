@@ -48,13 +48,15 @@ export const createProject = async (req: Request, res: Response) => {
       procurementCode: procurementCode || finalProjectCode,
       completionStatus: completionStatus || '未结项',
       relatedBudgetProject: relatedBudgetProject || finalProjectName,
-      budgetYear: budgetYear || new Date().getFullYear(),
+      budgetYear: budgetYear || new Date().getFullYear().toString(),
       budgetOccupied: finalBudgetAmount,
       budgetExecuted: 0, // 初始执行金额为0
+      remainingBudget: finalBudgetAmount, // 初始剩余 = 预算占用
       orderAmount: parseFloat(orderAmount || 0),
       acceptanceAmount: parseFloat(acceptanceAmount || 0),
       contractOrderNumber: contractOrderNumber || '',
       expectedAcceptanceTime: expectedAcceptanceTime ? new Date(expectedAcceptanceTime) : undefined,
+      approvalStatus: 'draft', // 默认为草稿状态
       // 向后兼容
       category: category || 'IDC-架构研发',
       subProjectName: subProjectName || finalProjectName,

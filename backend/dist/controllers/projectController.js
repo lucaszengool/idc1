@@ -8,31 +8,35 @@ const createProject = async (req, res) => {
         const { projectCode, projectName, projectType, projectStatus, owner, members, projectGoal, projectBackground, projectExplanation, procurementCode, completionStatus, relatedBudgetProject, budgetYear, budgetOccupied, orderAmount, acceptanceAmount, contractOrderNumber, expectedAcceptanceTime, 
         // 向后兼容字段
         category, subProjectName, budgetAmount, content, } = req.body;
+        // 生成项目编号（如果没有提供）
+        const finalProjectCode = projectCode || `DCOPS-${Date.now()}`;
+        const finalProjectName = projectName || subProjectName;
+        const finalBudgetAmount = parseFloat(budgetOccupied || budgetAmount || 0);
         const project = await models_1.Project.create({
-            projectCode,
-            projectName,
-            projectType,
-            projectStatus,
+            projectCode: finalProjectCode,
+            projectName: finalProjectName,
+            projectType: projectType || '常规',
+            projectStatus: projectStatus || '待开始',
             owner,
             members: members || '',
-            projectGoal,
-            projectBackground,
-            projectExplanation,
-            procurementCode,
+            projectGoal: projectGoal || content || '待完善项目目标',
+            projectBackground: projectBackground || content || '待完善项目背景',
+            projectExplanation: projectExplanation || content || '待完善推导说明',
+            procurementCode: procurementCode || finalProjectCode,
             completionStatus: completionStatus || '未结项',
-            relatedBudgetProject,
-            budgetYear,
-            budgetOccupied: parseFloat(budgetOccupied || budgetAmount),
+            relatedBudgetProject: relatedBudgetProject || finalProjectName,
+            budgetYear: budgetYear || new Date().getFullYear().toString(),
+            budgetOccupied: finalBudgetAmount,
             budgetExecuted: 0, // 初始执行金额为0
+            remainingBudget: finalBudgetAmount, // 初始剩余 = 预算占用
             orderAmount: parseFloat(orderAmount || 0),
             acceptanceAmount: parseFloat(acceptanceAmount || 0),
             contractOrderNumber: contractOrderNumber || '',
             expectedAcceptanceTime: expectedAcceptanceTime ? new Date(expectedAcceptanceTime) : undefined,
+            approvalStatus: 'draft', // 默认为草稿状态
             // 向后兼容
-            category: category,
-            subProjectName: subProjectName || projectName,
-            remainingBudget: parseFloat(budgetOccupied || budgetAmount),
-            approvalStatus: 'pending'
+            category: category || 'IDC-架构研发',
+            subProjectName: subProjectName || finalProjectName,
         });
         res.status(201).json({ success: true, data: project });
     }

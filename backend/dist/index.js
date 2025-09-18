@@ -65,7 +65,7 @@ const startServer = async () => {
         (0, models_1.defineAssociations)();
         console.log('Model associations defined.');
         // Sync database models (create tables if they don't exist)
-        await database_1.default.sync({ alter: false }); // Set to true for development
+        await database_1.default.sync({ force: false, alter: true }); // Create tables and modify structure if needed
         console.log('Database models synchronized.');
         // Start server
         app.listen(Number(PORT), HOST, () => {
