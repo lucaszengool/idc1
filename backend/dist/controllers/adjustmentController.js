@@ -7,14 +7,19 @@ const createAdjustment = async (req, res) => {
         const { originalProjectId, newProjectName, adjustmentReason, adjustmentAmount, targetCategory, targetProject, targetSubProject, targetOwner, } = req.body;
         // Check if original project exists and has enough remaining budget
         const originalProject = await models_1.Project.findByPk(originalProjectId, {
-            include: [{ model: models_1.BudgetExecution, as: 'executions' }],
+            include: [{
+                    model: models_1.BudgetExecution,
+                    as: 'executions',
+                    required: false
+                }],
         });
         if (!originalProject) {
             return res.status(404).json({ success: false, message: 'Original project not found' });
         }
-        const executions = originalProject.get('executions');
+        const executions = originalProject.get('executions') || [];
         const totalExecuted = executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0);
-        const remainingBudget = parseFloat((originalProject.budgetAmount || 0).toString()) - totalExecuted;
+        const budgetOccupied = parseFloat((originalProject.budgetOccupied || 0).toString());
+        const remainingBudget = budgetOccupied - totalExecuted;
         if (parseFloat(adjustmentAmount) > remainingBudget) {
             return res.status(400).json({
                 success: false,

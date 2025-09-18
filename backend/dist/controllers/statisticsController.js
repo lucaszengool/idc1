@@ -11,7 +11,11 @@ const getDashboard = async (req, res) => {
         });
         // Get all projects with their executions
         const projects = await models_1.Project.findAll({
-            include: [{ model: models_1.BudgetExecution, as: 'executions' }],
+            include: [{
+                    model: models_1.BudgetExecution,
+                    as: 'executions',
+                    required: false // LEFT JOIN to include projects without executions
+                }],
         });
         // Calculate statistics
         const totalBudgetAmount = totalBudgetRecord ? parseFloat(totalBudgetRecord.totalAmount.toString()) : 0;
@@ -58,7 +62,11 @@ const getDashboard = async (req, res) => {
         });
         // Get recent executions
         const recentExecutions = await models_1.BudgetExecution.findAll({
-            include: [{ model: models_1.Project, as: 'project' }],
+            include: [{
+                    model: models_1.Project,
+                    as: 'executionProject',
+                    required: false
+                }],
             order: [['createdAt', 'DESC']],
             limit: 5,
         });

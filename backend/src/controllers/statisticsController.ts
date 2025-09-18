@@ -14,7 +14,11 @@ export const getDashboard = async (req: Request, res: Response) => {
 
     // Get all projects with their executions
     const projects = await Project.findAll({
-      include: [{ model: BudgetExecution, as: 'executions' }],
+      include: [{
+        model: BudgetExecution,
+        as: 'executions',
+        required: false // LEFT JOIN to include projects without executions
+      }],
     });
 
     // Calculate statistics
@@ -70,7 +74,11 @@ export const getDashboard = async (req: Request, res: Response) => {
 
     // Get recent executions
     const recentExecutions = await BudgetExecution.findAll({
-      include: [{ model: Project, as: 'project' }],
+      include: [{
+        model: Project,
+        as: 'executionProject',
+        required: false
+      }],
       order: [['createdAt', 'DESC']],
       limit: 5,
     });

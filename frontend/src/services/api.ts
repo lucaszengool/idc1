@@ -69,9 +69,21 @@ export const statisticsAPI = {
 export const adjustmentAPI = {
   create: (data: Omit<BudgetAdjustment, 'id' | 'createdAt' | 'updatedAt'>) =>
     api.post<ApiResponse<BudgetAdjustment>>('/adjustments', data),
-  
+
   getAll: (params?: { originalProjectId?: number; page?: number; limit?: number }) =>
     api.get<ApiResponse<{ adjustments: BudgetAdjustment[]; totalCount: number; currentPage: number; totalPages: number }>>('/adjustments', { params }),
+};
+
+// Total Budget APIs
+export const totalBudgetAPI = {
+  get: (year?: string) =>
+    api.get<ApiResponse<{ id: number; budgetYear: string; totalAmount: number }>>('/total-budget', { params: { year } }),
+
+  update: (year: string, totalAmount: number) =>
+    api.post<ApiResponse<{ id: number; budgetYear: string; totalAmount: number }>>('/total-budget', {
+      budgetYear: year,
+      totalAmount
+    }),
 };
 
 export default api;

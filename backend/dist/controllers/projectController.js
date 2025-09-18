@@ -65,6 +65,7 @@ const getProjects = async (req, res) => {
                     model: models_1.BudgetExecution,
                     as: 'executions',
                     attributes: ['executionAmount'],
+                    required: false,
                 },
             ],
         });
@@ -118,6 +119,7 @@ const getProjectById = async (req, res) => {
                     model: models_1.BudgetExecution,
                     as: 'executions',
                     order: [['executionDate', 'DESC']],
+                    required: false,
                 },
             ],
         });

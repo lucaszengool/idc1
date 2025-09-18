@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Row, Col, Statistic, Table, Tag, Typography } from 'antd';
-import { statisticsAPI } from '../services/api';
+import { Card, Row, Col, Statistic, Table, Tag, Typography, Button, Modal, Form, InputNumber, message } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
+import { statisticsAPI, totalBudgetAPI } from '../services/api';
 import { DashboardStats } from '../types';
 
 const { Title } = Typography;
@@ -8,6 +9,10 @@ const { Title } = Typography;
 const Dashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditBudgetModalVisible, setIsEditBudgetModalVisible] = useState(false);
+  const [budgetForm] = Form.useForm();
+
+  const currentYear = new Date().getFullYear().toString();
 
   useEffect(() => {
     loadDashboardData();
@@ -21,16 +26,34 @@ const Dashboard: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
+      message.error('加载仪表板数据失败');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditTotalBudget = async (values: any) => {
+    try {
+      const response = await totalBudgetAPI.update(currentYear, values.totalAmount);
+      if (response.data.success) {
+        message.success('总预算更新成功');
+        setIsEditBudgetModalVisible(false);
+        budgetForm.resetFields();
+        // Reload dashboard data to reflect changes
+        loadDashboardData();
+      }
+    } catch (error: any) {
+      message.error(error.response?.data?.message || '总预算更新失败');
     }
   };
 
   const executionColumns = [
     {
       title: '项目名称',
-      dataIndex: ['project', 'projectName'],
+      dataIndex: ['executionProject', 'projectName'],
       key: 'projectName',
+      render: (name: string, record: any) =>
+        name || record.project?.projectName || '未知项目',
     },
     {
       title: '执行金额（万元）',
@@ -90,7 +113,19 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
-      <Title level={2}>预算执行总览</Title>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <Title level={2}>预算执行总览</Title>
+        <Button
+          type="primary"
+          icon={<EditOutlined />}
+          onClick={() => {
+            budgetForm.setFieldsValue({ totalAmount: dashboardData?.总预算 || 0 });
+            setIsEditBudgetModalVisible(true);
+          }}
+        >
+          编辑总预算
+        </Button>
+      </div>
       
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={6}>
@@ -193,6 +228,46 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      <Modal
+        title={`编辑${currentYear}年总预算`}
+        open={isEditBudgetModalVisible}
+        onCancel={() => {
+          setIsEditBudgetModalVisible(false);
+          budgetForm.resetFields();
+        }}
+        footer={null}
+      >
+        <Form form={budgetForm} onFinish={handleEditTotalBudget} layout="vertical">
+          <Form.Item
+            label="总预算金额（万元）"
+            name="totalAmount"
+            rules={[
+              { required: true, message: '请输入总预算金额' },
+              { type: 'number', min: 0, message: '总预算必须大于0' }
+            ]}
+          >
+            <InputNumber
+              min={0}
+              precision={2}
+              style={{ width: '100%' }}
+              placeholder="输入总预算金额"
+            />
+          </Form.Item>
+
+          <div style={{ textAlign: 'right', marginTop: 24 }}>
+            <Button
+              onClick={() => setIsEditBudgetModalVisible(false)}
+              style={{ marginRight: 8 }}
+            >
+              取消
+            </Button>
+            <Button type="primary" htmlType="submit">
+              更新总预算
+            </Button>
+          </div>
+        </Form>
+      </Modal>
     </div>
   );
 };
