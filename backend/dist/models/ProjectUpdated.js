@@ -18,7 +18,6 @@ Project.init({
     projectCode: {
         type: sequelize_1.DataTypes.STRING(50),
         allowNull: false,
-        unique: true,
         comment: '项目编号',
     },
     projectName: {

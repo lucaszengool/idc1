@@ -134,7 +134,6 @@ Project.init({
   projectCode: {
     type: DataTypes.STRING(50),
     allowNull: false,
-    unique: true,
     comment: '项目编号',
   },
   projectName: {
