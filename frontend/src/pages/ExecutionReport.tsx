@@ -40,7 +40,7 @@ const ExecutionReport: React.FC = () => {
       
       const formData = new FormData();
       formData.append('projectId', values.projectId.toString());
-      formData.append('executionAmount', (values.executionAmount * 10000).toString());
+      formData.append('executionAmount', values.executionAmount.toString());
       formData.append('executionDate', values.executionDate.format('YYYY-MM-DD'));
       formData.append('description', values.description);
       formData.append('createdBy', values.createdBy);
@@ -108,13 +108,9 @@ const ExecutionReport: React.FC = () => {
             <p><strong>项目名称：</strong>{selectedProject.projectName}</p>
             <p><strong>子项目：</strong>{selectedProject.subProjectName}</p>
             <p><strong>负责人：</strong>{selectedProject.owner}</p>
-            <p><strong>预算金额：</strong>¥{((selectedProject.budgetOccupied || selectedProject.budgetAmount || 0) / 10000).toFixed(2)}万元</p>
-            {selectedProject.executedAmount !== undefined && (
-              <>
-                <p><strong>已执行：</strong>¥{((selectedProject.executedAmount || selectedProject.budgetExecuted || 0) / 10000).toFixed(2)}万元</p>
-                <p><strong>剩余预算：</strong>¥{((selectedProject.remainingAmount || selectedProject.remainingBudget || ((selectedProject.budgetOccupied || 0) - (selectedProject.budgetExecuted || 0))) / 10000).toFixed(2)}万元</p>
-              </>
-            )}
+            <p><strong>预算金额：</strong>¥{(selectedProject.budgetOccupied || selectedProject.budgetAmount || 0).toFixed(2)}万元</p>
+            <p><strong>已执行：</strong>¥{(selectedProject.budgetExecuted || selectedProject.executedAmount || 0).toFixed(2)}万元</p>
+            <p><strong>剩余预算：</strong>¥{(selectedProject.remainingBudget || ((selectedProject.budgetOccupied || 0) - (selectedProject.budgetExecuted || 0))).toFixed(2)}万元</p>
           </div>
         )}
 
