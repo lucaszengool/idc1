@@ -36,12 +36,21 @@ if (!fs_1.default.existsSync(uploadsDir)) {
     fs_1.default.mkdirSync(uploadsDir, { recursive: true });
 }
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
+    let dbStatus = 'unknown';
+    try {
+        await database_1.default.authenticate();
+        dbStatus = 'connected';
+    }
+    catch (error) {
+        dbStatus = 'disconnected';
+    }
     res.json({
         success: true,
         message: 'DCOPS Budget System API is running',
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development'
+        environment: process.env.NODE_ENV || 'development',
+        database: dbStatus
     });
 });
 // API routes
@@ -57,27 +66,48 @@ app.use((req, res) => {
 });
 // Database connection and server startup
 const startServer = async () => {
+    // Start server immediately for health checks
+    const server = app.listen(Number(PORT), HOST, () => {
+        console.log(`🚀 Server is running on ${HOST}:${PORT}`);
+        console.log(`📊 DCOPS Budget Management System API`);
+        console.log(`🔗 Health check: http://${HOST}:${PORT}/health`);
+        console.log(`📚 API base URL: http://${HOST}:${PORT}/api`);
+    });
+    // Initialize database in background
+    initializeDatabase();
+    return server;
+};
+const initializeDatabase = async () => {
     try {
-        // Test database connection
-        await database_1.default.authenticate();
-        console.log('Database connection has been established successfully.');
+        console.log('Initializing database...');
+        // Test database connection with retry logic
+        let retries = 5;
+        while (retries > 0) {
+            try {
+                await database_1.default.authenticate();
+                console.log('Database connection has been established successfully.');
+                break;
+            }
+            catch (error) {
+                retries--;
+                console.log(`Database connection failed. Retries left: ${retries}`);
+                if (retries === 0) {
+                    console.error('Failed to connect to database after all retries:', error);
+                    return; // Continue without database
+                }
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+            }
+        }
         // Define model associations
         (0, models_1.defineAssociations)();
         console.log('Model associations defined.');
         // Sync database models (create tables if they don't exist)
-        await database_1.default.sync({ force: false, alter: true }); // Create tables and modify structure if needed
+        await database_1.default.sync({ force: false, alter: true });
         console.log('Database models synchronized.');
-        // Start server
-        app.listen(Number(PORT), HOST, () => {
-            console.log(`🚀 Server is running on ${HOST}:${PORT}`);
-            console.log(`📊 DCOPS Budget Management System API`);
-            console.log(`🔗 Health check: http://${HOST}:${PORT}/health`);
-            console.log(`📚 API base URL: http://${HOST}:${PORT}/api`);
-        });
     }
     catch (error) {
-        console.error('Unable to start server:', error);
-        process.exit(1);
+        console.error('Database initialization error:', error);
+        console.log('Server will continue running without database functionality.');
     }
 };
 // Handle graceful shutdown
