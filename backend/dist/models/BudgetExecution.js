@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const database_1 = __importDefault(require("../config/database"));
-const Project_1 = __importDefault(require("./Project"));
+const ProjectUpdated_1 = __importDefault(require("./ProjectUpdated"));
 class BudgetExecution extends sequelize_1.Model {
 }
 BudgetExecution.init({
@@ -18,7 +18,7 @@ BudgetExecution.init({
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Project_1.default,
+            model: ProjectUpdated_1.default,
             key: 'id',
         },
     },
@@ -48,7 +48,7 @@ BudgetExecution.init({
     tableName: 'budget_executions',
     timestamps: true,
 });
-BudgetExecution.belongsTo(Project_1.default, { foreignKey: 'projectId', as: 'project' });
-Project_1.default.hasMany(BudgetExecution, { foreignKey: 'projectId', as: 'executions', onDelete: 'CASCADE' });
+BudgetExecution.belongsTo(ProjectUpdated_1.default, { foreignKey: 'projectId', as: 'project' });
+ProjectUpdated_1.default.hasMany(BudgetExecution, { foreignKey: 'projectId', as: 'executions', onDelete: 'CASCADE' });
 exports.default = BudgetExecution;
 //# sourceMappingURL=BudgetExecution.js.map

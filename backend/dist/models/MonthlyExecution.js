@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const database_1 = __importDefault(require("../config/database"));
-const Project_1 = __importDefault(require("./Project"));
+const ProjectUpdated_1 = __importDefault(require("./ProjectUpdated"));
 class MonthlyExecution extends sequelize_1.Model {
 }
 MonthlyExecution.init({
@@ -18,7 +18,7 @@ MonthlyExecution.init({
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Project_1.default,
+            model: ProjectUpdated_1.default,
             key: 'id',
         },
         comment: '项目ID',
@@ -65,7 +65,7 @@ MonthlyExecution.init({
         },
     ],
 });
-MonthlyExecution.belongsTo(Project_1.default, { foreignKey: 'projectId', as: 'project' });
-Project_1.default.hasMany(MonthlyExecution, { foreignKey: 'projectId', as: 'monthlyExecutions', onDelete: 'CASCADE' });
+MonthlyExecution.belongsTo(ProjectUpdated_1.default, { foreignKey: 'projectId', as: 'project' });
+ProjectUpdated_1.default.hasMany(MonthlyExecution, { foreignKey: 'projectId', as: 'monthlyExecutions', onDelete: 'CASCADE' });
 exports.default = MonthlyExecution;
 //# sourceMappingURL=MonthlyExecution.js.map

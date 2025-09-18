@@ -115,8 +115,9 @@ const initializeDatabase = async () => {
     console.log('Model associations defined.');
 
     // Sync database models (create tables if they don't exist)
-    await sequelize.sync({ force: false, alter: true });
-    console.log('Database models synchronized.');
+    // Temporarily force recreate to fix schema conflicts
+    await sequelize.sync({ force: true });
+    console.log('Database models synchronized with force recreate.');
 
   } catch (error) {
     console.error('Database initialization error:', error);

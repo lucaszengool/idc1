@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../config/database';
-import Project from './Project';
+import Project from './ProjectUpdated';
 
 interface MonthlyExecutionAttributes {
   id: number;
