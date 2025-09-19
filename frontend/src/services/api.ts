@@ -12,6 +12,35 @@ const api = axios.create({
   },
 });
 
+// 添加请求拦截器以自动添加认证头
+api.interceptors.request.use(
+  (config) => {
+    // 从localStorage获取访问密钥
+    const accessKey = localStorage.getItem('accessKey');
+    if (accessKey) {
+      config.headers['x-access-key'] = accessKey;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 添加响应拦截器以处理认证错误
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // 清除无效的访问密钥
+      localStorage.removeItem('accessKey');
+      // 可以在这里触发重新登录
+      console.warn('Authentication failed, access key removed');
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Project APIs
 export const projectAPI = {
   create: (data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) =>

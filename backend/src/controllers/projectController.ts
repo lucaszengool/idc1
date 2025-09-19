@@ -188,23 +188,94 @@ export const getProjectById = async (req: Request, res: Response) => {
 export const updateProject = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { category, projectName, subProjectName, owner, budgetAmount, content } = req.body;
+    const {
+      category,
+      projectName,
+      subProjectName,
+      owner,
+      budgetAmount,
+      content,
+      // 新字段支持
+      budgetOccupied,
+      projectBackground,
+      projectGoal,
+      projectExplanation,
+      projectType,
+      projectStatus,
+      members,
+      procurementCode,
+      completionStatus,
+      relatedBudgetProject,
+      budgetYear,
+      orderAmount,
+      acceptanceAmount,
+      contractOrderNumber,
+      expectedAcceptanceTime
+    } = req.body;
 
     const project = await Project.findByPk(id);
     if (!project) {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
 
-    await project.update({
+    // 确定最终预算金额
+    const finalBudgetAmount = parseFloat(budgetOccupied || budgetAmount || project.budgetOccupied);
+
+    // 计算新的剩余预算 (原剩余预算 + 预算差额)
+    const budgetDifference = finalBudgetAmount - parseFloat(project.budgetOccupied.toString());
+    const newRemainingBudget = parseFloat(project.remainingBudget.toString()) + budgetDifference;
+
+    const updateData: any = {
       category,
       projectName,
       subProjectName,
       owner,
-      budgetAmount: parseFloat(budgetAmount),
-      content,
+      budgetAmount: finalBudgetAmount, // 向后兼容
+      budgetOccupied: finalBudgetAmount, // 新字段
+      remainingBudget: newRemainingBudget, // 更新剩余预算
+      content: content || projectBackground || project.projectBackground,
+      projectBackground: projectBackground || content || project.projectBackground,
+      projectGoal: projectGoal || project.projectGoal,
+      projectExplanation: projectExplanation || project.projectExplanation,
+    };
+
+    // 只更新提供的字段
+    if (projectType !== undefined) updateData.projectType = projectType;
+    if (projectStatus !== undefined) updateData.projectStatus = projectStatus;
+    if (members !== undefined) updateData.members = members;
+    if (procurementCode !== undefined) updateData.procurementCode = procurementCode;
+    if (completionStatus !== undefined) updateData.completionStatus = completionStatus;
+    if (relatedBudgetProject !== undefined) updateData.relatedBudgetProject = relatedBudgetProject;
+    if (budgetYear !== undefined) updateData.budgetYear = budgetYear;
+    if (orderAmount !== undefined) updateData.orderAmount = parseFloat(orderAmount);
+    if (acceptanceAmount !== undefined) updateData.acceptanceAmount = parseFloat(acceptanceAmount);
+    if (contractOrderNumber !== undefined) updateData.contractOrderNumber = contractOrderNumber;
+    if (expectedAcceptanceTime !== undefined) updateData.expectedAcceptanceTime = new Date(expectedAcceptanceTime);
+
+    await project.update(updateData);
+
+    // 重新计算执行率等统计信息
+    const executions = await BudgetExecution.findAll({ where: { projectId: id } });
+    const budgetExecuted = executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0);
+    const executionRate = finalBudgetAmount > 0 ? (budgetExecuted / finalBudgetAmount) * 100 : 0;
+
+    // 更新执行相关字段
+    await project.update({
+      budgetExecuted,
+      remainingBudget: finalBudgetAmount - budgetExecuted
     });
 
-    res.json({ success: true, data: project });
+    // 返回更新后的数据
+    const updatedProject = await Project.findByPk(id);
+    res.json({
+      success: true,
+      data: {
+        ...updatedProject?.toJSON(),
+        executionRate: parseFloat(executionRate.toFixed(2)),
+        executedAmount: budgetExecuted, // 向后兼容
+        remainingAmount: finalBudgetAmount - budgetExecuted, // 向后兼容
+      }
+    });
   } catch (error) {
     console.error('Update project error:', error);
     res.status(500).json({ success: false, message: 'Failed to update project' });

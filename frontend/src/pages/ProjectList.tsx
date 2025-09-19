@@ -59,6 +59,25 @@ const ProjectList: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
+    console.log('Delete button clicked for project ID:', id);
+
+    // 检查用户是否已登录
+    const accessKey = localStorage.getItem('accessKey');
+    const user = localStorage.getItem('user');
+
+    if (!accessKey || !user) {
+      Modal.confirm({
+        title: '需要登录',
+        content: '删除项目需要登录，是否现在前往登录？',
+        okText: '前往登录',
+        cancelText: '取消',
+        onOk: () => {
+          navigate('/login');
+        },
+      });
+      return;
+    }
+
     Modal.confirm({
       title: '确认删除',
       content: '确定要删除这个项目吗？此操作不可撤销。',
@@ -66,12 +85,36 @@ const ProjectList: React.FC = () => {
       cancelText: '取消',
       okType: 'danger',
       onOk: async () => {
+        console.log('Delete confirmed for project ID:', id);
         try {
-          await projectAPI.delete(id);
+          console.log('Calling projectAPI.delete...');
+          const response = await projectAPI.delete(id);
+          console.log('Delete response:', response);
           message.success('项目删除成功');
           loadProjects();
         } catch (error: any) {
-          message.error(error.response?.data?.message || '删除失败');
+          console.error('Delete error details:', error);
+          console.error('Error response:', error.response);
+
+          if (error.response?.status === 401) {
+            Modal.confirm({
+              title: '认证失败',
+              content: '您的登录已过期，请重新登录后再试',
+              okText: '前往登录',
+              cancelText: '取消',
+              onOk: () => {
+                localStorage.removeItem('accessKey');
+                localStorage.removeItem('user');
+                navigate('/login');
+              },
+            });
+          } else if (error.response?.status === 403) {
+            message.error('权限不足，只有项目负责人和PM可以删除项目');
+          } else if (error.response?.status === 404) {
+            message.error('项目不存在');
+          } else {
+            message.error(error.response?.data?.message || `删除失败: ${error.message}`);
+          }
         }
       },
     });

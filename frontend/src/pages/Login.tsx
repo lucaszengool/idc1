@@ -44,6 +44,11 @@ const Login: React.FC = () => {
         localStorage.setItem('username', values.username);
         localStorage.setItem('loginTime', new Date().toISOString());
 
+        // 保存 accessKey 用于API认证
+        if (userData.accessKey) {
+          localStorage.setItem('accessKey', userData.accessKey);
+        }
+
         // 根据用户角色跳转到不同页面
         if (userData.role === 'pm') {
           navigate('/pm-dashboard');
@@ -82,6 +87,11 @@ const Login: React.FC = () => {
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('username', currentUsername);
         localStorage.setItem('loginTime', new Date().toISOString());
+
+        // 保存 accessKey 用于API认证
+        if (userData.accessKey) {
+          localStorage.setItem('accessKey', userData.accessKey);
+        }
 
         setShowRoleSelection(false);
 

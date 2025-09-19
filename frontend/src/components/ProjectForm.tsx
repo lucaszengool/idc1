@@ -64,9 +64,38 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         <Form.Item
           name="projectName"
           label="项目名称"
-          rules={[{ required: true, message: '请输入项目名称' }]}
+          rules={[{ required: true, message: '请选择或输入项目名称' }]}
         >
-          <Input placeholder="请输入项目名称" />
+          <Select
+            mode="tags"
+            placeholder="请选择或输入项目名称"
+            showSearch
+            allowClear
+            maxTagCount={1}
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option?.children as unknown as string).toLowerCase().includes(input.toLowerCase())
+            }
+            dropdownRender={(menu) => (
+              <div>
+                {menu}
+                <div style={{ padding: 8, color: '#666', fontSize: '12px' }}>
+                  可选择常用项目名称或直接输入新名称
+                </div>
+              </div>
+            )}
+          >
+            <Option value="IDC运营平台">IDC运营平台</Option>
+            <Option value="架构管理系统">架构管理系统</Option>
+            <Option value="预算管理系统">预算管理系统</Option>
+            <Option value="自动化运维平台">自动化运维平台</Option>
+            <Option value="监控告警系统">监控告警系统</Option>
+            <Option value="容器云平台">容器云平台</Option>
+            <Option value="数据中心建设">数据中心建设</Option>
+            <Option value="高校合作项目">高校合作项目</Option>
+            <Option value="技术架构升级">技术架构升级</Option>
+            <Option value="安全防护系统">安全防护系统</Option>
+          </Select>
         </Form.Item>
 
         <Form.Item

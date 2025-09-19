@@ -9,7 +9,11 @@ export const createExecution = async (req: Request, res: Response) => {
 
     // Check if project exists and has enough remaining budget
     const project = await Project.findByPk(projectId, {
-      include: [{ model: BudgetExecution, as: 'executions' }],
+      include: [{
+        model: BudgetExecution,
+        as: 'executions',
+        required: false
+      }],
     });
 
     if (!project) {
@@ -46,7 +50,11 @@ export const createExecution = async (req: Request, res: Response) => {
     await project.update({ budgetExecuted: newTotalExecuted });
 
     const executionWithProject = await BudgetExecution.findByPk(execution.id, {
-      include: [{ model: Project, as: 'project' }],
+      include: [{
+        model: Project,
+        as: 'executionProject',
+        required: false
+      }],
     });
 
     res.status(201).json({ success: true, data: executionWithProject });
@@ -74,7 +82,11 @@ export const getExecutions = async (req: Request, res: Response) => {
       limit: parseInt(limit as string),
       offset,
       order: [['executionDate', 'DESC']],
-      include: [{ model: Project, as: 'project' }],
+      include: [{
+        model: Project,
+        as: 'executionProject',
+        required: false
+      }],
     });
 
     res.json({
@@ -99,7 +111,11 @@ export const getExecutionsByProject = async (req: Request, res: Response) => {
     const executions = await BudgetExecution.findAll({
       where: { projectId },
       order: [['executionDate', 'DESC']],
-      include: [{ model: Project, as: 'project' }],
+      include: [{
+        model: Project,
+        as: 'executionProject',
+        required: false
+      }],
     });
 
     const totalExecuted = executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0);
@@ -123,7 +139,11 @@ export const updateExecution = async (req: Request, res: Response) => {
     const { executionAmount, executionDate, description } = req.body;
 
     const execution = await BudgetExecution.findByPk(id, {
-      include: [{ model: Project, as: 'project' }],
+      include: [{
+        model: Project,
+        as: 'executionProject',
+        required: false
+      }],
     });
 
     if (!execution) {
@@ -132,7 +152,7 @@ export const updateExecution = async (req: Request, res: Response) => {
 
     // Check budget constraints if amount is being changed
     if (executionAmount && parseFloat(executionAmount) !== parseFloat(execution.executionAmount.toString())) {
-      const project = execution.get('project') as Project;
+      const project = execution.get('executionProject') as Project;
       const otherExecutions = await BudgetExecution.findAll({
         where: { 
           projectId: execution.projectId,
@@ -161,7 +181,7 @@ export const updateExecution = async (req: Request, res: Response) => {
     });
 
     // 更新项目的budgetExecuted字段
-    const project = execution.get('project') as Project;
+    const project = execution.get('executionProject') as Project;
     const allExecutions = await BudgetExecution.findAll({
       where: { projectId: execution.projectId },
     });
@@ -171,7 +191,11 @@ export const updateExecution = async (req: Request, res: Response) => {
     await project.update({ budgetExecuted: totalExecuted });
 
     const updatedExecution = await BudgetExecution.findByPk(execution.id, {
-      include: [{ model: Project, as: 'project' }],
+      include: [{
+        model: Project,
+        as: 'executionProject',
+        required: false
+      }],
     });
 
     res.json({ success: true, data: updatedExecution });

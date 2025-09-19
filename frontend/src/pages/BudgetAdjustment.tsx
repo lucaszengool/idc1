@@ -102,12 +102,19 @@ const BudgetAdjustment: React.FC = () => {
 
       const response = await adjustmentAPI.create(adjustmentData);
       if (response.data.success) {
-        message.success('预算调整创建成功');
+        message.success('预算调整创建成功，项目预算已更新');
         form.resetFields();
         setSelectedProject(null);
         setIsModalVisible(false);
+        // 刷新所有相关数据
         loadAdjustments();
         loadProjects();
+        loadTotalBudget();
+
+        // 通知用户数据已同步
+        setTimeout(() => {
+          message.info('所有相关数据已同步更新，可查看Dashboard查看最新数据');
+        }, 1000);
       }
     } catch (error: any) {
       message.error(error.response?.data?.message || '预算调整创建失败');
