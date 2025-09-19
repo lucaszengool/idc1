@@ -47,12 +47,13 @@ export const createProject = async (req: Request, res: Response) => {
       content: content || '项目描述'
     });
 
-    const project = await Project.create({
+    // 确保所有必填字段都有值
+    const projectData = {
       projectCode: finalProjectCode,
       projectName: finalProjectName,
       projectType: projectType || '常规',
       projectStatus: projectStatus || '待开始',
-      owner,
+      owner: owner || '待指定',
       members: members || '',
       projectGoal: projectGoal || content || '待完善项目目标',
       projectBackground: projectBackground || content || '待完善项目背景',
@@ -60,19 +61,25 @@ export const createProject = async (req: Request, res: Response) => {
       procurementCode: procurementCode || finalProjectCode,
       completionStatus: completionStatus || '未结项',
       relatedBudgetProject: relatedBudgetProject || finalProjectName,
-      budgetYear: budgetYear || new Date().getFullYear().toString(),
+      budgetYear: (budgetYear || new Date().getFullYear()).toString(),
       budgetOccupied: finalBudgetAmount,
       budgetExecuted: 0, // 初始执行金额为0
       remainingBudget: finalBudgetAmount, // 初始剩余 = 预算占用
-      orderAmount: parseFloat(orderAmount || 0),
-      acceptanceAmount: parseFloat(acceptanceAmount || 0),
+      orderAmount: parseFloat(orderAmount || '0'),
+      acceptanceAmount: parseFloat(acceptanceAmount || '0'),
       contractOrderNumber: contractOrderNumber || '',
-      expectedAcceptanceTime: expectedAcceptanceTime ? new Date(expectedAcceptanceTime) : undefined,
-      approvalStatus: 'draft', // 默认为草稿状态
-      // 向后兼容
+      expectedAcceptanceTime: expectedAcceptanceTime ? new Date(expectedAcceptanceTime) : null,
+      approvalStatus: 'draft' as const, // 默认为草稿状态
+      // 向后兼容字段
       category: category || 'IDC-架构研发',
       subProjectName: subProjectName || finalProjectName,
-    });
+      budgetAmount: finalBudgetAmount, // 向后兼容
+      content: content || projectBackground || '项目描述',
+    };
+
+    console.log('Final project data to create (detailed):', projectData);
+
+    const project = await Project.create(projectData);
 
     console.log('Project created successfully:', project.toJSON());
     res.status(201).json({ success: true, data: project });

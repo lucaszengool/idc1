@@ -108,9 +108,9 @@ const ExecutionReport: React.FC = () => {
             <p><strong>项目名称：</strong>{selectedProject.projectName}</p>
             <p><strong>子项目：</strong>{selectedProject.subProjectName}</p>
             <p><strong>负责人：</strong>{selectedProject.owner}</p>
-            <p><strong>预算金额：</strong>¥{(selectedProject.budgetOccupied || selectedProject.budgetAmount || 0).toFixed(2)}万元</p>
-            <p><strong>已执行：</strong>¥{(selectedProject.budgetExecuted || selectedProject.executedAmount || 0).toFixed(2)}万元</p>
-            <p><strong>剩余预算：</strong>¥{(selectedProject.remainingBudget || ((selectedProject.budgetOccupied || 0) - (selectedProject.budgetExecuted || 0))).toFixed(2)}万元</p>
+            <p><strong>预算金额：</strong>¥{parseFloat(String(selectedProject.budgetOccupied || selectedProject.budgetAmount || 0)).toFixed(2)}万元</p>
+            <p><strong>已执行：</strong>¥{parseFloat(String(selectedProject.budgetExecuted || selectedProject.executedAmount || 0)).toFixed(2)}万元</p>
+            <p><strong>剩余预算：</strong>¥{parseFloat(String(selectedProject.remainingBudget || ((parseFloat(String(selectedProject.budgetOccupied || 0)) - parseFloat(String(selectedProject.budgetExecuted || 0)))))).toFixed(2)}万元</p>
           </div>
         )}
 
