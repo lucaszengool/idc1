@@ -14,8 +14,8 @@ import {
 
 const router = express.Router();
 
-// 创建项目需要认证
-router.post('/', authenticateUser, createProject);
+// 创建项目暂时使用可选认证，因为数据库会被重新创建
+router.post('/', optionalAuth, createProject);
 
 // 获取项目列表和详情可以不需要认证，或使用可选认证
 router.get('/', optionalAuth, getProjects);

@@ -4,6 +4,9 @@ import { Op } from 'sequelize';
 
 export const createProject = async (req: Request, res: Response) => {
   try {
+    console.log('Create project request body:', req.body);
+    console.log('User from request:', req.user);
+
     const {
       projectCode,
       projectName,
@@ -35,6 +38,15 @@ export const createProject = async (req: Request, res: Response) => {
     const finalProjectName = projectName || subProjectName;
     const finalBudgetAmount = parseFloat(budgetOccupied || budgetAmount || 0);
 
+    console.log('Final project data to create:', {
+      finalProjectCode,
+      finalProjectName,
+      finalBudgetAmount,
+      category: category || 'IDC-架构研发',
+      owner,
+      content: content || '项目描述'
+    });
+
     const project = await Project.create({
       projectCode: finalProjectCode,
       projectName: finalProjectName,
@@ -62,9 +74,11 @@ export const createProject = async (req: Request, res: Response) => {
       subProjectName: subProjectName || finalProjectName,
     });
 
+    console.log('Project created successfully:', project.toJSON());
     res.status(201).json({ success: true, data: project });
   } catch (error) {
     console.error('Create project error:', error);
+    console.error('Error details:', error);
     res.status(500).json({ success: false, message: 'Failed to create project' });
   }
 };

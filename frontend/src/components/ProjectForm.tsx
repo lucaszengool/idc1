@@ -23,19 +23,47 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const onFinish = async (values: any) => {
     try {
       setLoading(true);
-      
+
+      console.log('ProjectForm onFinish called with values:', values);
+      console.log('Mode:', mode);
+
       if (mode === 'create') {
-        await projectAPI.create(values);
+        console.log('Calling projectAPI.create...');
+
+        // 处理项目名称的tags模式 - 取第一个值
+        const processedValues = {
+          ...values,
+          projectName: Array.isArray(values.projectName) ? values.projectName[0] : values.projectName
+        };
+
+        console.log('Processed values:', processedValues);
+        const response = await projectAPI.create(processedValues);
+        console.log('Create response:', response);
         message.success('项目创建成功！');
         form.resetFields();
       } else {
-        await projectAPI.update(project!.id, values);
+        console.log('Calling projectAPI.update...');
+        const response = await projectAPI.update(project!.id, values);
+        console.log('Update response:', response);
         message.success('项目更新成功！');
       }
-      
+
       onSuccess?.();
     } catch (error: any) {
-      message.error(error.response?.data?.message || '操作失败，请重试');
+      console.error('ProjectForm error:', error);
+      console.error('Error response:', error.response);
+
+      if (error.response?.status === 401) {
+        message.error('认证失败，请重新登录后重试');
+      } else if (error.response?.status === 403) {
+        message.error('权限不足，无法执行此操作');
+      } else if (error.response?.status === 400) {
+        message.error(error.response?.data?.message || '请求参数错误');
+      } else if (error.response?.status === 500) {
+        message.error('服务器错误，请稍后重试');
+      } else {
+        message.error(error.response?.data?.message || `操作失败: ${error.message}`);
+      }
     } finally {
       setLoading(false);
     }
