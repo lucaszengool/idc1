@@ -20,6 +20,7 @@ import StatisticsOverview from './pages/StatisticsOverview';
 import StatisticsByCategory from './pages/StatisticsByCategory';
 import StatisticsByOwner from './pages/StatisticsByOwner';
 import BudgetAdjustment from './pages/BudgetAdjustment';
+import BudgetManagement from './pages/BudgetManagement';
 import GroupManagement from './pages/GroupManagement';
 import ProjectTransfer from './pages/ProjectTransfer';
 
@@ -49,6 +50,7 @@ function App() {
             <Route path="statistics/by-category" element={<StatisticsByCategory />} />
             <Route path="statistics/by-owner" element={<StatisticsByOwner />} />
             <Route path="budget/adjustment" element={<BudgetAdjustment />} />
+            <Route path="budget/management" element={<BudgetManagement />} />
             <Route path="groups" element={<GroupManagement />} />
             <Route path="project-transfers" element={<ProjectTransfer />} />
 

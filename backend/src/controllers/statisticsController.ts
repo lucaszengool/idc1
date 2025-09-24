@@ -25,6 +25,7 @@ export const getDashboard = async (req: Request, res: Response) => {
     const totalBudgetAmount = totalBudgetRecord ? parseFloat(totalBudgetRecord.totalAmount.toString()) : 0;
     let allocatedBudget = 0;
     let totalExecuted = 0;
+    let totalPredictedExecution = 0; // Add predicted execution total
     const categoryStats: any[] = [];
     const highRiskProjects: any[] = [];
 
@@ -39,18 +40,25 @@ export const getDashboard = async (req: Request, res: Response) => {
         sum + parseFloat(exec.executionAmount), 0);
       totalExecuted += executedAmount;
 
+      // Calculate predicted execution amount from project data
+      // Use acceptanceAmount if available, otherwise use orderAmount, otherwise use budgetOccupied
+      const predictedAmount = parseFloat(project.acceptanceAmount || project.orderAmount || project.budgetOccupied || 0);
+      totalPredictedExecution += predictedAmount;
+
       const executionRate = budgetAmount > 0 ? (executedAmount / budgetAmount) * 100 : 0;
 
-      // Track category stats
+      // Track category stats with executed amounts from execution data
       const category = project.category || project.projectType || '未分类';
       if (categoryMap.has(category)) {
         const cat = categoryMap.get(category);
         cat.totalBudget += budgetAmount;
+        cat.executedAmount += executedAmount; // Track actual executed amounts
         cat.projectCount += 1;
       } else {
         categoryMap.set(category, {
           category,
           totalBudget: budgetAmount,
+          executedAmount, // Track actual executed amounts
           projectCount: 1,
         });
       }
@@ -84,8 +92,9 @@ export const getDashboard = async (req: Request, res: Response) => {
     });
 
     const availableBudget = totalBudgetAmount - allocatedBudget;
-    const remainingBudget = allocatedBudget - totalExecuted;
-    const executionRate = allocatedBudget > 0 ? (totalExecuted / allocatedBudget) * 100 : 0;
+    const remainingBudget = totalBudgetAmount - totalExecuted; // Use total budget instead of allocated
+    const executionRate = totalBudgetAmount > 0 ? (totalExecuted / totalBudgetAmount) * 100 : 0; // Calculate based on total budget
+    const predictedRemainingBudget = totalBudgetAmount - totalPredictedExecution;
 
     res.json({
       success: true,
@@ -96,6 +105,8 @@ export const getDashboard = async (req: Request, res: Response) => {
         已执行金额: totalExecuted,
         剩余预算: remainingBudget,
         预算执行率: parseFloat(executionRate.toFixed(2)),
+        预计执行金额: totalPredictedExecution,
+        预计剩余预算: predictedRemainingBudget,
         项目总数: projects.length,
         categoryStats,
         recentExecutions,

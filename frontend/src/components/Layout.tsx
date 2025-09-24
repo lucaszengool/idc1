@@ -140,19 +140,26 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         ],
       },
       {
-        key: '/budget/adjustment',
+        key: '/budget/management',
         icon: <SwapOutlined />,
-        label: '预算调整',
+        label: '预算管理',
+        children: [
+          {
+            key: '/budget/management?tab=adjustment',
+            icon: <SettingOutlined />,
+            label: '预算调整',
+          },
+          {
+            key: '/budget/management?tab=transfer',
+            icon: <SwapOutlined />,
+            label: '项目转移',
+          },
+        ],
       },
       {
         key: '/groups',
         icon: <TeamOutlined />,
         label: '组管理',
-      },
-      {
-        key: '/project-transfers',
-        icon: <SwapOutlined />,
-        label: '项目转移',
       },
     ];
 

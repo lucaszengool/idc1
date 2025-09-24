@@ -13,6 +13,7 @@ const Dashboard: React.FC = () => {
   const [budgetForm] = Form.useForm();
 
   const currentYear = new Date().getFullYear().toString();
+  const currentUsername = localStorage.getItem('username') || '';
 
   useEffect(() => {
     loadDashboardData();
@@ -115,20 +116,22 @@ const Dashboard: React.FC = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <Title level={2}>预算执行总览</Title>
-        <Button
-          type="primary"
-          icon={<EditOutlined />}
-          onClick={() => {
-            budgetForm.setFieldsValue({ totalAmount: dashboardData?.总预算 || 0 });
-            setIsEditBudgetModalVisible(true);
-          }}
-        >
-          编辑总预算
-        </Button>
+        {currentUsername === 'jessyyang' && (
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => {
+              budgetForm.setFieldsValue({ totalAmount: dashboardData?.总预算 || 0 });
+              setIsEditBudgetModalVisible(true);
+            }}
+          >
+            编辑总预算
+          </Button>
+        )}
       </div>
       
       <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={6}>
+        <Col span={4}>
           <Card>
             <Statistic
               title="总预算（万元）"
@@ -138,36 +141,81 @@ const Dashboard: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col span={4}>
           <Card>
             <Statistic
-              title="已执行金额（万元）"
+              title={
+                <span>
+                  已执行金额（万元）
+                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>财管</span>
+                </span>
+              }
               value={dashboardData.已执行金额}
               precision={2}
               valueStyle={{ color: '#52c41a' }}
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col span={4}>
           <Card>
             <Statistic
-              title="剩余预算（万元）"
+              title={
+                <span>
+                  剩余预算（万元）
+                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>财管</span>
+                </span>
+              }
               value={dashboardData.剩余预算}
               precision={2}
               valueStyle={{ color: '#faad14' }}
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col span={4}>
           <Card>
             <Statistic
-              title="预算执行率"
+              title={
+                <span>
+                  预算执行率
+                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>财管</span>
+                </span>
+              }
               value={dashboardData.预算执行率}
               precision={2}
               suffix="%"
-              valueStyle={{ 
-                color: dashboardData.预算执行率 > 80 ? '#f5222d' : '#52c41a' 
+              valueStyle={{
+                color: dashboardData.预算执行率 > 80 ? '#f5222d' : '#52c41a'
               }}
+            />
+          </Card>
+        </Col>
+        <Col span={4}>
+          <Card>
+            <Statistic
+              title={
+                <span>
+                  预计执行金额（万元）
+                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>架构组</span>
+                </span>
+              }
+              value={dashboardData.预计执行金额}
+              precision={2}
+              valueStyle={{ color: '#722ed1' }}
+            />
+          </Card>
+        </Col>
+        <Col span={4}>
+          <Card>
+            <Statistic
+              title={
+                <span>
+                  预计剩余预算（万元）
+                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>架构组</span>
+                </span>
+              }
+              value={dashboardData.预计剩余预算}
+              precision={2}
+              valueStyle={{ color: '#13c2c2' }}
             />
           </Card>
         </Col>
@@ -188,15 +236,27 @@ const Dashboard: React.FC = () => {
             <Row gutter={16}>
               {dashboardData.categoryStats.map((stat, index) => (
                 <Col span={8} key={index}>
-                  <Statistic
-                    title={stat.category}
-                    value={stat.totalBudget}
-                    precision={2}
-                    suffix="万元"
-                  />
-                  <p style={{ margin: 0, color: '#666' }}>
-                    {stat.projectCount} 个项目
-                  </p>
+                  <div style={{ marginBottom: 16 }}>
+                    <Statistic
+                      title={stat.category}
+                      value={stat.totalBudget}
+                      precision={2}
+                      suffix="万元"
+                      valueStyle={{ fontSize: '20px' }}
+                    />
+                    <div style={{ marginTop: 8 }}>
+                      <Statistic
+                        title="已执行金额"
+                        value={stat.executedAmount || 0}
+                        precision={2}
+                        suffix="万元"
+                        valueStyle={{ fontSize: '14px', color: '#52c41a' }}
+                      />
+                    </div>
+                    <p style={{ margin: 0, color: '#666', marginTop: 8 }}>
+                      {stat.projectCount} 个项目
+                    </p>
+                  </div>
                 </Col>
               ))}
             </Row>

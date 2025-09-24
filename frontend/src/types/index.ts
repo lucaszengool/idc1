@@ -82,11 +82,14 @@ export interface DashboardStats {
   已执行金额: number;
   剩余预算: number;
   预算执行率: number;
+  预计执行金额: number;
+  预计剩余预算: number;
   项目总数: number;
   categoryStats: Array<{
     category: string;
     projectCount: number;
     totalBudget: number;
+    executedAmount: number; // Add executed amount from execution data
   }>;
   recentExecutions: BudgetExecution[];
   highRiskProjects: Array<{
