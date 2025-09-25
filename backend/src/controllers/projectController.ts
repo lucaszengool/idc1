@@ -68,7 +68,7 @@ export const createProject = async (req: Request, res: Response) => {
       orderAmount: parseFloat(orderAmount || '0'),
       acceptanceAmount: parseFloat(acceptanceAmount || '0'),
       contractOrderNumber: contractOrderNumber || '',
-      expectedAcceptanceTime: expectedAcceptanceTime ? new Date(expectedAcceptanceTime) : null,
+      expectedAcceptanceTime: expectedAcceptanceTime ? new Date(expectedAcceptanceTime) : undefined,
       approvalStatus: 'draft' as const, // 默认为草稿状态
       // 向后兼容字段
       category: category || 'IDC-架构研发',

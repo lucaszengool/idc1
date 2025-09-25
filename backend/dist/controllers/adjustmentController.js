@@ -26,20 +26,97 @@ const createAdjustment = async (req, res) => {
                 message: `Adjustment amount (${adjustmentAmount}) exceeds remaining budget (${remainingBudget.toFixed(2)})`
             });
         }
-        const adjustment = await models_1.BudgetAdjustment.create({
-            originalProjectId: parseInt(originalProjectId),
-            newProjectName,
-            adjustmentReason,
-            adjustmentAmount: parseFloat(adjustmentAmount),
-            targetCategory,
-            targetProject,
-            targetSubProject,
-            targetOwner,
-        });
-        const adjustmentWithProject = await models_1.BudgetAdjustment.findByPk(adjustment.id, {
-            include: [{ model: models_1.Project, as: 'originalProject' }],
-        });
-        res.status(201).json({ success: true, data: adjustmentWithProject });
+        // 使用事务确保数据一致性
+        const transaction = await originalProject.sequelize.transaction();
+        try {
+            // 创建预算调整记录
+            const adjustment = await models_1.BudgetAdjustment.create({
+                originalProjectId: parseInt(originalProjectId),
+                newProjectName,
+                adjustmentReason,
+                adjustmentAmount: parseFloat(adjustmentAmount),
+                targetCategory,
+                targetProject,
+                targetSubProject,
+                targetOwner,
+            }, { transaction });
+            // 更新原项目的预算占用（减少）
+            const newBudgetOccupied = budgetOccupied - parseFloat(adjustmentAmount);
+            const newRemainingBudget = newBudgetOccupied - totalExecuted;
+            await originalProject.update({
+                budgetOccupied: newBudgetOccupied,
+                remainingBudget: newRemainingBudget,
+                budgetAmount: newBudgetOccupied // 向后兼容字段
+            }, { transaction });
+            // 创建或更新目标项目
+            let targetProjectRecord = await models_1.Project.findOne({
+                where: {
+                    projectName: targetProject,
+                    category: targetCategory,
+                    owner: targetOwner
+                },
+                transaction
+            });
+            if (targetProjectRecord) {
+                // 如果目标项目存在，增加其预算
+                const targetBudgetOccupied = parseFloat((targetProjectRecord.budgetOccupied || 0).toString());
+                const targetExecutions = await models_1.BudgetExecution.findAll({
+                    where: { projectId: targetProjectRecord.id },
+                    transaction
+                });
+                const targetTotalExecuted = targetExecutions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0);
+                const newTargetBudgetOccupied = targetBudgetOccupied + parseFloat(adjustmentAmount);
+                const newTargetRemainingBudget = newTargetBudgetOccupied - targetTotalExecuted;
+                await targetProjectRecord.update({
+                    budgetOccupied: newTargetBudgetOccupied,
+                    remainingBudget: newTargetRemainingBudget,
+                    budgetAmount: newTargetBudgetOccupied, // 向后兼容字段
+                    subProjectName: targetSubProject || targetProjectRecord.subProjectName
+                }, { transaction });
+            }
+            else {
+                // 如果目标项目不存在，创建新项目
+                const projectCode = `ADJ-${Date.now()}`;
+                targetProjectRecord = await models_1.Project.create({
+                    projectCode,
+                    projectName: targetProject,
+                    projectType: '调整项目',
+                    projectStatus: '进行中',
+                    owner: targetOwner,
+                    members: '',
+                    projectGoal: `通过预算调整创建的项目：${adjustmentReason}`,
+                    projectBackground: `原项目：${originalProject.projectName}，调整金额：${adjustmentAmount}万元`,
+                    projectExplanation: adjustmentReason,
+                    procurementCode: projectCode,
+                    completionStatus: '未结项',
+                    relatedBudgetProject: targetProject,
+                    budgetYear: originalProject.budgetYear || new Date().getFullYear().toString(),
+                    budgetOccupied: parseFloat(adjustmentAmount),
+                    budgetExecuted: 0,
+                    remainingBudget: parseFloat(adjustmentAmount),
+                    orderAmount: 0,
+                    acceptanceAmount: 0,
+                    contractOrderNumber: '',
+                    category: targetCategory,
+                    subProjectName: targetSubProject || targetProject,
+                    budgetAmount: parseFloat(adjustmentAmount), // 向后兼容字段
+                    content: `通过预算调整创建的项目：${adjustmentReason}`,
+                    approvalStatus: 'approved' // 调整项目自动审批
+                }, { transaction });
+            }
+            // 提交事务
+            await transaction.commit();
+            // 重新查询调整记录以包含关联数据
+            const adjustmentWithProject = await models_1.BudgetAdjustment.findByPk(adjustment.id, {
+                include: [{ model: models_1.Project, as: 'originalProject' }],
+            });
+            res.status(201).json({ success: true, data: adjustmentWithProject });
+        }
+        catch (error) {
+            // 回滚事务
+            await transaction.rollback();
+            throw error;
+        }
     }
     catch (error) {
         console.error('Create adjustment error:', error);

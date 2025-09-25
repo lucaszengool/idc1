@@ -9,7 +9,11 @@ const createExecution = async (req, res) => {
         let { voucherUrl } = req.body;
         // Check if project exists and has enough remaining budget
         const project = await models_1.Project.findByPk(projectId, {
-            include: [{ model: models_1.BudgetExecution, as: 'executions' }],
+            include: [{
+                    model: models_1.BudgetExecution,
+                    as: 'executions',
+                    required: false
+                }],
         });
         if (!project) {
             return res.status(404).json({ success: false, message: 'Project not found' });
@@ -39,7 +43,11 @@ const createExecution = async (req, res) => {
         const newTotalExecuted = totalExecuted + parseFloat(executionAmount);
         await project.update({ budgetExecuted: newTotalExecuted });
         const executionWithProject = await models_1.BudgetExecution.findByPk(execution.id, {
-            include: [{ model: models_1.Project, as: 'project' }],
+            include: [{
+                    model: models_1.Project,
+                    as: 'executionProject',
+                    required: false
+                }],
         });
         res.status(201).json({ success: true, data: executionWithProject });
     }
@@ -66,7 +74,11 @@ const getExecutions = async (req, res) => {
             limit: parseInt(limit),
             offset,
             order: [['executionDate', 'DESC']],
-            include: [{ model: models_1.Project, as: 'project' }],
+            include: [{
+                    model: models_1.Project,
+                    as: 'executionProject',
+                    required: false
+                }],
         });
         res.json({
             success: true,
@@ -90,7 +102,11 @@ const getExecutionsByProject = async (req, res) => {
         const executions = await models_1.BudgetExecution.findAll({
             where: { projectId },
             order: [['executionDate', 'DESC']],
-            include: [{ model: models_1.Project, as: 'project' }],
+            include: [{
+                    model: models_1.Project,
+                    as: 'executionProject',
+                    required: false
+                }],
         });
         const totalExecuted = executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0);
         res.json({
@@ -112,14 +128,18 @@ const updateExecution = async (req, res) => {
         const { id } = req.params;
         const { executionAmount, executionDate, description } = req.body;
         const execution = await models_1.BudgetExecution.findByPk(id, {
-            include: [{ model: models_1.Project, as: 'project' }],
+            include: [{
+                    model: models_1.Project,
+                    as: 'executionProject',
+                    required: false
+                }],
         });
         if (!execution) {
             return res.status(404).json({ success: false, message: 'Execution record not found' });
         }
         // Check budget constraints if amount is being changed
         if (executionAmount && parseFloat(executionAmount) !== parseFloat(execution.executionAmount.toString())) {
-            const project = execution.get('project');
+            const project = execution.get('executionProject');
             const otherExecutions = await models_1.BudgetExecution.findAll({
                 where: {
                     projectId: execution.projectId,
@@ -143,14 +163,18 @@ const updateExecution = async (req, res) => {
             description: description || execution.description,
         });
         // 更新项目的budgetExecuted字段
-        const project = execution.get('project');
+        const project = execution.get('executionProject');
         const allExecutions = await models_1.BudgetExecution.findAll({
             where: { projectId: execution.projectId },
         });
         const totalExecuted = allExecutions.reduce((sum, exec) => sum + (exec.id === execution.id ? newAmount : parseFloat(exec.executionAmount.toString())), 0);
         await project.update({ budgetExecuted: totalExecuted });
         const updatedExecution = await models_1.BudgetExecution.findByPk(execution.id, {
-            include: [{ model: models_1.Project, as: 'project' }],
+            include: [{
+                    model: models_1.Project,
+                    as: 'executionProject',
+                    required: false
+                }],
         });
         res.json({ success: true, data: updatedExecution });
     }

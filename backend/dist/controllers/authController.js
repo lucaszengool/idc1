@@ -116,6 +116,7 @@ const loginWithAccessKey = async (req, res) => {
             department: user.department,
             position: user.position,
             phone: user.phone,
+            accessKey: user.accessKey, // 添加 accessKey
             groups: [],
             managedGroups: []
         };
