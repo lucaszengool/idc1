@@ -13,16 +13,28 @@ declare global {
 // 基础认证中间件
 export const authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('=== Authentication Middleware ===');
+    console.log('Headers:', {
+      authorization: req.headers.authorization,
+      'x-access-key': req.headers['x-access-key'],
+      'x-username': req.headers['x-username'],
+      'x-display-name': req.headers['x-display-name']
+    });
+
     const authHeader = req.headers.authorization;
     const accessKey = req.headers['x-access-key'] || authHeader?.replace('Bearer ', '');
 
+    console.log('Extracted access key:', accessKey);
+
     if (!accessKey) {
+      console.log('No access key provided');
       return res.status(401).json({
         success: false,
         message: 'Access key required'
       });
     }
 
+    console.log('Looking up user with access key:', accessKey);
     const user = await User.findOne({
       where: { accessKey, isActive: true },
       include: [
@@ -50,7 +62,10 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
       ]
     });
 
+    console.log('User lookup result:', user ? `Found user: ${user.username}` : 'User not found');
+
     if (!user) {
+      console.log('Invalid access key - user not found or not active');
       return res.status(401).json({
         success: false,
         message: 'Invalid access key'
@@ -58,6 +73,7 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
     }
 
     req.user = user;
+    console.log('Authentication successful for user:', user.username);
     next();
   } catch (error) {
     console.error('Authentication error:', error);
