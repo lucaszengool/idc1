@@ -257,11 +257,16 @@ const deleteProject = async (req, res) => {
         if (!project) {
             return res.status(404).json({ success: false, message: 'Project not found' });
         }
-        // 先删除相关的执行记录
+        // Delete all related records in order
+        // 1. Delete budget executions
         await models_1.BudgetExecution.destroy({ where: { projectId: id } });
-        // 先删除相关的月度执行计划
+        // 2. Delete monthly execution plans
         await models_1.MonthlyExecution.destroy({ where: { projectId: id } });
-        // 然后删除项目
+        // 3. Delete budget adjustments where this project is the original project
+        await models_1.BudgetAdjustment.destroy({ where: { originalProjectId: id } });
+        // 4. Delete project transfers
+        await models_1.ProjectTransfer.destroy({ where: { projectId: id } });
+        // 5. Finally delete the project itself
         await project.destroy();
         res.json({ success: true, message: 'Project deleted successfully' });
     }

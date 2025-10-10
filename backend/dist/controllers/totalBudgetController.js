@@ -5,12 +5,14 @@ const models_1 = require("../models");
 const createOrUpdateTotalBudget = async (req, res) => {
     try {
         const { budgetYear, totalAmount, description = '', createdBy = 'Admin' } = req.body;
-        // Security check: Only jessyyang can update total budget
-        const currentUsername = req.headers['x-username'];
-        if (currentUsername !== 'jessyyang') {
+        // Security check: Only 杨雯宇 can update total budget
+        const encodedDisplayName = req.headers['x-display-name'];
+        // Decode the displayName (it's URL-encoded to handle Chinese characters)
+        const currentDisplayName = encodedDisplayName ? decodeURIComponent(encodedDisplayName) : '';
+        if (currentDisplayName !== '杨雯宇') {
             return res.status(403).json({
                 success: false,
-                message: '无权限：只有用户 jessyyang 可以更改预算总金额'
+                message: '无权限：只有用户 杨雯宇 可以更改预算总金额'
             });
         }
         // Check if total budget for this year already exists

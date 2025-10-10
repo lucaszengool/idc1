@@ -33,7 +33,8 @@ api.interceptors.request.use(
       try {
         const user = JSON.parse(userStr);
         if (user?.displayName) {
-          config.headers['x-display-name'] = user.displayName;
+          // Encode displayName to handle non-ASCII characters (like Chinese)
+          config.headers['x-display-name'] = encodeURIComponent(user.displayName);
         }
       } catch (e) {
         console.warn('Failed to parse user data from localStorage');

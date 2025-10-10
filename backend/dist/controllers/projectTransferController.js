@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBudgetReallocationOptions = exports.rejectProjectTransfer = exports.approveProjectTransfer = exports.getProjectTransfers = exports.initiateProjectTransfer = void 0;
+const sequelize_1 = require("sequelize");
 const models_1 = require("../models");
 const initiateProjectTransfer = async (req, res) => {
     try {
@@ -104,23 +105,25 @@ const getProjectTransfers = async (req, res) => {
         const { userId, groupId, status } = req.query;
         let whereClause = {};
         if (userId) {
+            const userIdNum = parseInt(userId);
             whereClause = {
-                $or: [
-                    { fromUserId: userId },
-                    { toUserId: userId },
-                    { requesterId: userId }
+                [sequelize_1.Op.or]: [
+                    { fromUserId: userIdNum },
+                    { toUserId: userIdNum },
+                    { requesterId: userIdNum }
                 ]
             };
         }
         if (groupId) {
-            if (whereClause.$or) {
+            const groupIdNum = parseInt(groupId);
+            if (whereClause[sequelize_1.Op.or]) {
                 whereClause = {
-                    $and: [
+                    [sequelize_1.Op.and]: [
                         whereClause,
                         {
-                            $or: [
-                                { fromGroupId: groupId },
-                                { toGroupId: groupId }
+                            [sequelize_1.Op.or]: [
+                                { fromGroupId: groupIdNum },
+                                { toGroupId: groupIdNum }
                             ]
                         }
                     ]
@@ -128,9 +131,9 @@ const getProjectTransfers = async (req, res) => {
             }
             else {
                 whereClause = {
-                    $or: [
-                        { fromGroupId: groupId },
-                        { toGroupId: groupId }
+                    [sequelize_1.Op.or]: [
+                        { fromGroupId: groupIdNum },
+                        { toGroupId: groupIdNum }
                     ]
                 };
             }

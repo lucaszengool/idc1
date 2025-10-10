@@ -6,7 +6,9 @@ export const createOrUpdateTotalBudget = async (req: Request, res: Response) => 
     const { budgetYear, totalAmount, description = '', createdBy = 'Admin' } = req.body;
 
     // Security check: Only 杨雯宇 can update total budget
-    const currentDisplayName = req.headers['x-display-name'] as string;
+    const encodedDisplayName = req.headers['x-display-name'] as string;
+    // Decode the displayName (it's URL-encoded to handle Chinese characters)
+    const currentDisplayName = encodedDisplayName ? decodeURIComponent(encodedDisplayName) : '';
     if (currentDisplayName !== '杨雯宇') {
       return res.status(403).json({
         success: false,
