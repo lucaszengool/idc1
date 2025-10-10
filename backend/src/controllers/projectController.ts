@@ -305,29 +305,41 @@ export const updateProject = async (req: Request, res: Response) => {
 
 export const deleteProject = async (req: Request, res: Response) => {
   try {
+    console.log('Delete project request received for ID:', req.params.id);
+    console.log('User:', req.user);
+
     const { id } = req.params;
 
     const project = await Project.findByPk(id);
     if (!project) {
+      console.log('Project not found:', id);
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
 
+    console.log('Deleting project:', project.projectName);
+
     // Delete all related records in order
     // 1. Delete budget executions
+    console.log('Deleting budget executions...');
     await BudgetExecution.destroy({ where: { projectId: id } });
 
     // 2. Delete monthly execution plans
+    console.log('Deleting monthly executions...');
     await MonthlyExecution.destroy({ where: { projectId: id } });
 
     // 3. Delete budget adjustments where this project is the original project
+    console.log('Deleting budget adjustments...');
     await BudgetAdjustment.destroy({ where: { originalProjectId: id } });
 
     // 4. Delete project transfers
+    console.log('Deleting project transfers...');
     await ProjectTransfer.destroy({ where: { projectId: id } });
 
     // 5. Finally delete the project itself
+    console.log('Deleting project record...');
     await project.destroy();
 
+    console.log('Project deleted successfully:', id);
     res.json({ success: true, message: 'Project deleted successfully' });
   } catch (error) {
     console.error('Delete project error:', error);
