@@ -27,6 +27,19 @@ api.interceptors.request.use(
       config.headers['x-username'] = username;
     }
 
+    // 从localStorage获取用户对象并发送displayName
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user?.displayName) {
+          config.headers['x-display-name'] = user.displayName;
+        }
+      } catch (e) {
+        console.warn('Failed to parse user data from localStorage');
+      }
+    }
+
     return config;
   },
   (error) => {

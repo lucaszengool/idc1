@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import { User, Group, ProjectTransfer, Project, Approval } from '../models';
 
 export const initiateProjectTransfer = async (req: Request, res: Response) => {
@@ -124,33 +125,35 @@ export const getProjectTransfers = async (req: Request, res: Response) => {
     let whereClause: any = {};
 
     if (userId) {
+      const userIdNum = parseInt(userId as string);
       whereClause = {
-        $or: [
-          { fromUserId: userId },
-          { toUserId: userId },
-          { requesterId: userId }
+        [Op.or]: [
+          { fromUserId: userIdNum },
+          { toUserId: userIdNum },
+          { requesterId: userIdNum }
         ]
       };
     }
 
     if (groupId) {
-      if (whereClause.$or) {
+      const groupIdNum = parseInt(groupId as string);
+      if (whereClause[Op.or]) {
         whereClause = {
-          $and: [
+          [Op.and]: [
             whereClause,
             {
-              $or: [
-                { fromGroupId: groupId },
-                { toGroupId: groupId }
+              [Op.or]: [
+                { fromGroupId: groupIdNum },
+                { toGroupId: groupIdNum }
               ]
             }
           ]
         };
       } else {
         whereClause = {
-          $or: [
-            { fromGroupId: groupId },
-            { toGroupId: groupId }
+          [Op.or]: [
+            { fromGroupId: groupIdNum },
+            { toGroupId: groupIdNum }
           ]
         };
       }

@@ -44,7 +44,10 @@ const BudgetAdjustmentContent: React.FC<BudgetAdjustmentContentProps> = ({
   const [form] = Form.useForm();
   const [totalBudgetForm] = Form.useForm();
 
-  const currentUsername = localStorage.getItem('username') || '';
+  // Get user object to check displayName
+  const userStr = localStorage.getItem('user');
+  const currentUser = userStr ? JSON.parse(userStr) : null;
+  const currentDisplayName = currentUser?.displayName || '';
 
   const handleProjectSelect = (projectId: number) => {
     const project = projects.find(p => p.id === projectId);
@@ -152,7 +155,7 @@ const BudgetAdjustmentContent: React.FC<BudgetAdjustmentContentProps> = ({
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
-          {currentUsername === 'jessyyang' && (
+          {currentDisplayName === '杨雯宇' && (
             <Button
               type="default"
               icon={<EditOutlined />}
@@ -350,7 +353,7 @@ const BudgetAdjustmentContent: React.FC<BudgetAdjustmentContentProps> = ({
         </Form>
       </Modal>
 
-      {currentUsername === 'jessyyang' && (
+      {currentDisplayName === '杨雯宇' && (
         <Modal
           title={`编辑${currentYear}年总预算`}
           open={isTotalBudgetModalVisible}
