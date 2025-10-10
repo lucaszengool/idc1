@@ -68,65 +68,38 @@ const ProjectList: React.FC = () => {
     console.log('Auth check - accessKey exists:', !!accessKey, 'user exists:', !!user);
 
     if (!accessKey || !user) {
-      console.log('User not logged in, showing login prompt');
-      Modal.confirm({
-        title: '需要登录',
-        content: '删除项目需要登录，是否现在前往登录？',
-        okText: '前往登录',
-        cancelText: '取消',
-        onOk: () => {
-          navigate('/login');
-        },
-      });
+      console.log('User not logged in');
+      message.error('请先登录');
+      navigate('/login');
       return;
     }
 
-    console.log('User is logged in, showing delete confirmation modal');
+    console.log('User is logged in, proceeding with delete');
 
-    Modal.confirm({
-      title: '确认删除',
-      content: '确定要删除这个项目吗？此操作不可撤销。',
-      okText: '删除',
-      cancelText: '取消',
-      okType: 'danger',
-      onOk: async () => {
-        console.log('Delete confirmed for project ID:', id);
-        try {
-          console.log('Calling projectAPI.delete...');
-          const response = await projectAPI.delete(id);
-          console.log('Delete response:', response);
-          message.success('项目删除成功');
-          await loadProjects();
-        } catch (error: any) {
-          console.error('Delete error details:', error);
-          console.error('Error response:', error.response);
-          console.error('Error config:', error.config);
+    try {
+      console.log('Calling projectAPI.delete...');
+      const response = await projectAPI.delete(id);
+      console.log('Delete response:', response);
+      message.success('项目删除成功');
+      await loadProjects();
+    } catch (error: any) {
+      console.error('Delete error details:', error);
+      console.error('Error response:', error.response);
+      console.error('Error config:', error.config);
 
-          if (error.response?.status === 401) {
-            Modal.confirm({
-              title: '认证失败',
-              content: '您的登录已过期，请重新登录后再试',
-              okText: '前往登录',
-              cancelText: '取消',
-              onOk: () => {
-                localStorage.removeItem('accessKey');
-                localStorage.removeItem('user');
-                navigate('/login');
-              },
-            });
-          } else if (error.response?.status === 403) {
-            message.error('权限不足，只有项目负责人和PM可以删除项目');
-          } else if (error.response?.status === 404) {
-            message.error('项目不存在');
-          } else {
-            message.error(error.response?.data?.message || `删除失败: ${error.message}`);
-          }
-        }
-      },
-      onCancel: () => {
-        console.log('Delete cancelled for project ID:', id);
+      if (error.response?.status === 401) {
+        message.error('登录已过期，请重新登录');
+        localStorage.removeItem('accessKey');
+        localStorage.removeItem('user');
+        navigate('/login');
+      } else if (error.response?.status === 403) {
+        message.error('权限不足，只有项目负责人和PM可以删除项目');
+      } else if (error.response?.status === 404) {
+        message.error('项目不存在');
+      } else {
+        message.error(error.response?.data?.message || `删除失败: ${error.message}`);
       }
-    });
+    }
   };
 
   const handleTableChange = (newPagination: any) => {
