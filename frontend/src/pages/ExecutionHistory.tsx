@@ -57,7 +57,8 @@ const ExecutionHistory: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
+    console.log('Delete execution button clicked for ID:', id);
     Modal.confirm({
       title: '确认删除',
       content: '确定要删除这条执行记录吗？此操作不可撤销。',
@@ -65,11 +66,15 @@ const ExecutionHistory: React.FC = () => {
       cancelText: '取消',
       okType: 'danger',
       onOk: async () => {
+        console.log('Delete execution confirmed for ID:', id);
         try {
-          await executionAPI.delete(id);
+          console.log('Calling executionAPI.delete...');
+          const response = await executionAPI.delete(id);
+          console.log('Delete execution response:', response);
           message.success('执行记录删除成功');
-          loadExecutions();
+          await loadExecutions();
         } catch (error: any) {
+          console.error('Delete execution error:', error);
           message.error(error.response?.data?.message || '删除失败');
         }
       },

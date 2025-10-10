@@ -5,6 +5,14 @@ const models_1 = require("../models");
 const createOrUpdateTotalBudget = async (req, res) => {
     try {
         const { budgetYear, totalAmount, description = '', createdBy = 'Admin' } = req.body;
+        // Security check: Only jessyyang can update total budget
+        const currentUsername = req.headers['x-username'];
+        if (currentUsername !== 'jessyyang') {
+            return res.status(403).json({
+                success: false,
+                message: '无权限：只有用户 jessyyang 可以更改预算总金额'
+            });
+        }
         // Check if total budget for this year already exists
         let totalBudget = await models_1.TotalBudget.findOne({ where: { budgetYear } });
         if (totalBudget) {

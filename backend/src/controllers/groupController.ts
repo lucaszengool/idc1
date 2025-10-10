@@ -171,12 +171,12 @@ export const getGroups = async (req: Request, res: Response) => {
 export const addGroupMember = async (req: Request, res: Response) => {
   try {
     const { groupId } = req.params;
-    const { userId, addedBy } = req.body;
+    const { userId, username, displayName, addedBy } = req.body;
 
-    if (!userId || !addedBy) {
+    if (!addedBy) {
       return res.status(400).json({
         success: false,
-        message: 'User ID and adder ID are required'
+        message: 'Adder ID is required'
       });
     }
 
@@ -189,15 +189,6 @@ export const addGroupMember = async (req: Request, res: Response) => {
       });
     }
 
-    // 验证用户是否存在
-    const user = await User.findByPk(userId);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
     // 验证添加者是否为该组的PM
     if (group.pmId !== parseInt(addedBy)) {
       return res.status(403).json({
@@ -206,11 +197,57 @@ export const addGroupMember = async (req: Request, res: Response) => {
       });
     }
 
+    let user: User | null = null;
+
+    // 如果提供了userId，直接使用（旧方式兼容）
+    if (userId) {
+      user = await User.findByPk(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+    }
+    // 如果提供了username和displayName，查找或创建用户（新方式）
+    else if (username && displayName) {
+      if (!username.trim() || !displayName.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Username and display name cannot be empty'
+        });
+      }
+
+      // 查找是否已存在该用户名的用户
+      user = await User.findOne({ where: { username: username.trim() } });
+
+      if (!user) {
+        // 用户不存在，自动创建
+        const crypto = require('crypto');
+        const accessKey = crypto.randomBytes(32).toString('hex');
+
+        user = await User.create({
+          username: username.trim(),
+          displayName: displayName.trim(),
+          role: 'employee', // 默认为员工角色
+          accessKey: accessKey,
+          isActive: true
+        });
+
+        console.log(`Auto-created user: ${username} with display name: ${displayName}`);
+      }
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Either userId or (username and displayName) must be provided'
+      });
+    }
+
     // 检查用户是否已在组中
     const existingMember = await GroupMember.findOne({
       where: {
         groupId,
-        userId
+        userId: user.id
       }
     });
 
@@ -224,7 +261,7 @@ export const addGroupMember = async (req: Request, res: Response) => {
     // 添加用户到组
     const groupMember = await GroupMember.create({
       groupId: parseInt(groupId),
-      userId: parseInt(userId),
+      userId: user.id,
       addedBy: parseInt(addedBy)
     });
 

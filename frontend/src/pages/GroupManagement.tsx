@@ -68,8 +68,6 @@ const GroupManagement: React.FC = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [addMemberModalVisible, setAddMemberModalVisible] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-  const [searchResults, setSearchResults] = useState<User[]>([]);
-  const [searchLoading, setSearchLoading] = useState(false);
 
   const [createForm] = Form.useForm();
   const [addMemberForm] = Form.useForm();
@@ -122,31 +120,23 @@ const GroupManagement: React.FC = () => {
     }
   };
 
-  const searchUsers = async (query: string, groupId: number) => {
-    if (!query.trim()) {
-      setSearchResults([]);
+  const handleAddMember = async (values: { username: string; displayName: string }) => {
+    if (!selectedGroup || !currentUser) return;
+
+    if (!values.username || !values.username.trim()) {
+      message.error('请输入用户名');
       return;
     }
 
-    setSearchLoading(true);
-    try {
-      const response = await axios.get(`${API_BASE_URL}/groups/${groupId}/search-users?query=${query}`);
-      if (response.data.success) {
-        setSearchResults(response.data.data);
-      }
-    } catch (error) {
-      console.error('搜索用户失败:', error);
-    } finally {
-      setSearchLoading(false);
+    if (!values.displayName || !values.displayName.trim()) {
+      message.error('请输入显示名称');
+      return;
     }
-  };
-
-  const handleAddMember = async (values: { userId: number }) => {
-    if (!selectedGroup || !currentUser) return;
 
     try {
       const response = await axios.post(`${API_BASE_URL}/groups/${selectedGroup.id}/members`, {
-        userId: values.userId,
+        username: values.username.trim(),
+        displayName: values.displayName.trim(),
         addedBy: currentUser.id
       });
 
@@ -154,29 +144,36 @@ const GroupManagement: React.FC = () => {
         message.success('成员添加成功');
         setAddMemberModalVisible(false);
         addMemberForm.resetFields();
-        setSearchResults([]);
-        loadGroups(currentUser.id);
+        await loadGroups(currentUser.id);
       }
     } catch (error: any) {
       message.error(error.response?.data?.message || '添加成员失败');
     }
   };
 
-  const handleRemoveMember = async (groupId: number, userId: number, userName: string) => {
+  const handleRemoveMember = (groupId: number, userId: number, userName: string) => {
+    console.log('Remove member button clicked:', { groupId, userId, userName });
     Modal.confirm({
       title: '确认移除成员',
       content: `确定要从组中移除 ${userName} 吗？`,
+      okText: '移除',
+      cancelText: '取消',
+      okType: 'danger',
       onOk: async () => {
+        console.log('Remove member confirmed:', { groupId, userId });
         try {
+          console.log('Calling API to remove member...');
           const response = await axios.delete(`${API_BASE_URL}/groups/${groupId}/members/${userId}`, {
             data: { removedBy: currentUser?.id }
           });
+          console.log('Remove member response:', response);
 
           if (response.data.success) {
             message.success('成员移除成功');
-            loadGroups(currentUser?.id || 0);
+            await loadGroups(currentUser?.id || 0);
           }
         } catch (error: any) {
+          console.error('Remove member error:', error);
           message.error(error.response?.data?.message || '移除成员失败');
         }
       }
@@ -390,7 +387,6 @@ const GroupManagement: React.FC = () => {
         onCancel={() => {
           setAddMemberModalVisible(false);
           addMemberForm.resetFields();
-          setSearchResults([]);
         }}
         footer={null}
         width={600}
@@ -401,42 +397,43 @@ const GroupManagement: React.FC = () => {
           layout="vertical"
         >
           <Form.Item
-            name="userId"
-            label="选择用户"
-            rules={[{ required: true, message: '请选择要添加的用户' }]}
+            name="username"
+            label="用户名"
+            rules={[
+              { required: true, message: '请输入用户名' },
+              { pattern: /^[a-zA-Z0-9_]+$/, message: '用户名只能包含字母、数字和下划线' }
+            ]}
           >
-            <Select
-              placeholder="搜索用户姓名或用户名..."
-              showSearch
-              loading={searchLoading}
-              onSearch={(value) => selectedGroup && searchUsers(value, selectedGroup.id)}
-              filterOption={false}
-              notFoundContent={searchLoading ? '搜索中...' : '请输入关键词搜索用户'}
-            >
-              {searchResults.map((user) => (
-                <Option key={user.id} value={user.id}>
-                  <Space>
-                    <Avatar size="small" icon={<UserOutlined />} />
-                    <span>{user.displayName}</span>
-                    <Text type="secondary">({user.username})</Text>
-                    <Tag color={user.role === 'pm' ? 'gold' : 'blue'}>
-                      {user.role === 'pm' ? 'PM' : '员工'}
-                    </Tag>
-                    {user.department && (
-                      <Tag color="green">{user.department}</Tag>
-                    )}
-                  </Space>
-                </Option>
-              ))}
-            </Select>
+            <Input
+              placeholder="请输入用户名（例如：zhangsan）"
+              maxLength={50}
+            />
           </Form.Item>
+
+          <Form.Item
+            name="displayName"
+            label="显示名称"
+            rules={[{ required: true, message: '请输入显示名称' }]}
+          >
+            <Input
+              placeholder="请输入显示名称（例如：张三）"
+              maxLength={50}
+            />
+          </Form.Item>
+
+          <Alert
+            message="提示"
+            description="输入用户名和显示名称后，如果该用户不存在，系统会自动创建该用户账号。用户首次登录时使用该用户名即可。"
+            type="info"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
 
           <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
             <Space>
               <Button onClick={() => {
                 setAddMemberModalVisible(false);
                 addMemberForm.resetFields();
-                setSearchResults([]);
               }}>
                 取消
               </Button>

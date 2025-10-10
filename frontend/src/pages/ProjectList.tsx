@@ -58,7 +58,7 @@ const ProjectList: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     console.log('Delete button clicked for project ID:', id);
 
     // 检查用户是否已登录
@@ -91,7 +91,7 @@ const ProjectList: React.FC = () => {
           const response = await projectAPI.delete(id);
           console.log('Delete response:', response);
           message.success('项目删除成功');
-          loadProjects();
+          await loadProjects();
         } catch (error: any) {
           console.error('Delete error details:', error);
           console.error('Error response:', error.response);

@@ -36,6 +36,7 @@ const BudgetAdjustment: React.FC = () => {
   const [totalBudgetForm] = Form.useForm();
 
   const currentYear = new Date().getFullYear().toString();
+  const currentUsername = localStorage.getItem('username') || '';
 
   useEffect(() => {
     loadProjects();
@@ -161,7 +162,7 @@ const BudgetAdjustment: React.FC = () => {
       title: '调整金额（万元）',
       dataIndex: 'adjustmentAmount',
       key: 'adjustmentAmount',
-      render: (amount: number) => `¥${amount.toFixed(2)}`,
+      render: (amount: number | string) => `¥${parseFloat(String(amount || 0)).toFixed(2)}`,
     },
     {
       title: '目标类别',
@@ -187,17 +188,19 @@ const BudgetAdjustment: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <Title level={2}>预算调整管理</Title>
         <div>
-          <Button
-            type="default"
-            icon={<EditOutlined />}
-            onClick={() => {
-              totalBudgetForm.setFieldsValue({ totalAmount: totalBudget });
-              setIsTotalBudgetModalVisible(true);
-            }}
-            style={{ marginRight: 8 }}
-          >
-            编辑总预算
-          </Button>
+          {currentUsername === 'jessyyang' && (
+            <Button
+              type="default"
+              icon={<EditOutlined />}
+              onClick={() => {
+                totalBudgetForm.setFieldsValue({ totalAmount: totalBudget });
+                setIsTotalBudgetModalVisible(true);
+              }}
+              style={{ marginRight: 8 }}
+            >
+              编辑总预算
+            </Button>
+          )}
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -275,7 +278,7 @@ const BudgetAdjustment: React.FC = () => {
             >
               {projects.map(project => (
                 <Option key={project.id} value={project.id}>
-                  {project.projectName} (剩余: ¥{project.remainingBudget?.toFixed(2) || '0.00'}万)
+                  {project.projectName} (剩余: ¥{parseFloat(String(project.remainingBudget || 0)).toFixed(2)}万)
                 </Option>
               ))}
             </Select>
@@ -287,7 +290,7 @@ const BudgetAdjustment: React.FC = () => {
                 <Col span={8}>
                   <Statistic
                     title="预算占用"
-                    value={selectedProject.budgetOccupied}
+                    value={parseFloat(String(selectedProject.budgetOccupied || 0))}
                     precision={2}
                     suffix="万元"
                   />
@@ -295,7 +298,7 @@ const BudgetAdjustment: React.FC = () => {
                 <Col span={8}>
                   <Statistic
                     title="已执行"
-                    value={selectedProject.budgetExecuted}
+                    value={parseFloat(String(selectedProject.budgetExecuted || 0))}
                     precision={2}
                     suffix="万元"
                   />
@@ -303,7 +306,7 @@ const BudgetAdjustment: React.FC = () => {
                 <Col span={8}>
                   <Statistic
                     title="可调整余额"
-                    value={selectedProject.remainingBudget}
+                    value={parseFloat(String(selectedProject.remainingBudget || 0))}
                     precision={2}
                     suffix="万元"
                     valueStyle={{ color: '#52c41a' }}
@@ -331,8 +334,11 @@ const BudgetAdjustment: React.FC = () => {
                   { required: true, message: '请输入调整金额' },
                   {
                     validator: (_, value) => {
-                      if (selectedProject && value > selectedProject.remainingBudget) {
-                        return Promise.reject('调整金额不能超过项目剩余预算');
+                      if (selectedProject) {
+                        const remaining = parseFloat(String(selectedProject.remainingBudget || 0));
+                        if (value > remaining) {
+                          return Promise.reject('调整金额不能超过项目剩余预算');
+                        }
                       }
                       return Promise.resolve();
                     }
@@ -341,7 +347,7 @@ const BudgetAdjustment: React.FC = () => {
               >
                 <InputNumber
                   min={0}
-                  max={selectedProject?.remainingBudget || 0}
+                  max={parseFloat(String(selectedProject?.remainingBudget || 0))}
                   precision={2}
                   style={{ width: '100%' }}
                   placeholder="输入调整金额"
@@ -416,45 +422,47 @@ const BudgetAdjustment: React.FC = () => {
         </Form>
       </Modal>
 
-      <Modal
-        title={`编辑${currentYear}年总预算`}
-        open={isTotalBudgetModalVisible}
-        onCancel={() => {
-          setIsTotalBudgetModalVisible(false);
-          totalBudgetForm.resetFields();
-        }}
-        footer={null}
-      >
-        <Form form={totalBudgetForm} onFinish={handleTotalBudgetUpdate} layout="vertical">
-          <Form.Item
-            label="总预算金额（万元）"
-            name="totalAmount"
-            rules={[
-              { required: true, message: '请输入总预算金额' },
-              { type: 'number', min: 0, message: '总预算必须大于0' }
-            ]}
-          >
-            <InputNumber
-              min={0}
-              precision={2}
-              style={{ width: '100%' }}
-              placeholder="输入总预算金额"
-            />
-          </Form.Item>
-
-          <div style={{ textAlign: 'right', marginTop: 24 }}>
-            <Button
-              onClick={() => setIsTotalBudgetModalVisible(false)}
-              style={{ marginRight: 8 }}
+      {currentUsername === 'jessyyang' && (
+        <Modal
+          title={`编辑${currentYear}年总预算`}
+          open={isTotalBudgetModalVisible}
+          onCancel={() => {
+            setIsTotalBudgetModalVisible(false);
+            totalBudgetForm.resetFields();
+          }}
+          footer={null}
+        >
+          <Form form={totalBudgetForm} onFinish={handleTotalBudgetUpdate} layout="vertical">
+            <Form.Item
+              label="总预算金额（万元）"
+              name="totalAmount"
+              rules={[
+                { required: true, message: '请输入总预算金额' },
+                { type: 'number', min: 0, message: '总预算必须大于0' }
+              ]}
             >
-              取消
-            </Button>
-            <Button type="primary" htmlType="submit" loading={loading}>
-              更新总预算
-            </Button>
-          </div>
-        </Form>
-      </Modal>
+              <InputNumber
+                min={0}
+                precision={2}
+                style={{ width: '100%' }}
+                placeholder="输入总预算金额"
+              />
+            </Form.Item>
+
+            <div style={{ textAlign: 'right', marginTop: 24 }}>
+              <Button
+                onClick={() => setIsTotalBudgetModalVisible(false)}
+                style={{ marginRight: 8 }}
+              >
+                取消
+              </Button>
+              <Button type="primary" htmlType="submit" loading={loading}>
+                更新总预算
+              </Button>
+            </div>
+          </Form>
+        </Modal>
+      )}
     </div>
   );
 };

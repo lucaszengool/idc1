@@ -20,6 +20,13 @@ api.interceptors.request.use(
     if (accessKey) {
       config.headers['x-access-key'] = accessKey;
     }
+
+    // 从localStorage获取用户名
+    const username = localStorage.getItem('username');
+    if (username) {
+      config.headers['x-username'] = username;
+    }
+
     return config;
   },
   (error) => {

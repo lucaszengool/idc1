@@ -5,6 +5,15 @@ export const createOrUpdateTotalBudget = async (req: Request, res: Response) => 
   try {
     const { budgetYear, totalAmount, description = '', createdBy = 'Admin' } = req.body;
 
+    // Security check: Only jessyyang can update total budget
+    const currentUsername = req.headers['x-username'] as string;
+    if (currentUsername !== 'jessyyang') {
+      return res.status(403).json({
+        success: false,
+        message: '无权限：只有用户 jessyyang 可以更改预算总金额'
+      });
+    }
+
     // Check if total budget for this year already exists
     let totalBudget = await TotalBudget.findOne({ where: { budgetYear } });
 
