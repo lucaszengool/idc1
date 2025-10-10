@@ -24,7 +24,8 @@ api.interceptors.request.use(
     // 从localStorage获取用户名
     const username = localStorage.getItem('username');
     if (username) {
-      config.headers['x-username'] = username;
+      // Encode username to handle non-ASCII characters (like Chinese)
+      config.headers['x-username'] = encodeURIComponent(username);
     }
 
     // 从localStorage获取用户对象并发送displayName
