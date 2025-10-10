@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Project, BudgetExecution, MonthlyExecution } from '../models';
+import { Project, BudgetExecution, MonthlyExecution, BudgetAdjustment, ProjectTransfer } from '../models';
 import { Op } from 'sequelize';
 
 export const createProject = async (req: Request, res: Response) => {
@@ -312,14 +312,29 @@ export const deleteProject = async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
 
-    // 先删除相关的执行记录
+    // Delete all related records in order
+    // 1. Delete budget executions
     await BudgetExecution.destroy({ where: { projectId: id } });
 
-    // 先删除相关的月度执行计划
+    // 2. Delete monthly execution plans
     await MonthlyExecution.destroy({ where: { projectId: id } });
 
-    // 然后删除项目
+    // 3. Delete budget adjustments (both as original project and related adjustments)
+    await BudgetAdjustment.destroy({
+      where: {
+        [Op.or]: [
+          { originalProjectId: id },
+          { projectId: id }
+        ]
+      }
+    });
+
+    // 4. Delete project transfers
+    await ProjectTransfer.destroy({ where: { projectId: id } });
+
+    // 5. Finally delete the project itself
     await project.destroy();
+
     res.json({ success: true, message: 'Project deleted successfully' });
   } catch (error) {
     console.error('Delete project error:', error);
