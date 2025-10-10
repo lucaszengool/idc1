@@ -319,15 +319,8 @@ export const deleteProject = async (req: Request, res: Response) => {
     // 2. Delete monthly execution plans
     await MonthlyExecution.destroy({ where: { projectId: id } });
 
-    // 3. Delete budget adjustments (both as original project and related adjustments)
-    await BudgetAdjustment.destroy({
-      where: {
-        [Op.or]: [
-          { originalProjectId: id },
-          { projectId: id }
-        ]
-      }
-    });
+    // 3. Delete budget adjustments where this project is the original project
+    await BudgetAdjustment.destroy({ where: { originalProjectId: id } });
 
     // 4. Delete project transfers
     await ProjectTransfer.destroy({ where: { projectId: id } });
