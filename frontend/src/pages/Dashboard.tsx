@@ -147,7 +147,7 @@ const Dashboard: React.FC = () => {
               title={
                 <span>
                   已执行金额（万元）
-                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>财管</span>
+                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>(for 财管)</span>
                 </span>
               }
               value={dashboardData.已执行金额}
@@ -162,7 +162,7 @@ const Dashboard: React.FC = () => {
               title={
                 <span>
                   剩余预算（万元）
-                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>财管</span>
+                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>(for 财管)</span>
                 </span>
               }
               value={dashboardData.剩余预算}
@@ -177,7 +177,7 @@ const Dashboard: React.FC = () => {
               title={
                 <span>
                   预算执行率
-                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>财管</span>
+                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>(for 财管)</span>
                 </span>
               }
               value={dashboardData.预算执行率}
@@ -195,7 +195,7 @@ const Dashboard: React.FC = () => {
               title={
                 <span>
                   预计执行金额（万元）
-                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>架构组</span>
+                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>(for 架构组内部)</span>
                 </span>
               }
               value={dashboardData.预计执行金额}
@@ -210,7 +210,7 @@ const Dashboard: React.FC = () => {
               title={
                 <span>
                   预计剩余预算（万元）
-                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>架构组</span>
+                  <span style={{ fontSize: '10px', color: '#666', marginLeft: 4 }}>(for 架构组内部)</span>
                 </span>
               }
               value={dashboardData.预计剩余预算}

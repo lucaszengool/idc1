@@ -253,10 +253,17 @@ const ProjectTransfer: React.FC = () => {
           <Space direction="vertical" style={{ width: '100%' }}>
             <Form.Item
               name="projectId"
-              label="选择项目"
-              rules={[{ required: true, message: '请选择要转移的项目' }]}
+              label="选择项目（可选择已有项目或输入新项目名称）"
+              rules={[{ required: true, message: '请选择或输入项目名称' }]}
+              extra="可以从下拉菜单选择已有项目，或直接输入新项目名称"
             >
-              <Select placeholder="选择项目" showSearch optionFilterProp="children">
+              <Select
+                placeholder="选择项目或输入新项目名称"
+                showSearch
+                optionFilterProp="children"
+                mode="tags"
+                maxTagCount={1}
+              >
                 {projects.map((project) => (
                   <Option key={project.id} value={project.id}>
                     {project.projectName} ({project.projectCode})
