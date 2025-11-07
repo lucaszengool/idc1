@@ -41,6 +41,7 @@ export interface BudgetExecution {
   projectId: number;
   executionAmount: number;
   executionDate: string;
+  executionStatus: string; // 执行情况：合同签订付款20%、方案设计60%、样机测试完成20%
   description: string;
   voucherUrl?: string;
   createdBy: string;

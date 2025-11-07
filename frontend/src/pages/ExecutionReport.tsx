@@ -42,6 +42,7 @@ const ExecutionReport: React.FC = () => {
       formData.append('projectId', values.projectId.toString());
       formData.append('executionAmount', values.executionAmount.toString());
       formData.append('executionDate', values.executionDate.format('YYYY-MM-DD'));
+      formData.append('executionStatus', values.executionStatus);
       formData.append('description', values.description);
       formData.append('createdBy', values.createdBy);
       
@@ -141,6 +142,18 @@ const ExecutionReport: React.FC = () => {
             placeholder="请选择执行日期"
             disabledDate={(current) => current && current > dayjs().endOf('day')}
           />
+        </Form.Item>
+
+        <Form.Item
+          name="executionStatus"
+          label="执行情况"
+          rules={[{ required: true, message: '请选择执行情况' }]}
+        >
+          <Select placeholder="请选择执行情况">
+            <Option value="合同签订付款20%">合同签订付款20%</Option>
+            <Option value="方案设计60%">方案设计60%</Option>
+            <Option value="样机测试完成20%">样机测试完成20%</Option>
+          </Select>
         </Form.Item>
 
         <Form.Item

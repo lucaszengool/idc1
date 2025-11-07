@@ -69,8 +69,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     }
   };
 
+  // 根据需求，编辑模式下所有项目信息不可修改
+  const isReadOnly = mode === 'edit';
+
   return (
-    <Card title={mode === 'create' ? '创建新项目' : '编辑项目'}>
+    <Card
+      title={mode === 'create' ? '创建新项目' : '查看项目信息'}
+      extra={isReadOnly && <span style={{ color: '#ff4d4f', fontSize: '14px' }}>项目信息不可修改，如需调整预算请使用"预算调整"功能</span>}
+    >
       <Form
         form={form}
         layout="vertical"
@@ -82,7 +88,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           label="项目分类"
           rules={[{ required: true, message: '请选择项目分类' }]}
         >
-          <Select placeholder="请选择项目分类">
+          <Select placeholder="请选择项目分类" disabled={isReadOnly}>
             <Option value="IDC-架构研发">IDC-架构研发</Option>
             <Option value="高校合作">高校合作</Option>
             <Option value="IDC运营-研发">IDC运营-研发</Option>
@@ -101,6 +107,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             allowClear
             maxTagCount={1}
             optionFilterProp="children"
+            disabled={isReadOnly}
             filterOption={(input, option) =>
               (option?.children as unknown as string).toLowerCase().includes(input.toLowerCase())
             }
@@ -131,7 +138,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           label="子项目名称"
           rules={[{ required: true, message: '请输入子项目名称' }]}
         >
-          <Input placeholder="请输入子项目名称" />
+          <Input placeholder="请输入子项目名称" disabled={isReadOnly} />
         </Form.Item>
 
         <Form.Item
@@ -139,7 +146,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           label="项目负责人"
           rules={[{ required: true, message: '请输入项目负责人' }]}
         >
-          <Input placeholder="请输入项目负责人" />
+          <Input placeholder="请输入项目负责人" disabled={isReadOnly} />
         </Form.Item>
 
         <Form.Item
@@ -155,6 +162,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             style={{ width: '100%' }}
             precision={2}
             min={0}
+            disabled={isReadOnly}
           />
         </Form.Item>
 
@@ -166,20 +174,23 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           <TextArea
             rows={4}
             placeholder="请详细描述项目内容"
+            disabled={isReadOnly}
           />
         </Form.Item>
 
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            size="large"
-            style={{ width: '100%' }}
-          >
-            {mode === 'create' ? '创建项目' : '更新项目'}
-          </Button>
-        </Form.Item>
+        {!isReadOnly && (
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              size="large"
+              style={{ width: '100%' }}
+            >
+              {mode === 'create' ? '创建项目' : '更新项目'}
+            </Button>
+          </Form.Item>
+        )}
       </Form>
     </Card>
   );

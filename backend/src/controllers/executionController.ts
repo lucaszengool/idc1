@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 
 export const createExecution = async (req: Request, res: Response) => {
   try {
-    const { projectId, executionAmount, executionDate, description, createdBy } = req.body;
+    const { projectId, executionAmount, executionDate, executionStatus, description, createdBy } = req.body;
     let { voucherUrl } = req.body;
 
     // Check if project exists and has enough remaining budget
@@ -40,6 +40,7 @@ export const createExecution = async (req: Request, res: Response) => {
       projectId: parseInt(projectId),
       executionAmount: parseFloat(executionAmount),
       executionDate: new Date(executionDate),
+      executionStatus,
       description,
       voucherUrl,
       createdBy,
@@ -136,7 +137,7 @@ export const getExecutionsByProject = async (req: Request, res: Response) => {
 export const updateExecution = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { executionAmount, executionDate, description } = req.body;
+    const { executionAmount, executionDate, executionStatus, description } = req.body;
 
     const execution = await BudgetExecution.findByPk(id, {
       include: [{
@@ -177,6 +178,7 @@ export const updateExecution = async (req: Request, res: Response) => {
     await execution.update({
       executionAmount: newAmount,
       executionDate: executionDate ? new Date(executionDate) : execution.executionDate,
+      executionStatus: executionStatus || execution.executionStatus,
       description: description || execution.description,
     });
 
