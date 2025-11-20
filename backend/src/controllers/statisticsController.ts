@@ -47,19 +47,33 @@ export const getDashboard = async (req: Request, res: Response) => {
 
       const executionRate = budgetAmount > 0 ? (executedAmount / budgetAmount) * 100 : 0;
 
-      // Track category stats with executed amounts from execution data
+      // Track category stats with executed amounts from execution data and subprojects
       const category = project.category || project.projectType || '未分类';
       if (categoryMap.has(category)) {
         const cat = categoryMap.get(category);
         cat.totalBudget += budgetAmount;
         cat.executedAmount += executedAmount; // Track actual executed amounts
         cat.projectCount += 1;
+        cat.projects.push({
+          id: project.id,
+          subProjectName: project.subProjectName || project.projectName,
+          projectName: project.projectName,
+          budgetAmount,
+          executedAmount,
+        });
       } else {
         categoryMap.set(category, {
           category,
           totalBudget: budgetAmount,
           executedAmount, // Track actual executed amounts
           projectCount: 1,
+          projects: [{
+            id: project.id,
+            subProjectName: project.subProjectName || project.projectName,
+            projectName: project.projectName,
+            budgetAmount,
+            executedAmount,
+          }],
         });
       }
 

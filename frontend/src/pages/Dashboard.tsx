@@ -222,41 +222,63 @@ const Dashboard: React.FC = () => {
       </Row>
 
       <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="项目总数"
-              value={dashboardData.项目总数}
-              valueStyle={{ color: '#722ed1' }}
-            />
-          </Card>
-        </Col>
-        <Col span={18}>
-          <Card title="各分类预算分布">
+        <Col span={24}>
+          <Card title="2026年研发费预算评审目录">
             <Row gutter={16}>
               {dashboardData.categoryStats.map((stat, index) => (
                 <Col span={8} key={index}>
-                  <div style={{ marginBottom: 16 }}>
-                    <Statistic
-                      title={stat.category}
-                      value={stat.totalBudget}
-                      precision={2}
-                      suffix="万元"
-                      valueStyle={{ fontSize: '20px' }}
-                    />
-                    <div style={{ marginTop: 8 }}>
-                      <Statistic
-                        title="已执行金额"
-                        value={stat.executedAmount || 0}
-                        precision={2}
-                        suffix="万元"
-                        valueStyle={{ fontSize: '14px', color: '#52c41a' }}
-                      />
+                  <Card
+                    type="inner"
+                    title={
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{stat.category}</span>
+                        <span style={{ fontSize: '14px', color: '#1890ff' }}>
+                          {stat.totalBudget.toFixed(0)}万元
+                        </span>
+                      </div>
+                    }
+                    style={{ marginBottom: 16 }}
+                  >
+                    {stat.projects && stat.projects.map((project: any, pIndex: number) => (
+                      <div
+                        key={pIndex}
+                        style={{
+                          marginBottom: 12,
+                          paddingBottom: 12,
+                          borderBottom: pIndex < stat.projects.length - 1 ? '1px solid #f0f0f0' : 'none'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div style={{ flex: 1, marginRight: 8 }}>
+                            <div style={{ fontSize: '14px', fontWeight: 500, marginBottom: 4 }}>
+                              {project.projectName}
+                            </div>
+                            {project.subProjectName && project.subProjectName !== project.projectName && (
+                              <div style={{ fontSize: '12px', color: '#666' }}>
+                                子项目: {project.subProjectName}
+                              </div>
+                            )}
+                          </div>
+                          <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                            <div style={{ fontSize: '14px', color: '#1890ff', fontWeight: 500 }}>
+                              {project.budgetAmount.toFixed(0)}万
+                            </div>
+                            {project.executedAmount > 0 && (
+                              <div style={{ fontSize: '12px', color: '#52c41a' }}>
+                                已执行: {project.executedAmount.toFixed(2)}万
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #f0f0f0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#666' }}>
+                        <span>{stat.projectCount} 个子项目</span>
+                        <span>已执行: {stat.executedAmount.toFixed(2)}万元</span>
+                      </div>
                     </div>
-                    <p style={{ margin: 0, color: '#666', marginTop: 8 }}>
-                      {stat.projectCount} 个项目
-                    </p>
-                  </div>
+                  </Card>
                 </Col>
               ))}
             </Row>

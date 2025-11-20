@@ -91,6 +91,13 @@ export interface DashboardStats {
     projectCount: number;
     totalBudget: number;
     executedAmount: number; // Add executed amount from execution data
+    projects: Array<{
+      id: number;
+      projectName: string;
+      subProjectName: string;
+      budgetAmount: number;
+      executedAmount: number;
+    }>;
   }>;
   recentExecutions: BudgetExecution[];
   highRiskProjects: Array<{
