@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.optionalAuth = exports.requirePMRole = exports.checkProjectPermission = exports.authenticateUser = void 0;
+exports.checkDeletePermission = exports.optionalAuth = exports.requirePMRole = exports.checkProjectPermission = exports.authenticateUser = void 0;
 const models_1 = require("../models");
 // 基础认证中间件
 const authenticateUser = async (req, res, next) => {
@@ -194,4 +194,34 @@ const optionalAuth = async (req, res, next) => {
     }
 };
 exports.optionalAuth = optionalAuth;
+// 检查是否为杨雯宇账号（只有她可以删除）
+const checkDeletePermission = async (req, res, next) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: '请先登录后再进行此操作'
+            });
+        }
+        // 只允许 yangwenyu 账号删除
+        const allowedUsernames = ['yangwenyu', '杨雯宇'];
+        if (!allowedUsernames.includes(user.username) && !allowedUsernames.includes(user.displayName)) {
+            return res.status(403).json({
+                success: false,
+                message: '您没有删除权限。只有管理员可以删除数据。'
+            });
+        }
+        console.log(`Delete permission granted for user: ${user.username}`);
+        next();
+    }
+    catch (error) {
+        console.error('Delete permission check error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Permission check failed'
+        });
+    }
+};
+exports.checkDeletePermission = checkDeletePermission;
 //# sourceMappingURL=authMiddleware.js.map

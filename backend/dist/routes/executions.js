@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const executionController_1 = require("../controllers/executionController");
+const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = express_1.default.Router();
 // Configure multer for file uploads
 const storage = multer_1.default.diskStorage({
@@ -37,6 +38,6 @@ router.post('/', upload.single('voucher'), executionController_1.createExecution
 router.get('/', executionController_1.getExecutions);
 router.get('/project/:projectId', executionController_1.getExecutionsByProject);
 router.put('/:id', executionController_1.updateExecution);
-router.delete('/:id', executionController_1.deleteExecution);
+router.delete('/:id', authMiddleware_1.optionalAuth, authMiddleware_1.checkDeletePermission, executionController_1.deleteExecution);
 exports.default = router;
 //# sourceMappingURL=executions.js.map

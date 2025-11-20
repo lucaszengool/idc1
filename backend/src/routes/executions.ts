@@ -8,6 +8,7 @@ import {
   updateExecution,
   deleteExecution,
 } from '../controllers/executionController';
+import { optionalAuth, checkDeletePermission } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
@@ -42,6 +43,6 @@ router.post('/', upload.single('voucher'), createExecution);
 router.get('/', getExecutions);
 router.get('/project/:projectId', getExecutionsByProject);
 router.put('/:id', updateExecution);
-router.delete('/:id', deleteExecution);
+router.delete('/:id', optionalAuth, checkDeletePermission, deleteExecution);
 
 export default router;

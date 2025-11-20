@@ -221,3 +221,35 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     next(); // 继续执行，即使认证失败
   }
 };
+
+// 检查是否为杨雯宇账号（只有她可以删除）
+export const checkDeletePermission = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: '请先登录后再进行此操作'
+      });
+    }
+
+    // 只允许 yangwenyu 账号删除
+    const allowedUsernames = ['yangwenyu', '杨雯宇'];
+    if (!allowedUsernames.includes(user.username) && !allowedUsernames.includes(user.displayName)) {
+      return res.status(403).json({
+        success: false,
+        message: '您没有删除权限。只有管理员可以删除数据。'
+      });
+    }
+
+    console.log(`Delete permission granted for user: ${user.username}`);
+    next();
+  } catch (error) {
+    console.error('Delete permission check error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Permission check failed'
+    });
+  }
+};

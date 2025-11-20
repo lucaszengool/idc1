@@ -21,6 +21,12 @@ const ExecutionHistory: React.FC = () => {
     endDate: '',
   });
 
+  // 获取当前用户信息
+  const currentUsername = localStorage.getItem('username') || '';
+  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const canDelete = currentUsername === 'yangwenyu' || currentUser.username === 'yangwenyu' ||
+                    currentUsername === '杨雯宇' || currentUser.displayName === '杨雯宇';
+
   useEffect(() => {
     loadExecutions();
   }, [pagination.current, pagination.pageSize, filters]);
@@ -147,14 +153,18 @@ const ExecutionHistory: React.FC = () => {
       title: '操作',
       key: 'action',
       render: (_: any, record: BudgetExecution) => (
-        <Button
-          icon={<DeleteOutlined />}
-          onClick={() => handleDelete(record.id)}
-          danger
-          size="small"
-        >
-          删除
-        </Button>
+        canDelete ? (
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.id)}
+            danger
+            size="small"
+          >
+            删除
+          </Button>
+        ) : (
+          <span style={{ color: '#999' }}>无权限</span>
+        )
       ),
     },
   ];
