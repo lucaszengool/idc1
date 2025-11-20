@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, theme, Dropdown, Avatar, Typography, Space, Button, Modal, Select, message } from 'antd';
+import { Layout, Menu, theme, Typography, Space, Button, Select, message } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import {
   DashboardOutlined,
-  ProjectOutlined,
-  PlusOutlined,
   BarChartOutlined,
   FileDoneOutlined,
   SwapOutlined,
   TeamOutlined,
-  UserOutlined,
   LogoutOutlined,
-  SettingOutlined,
   CrownOutlined
 } from '@ant-design/icons';
 
@@ -84,23 +80,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         label: '首页Dashboard',
       },
       {
-        key: '/projects',
-        icon: <ProjectOutlined />,
-        label: '项目管理',
-        children: [
-          {
-            key: '/projects/list',
-            icon: <FileDoneOutlined />,
-            label: '项目列表',
-          },
-          {
-            key: '/projects/create',
-            icon: <PlusOutlined />,
-            label: '创建项目',
-          },
-        ],
-      },
-      {
         key: '/execution',
         icon: <BarChartOutlined />,
         label: '执行管理',
@@ -143,18 +122,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         key: '/budget/management',
         icon: <SwapOutlined />,
         label: '预算管理',
-        children: [
-          {
-            key: '/budget/management?tab=adjustment',
-            icon: <SettingOutlined />,
-            label: '预算调整',
-          },
-          {
-            key: '/budget/management?tab=transfer',
-            icon: <SwapOutlined />,
-            label: '项目转移',
-          },
-        ],
       },
       {
         key: '/groups',

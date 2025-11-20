@@ -45,7 +45,7 @@ export interface ProjectAttributes {
     createdAt: Date;
     updatedAt: Date;
 }
-export interface ProjectCreationAttributes extends Optional<ProjectAttributes, 'id' | 'ownerId' | 'groupId' | 'contractOrderNumber' | 'expectedAcceptanceTime' | 'septemberActualExecution' | 'octoberPlan' | 'novemberPlan' | 'decemberPlan' | 'septemberActual' | 'octoberActual' | 'novemberActual' | 'decemberActual' | 'riskLevel' | 'priority' | 'submittedBy' | 'approvedBy' | 'approvedAt' | 'rejectionReason' | 'category' | 'subProjectName' | 'budgetAmount' | 'content' | 'createdAt' | 'updatedAt'> {
+export interface ProjectCreationAttributes extends Optional<ProjectAttributes, 'id' | 'ownerId' | 'groupId' | 'contractOrderNumber' | 'expectedAcceptanceTime' | 'septemberActualExecution' | 'octoberPlan' | 'novemberPlan' | 'decemberPlan' | 'septemberActual' | 'octoberActual' | 'novemberActual' | 'decemberActual' | 'riskLevel' | 'priority' | 'submittedBy' | 'approvedBy' | 'approvedAt' | 'rejectionReason' | 'category' | 'subProjectName' | 'budgetAmount' | 'content' | 'remainingBudget' | 'createdAt' | 'updatedAt'> {
 }
 export declare class Project extends Model<ProjectAttributes, ProjectCreationAttributes> implements ProjectAttributes {
     id: number;

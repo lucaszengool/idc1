@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Select, InputNumber, DatePicker, Input, Button, Upload, Card, message } from 'antd';
+import { Form, Select, InputNumber, Input, Button, Upload, Card, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { projectAPI, executionAPI } from '../services/api';
 import { Project } from '../types';
-import dayjs from 'dayjs';
 
-const { TextArea } = Input;
 const { Option } = Select;
 
 const ExecutionReport: React.FC = () => {
@@ -37,15 +35,13 @@ const ExecutionReport: React.FC = () => {
   const onFinish = async (values: any) => {
     try {
       setLoading(true);
-      
+
       const formData = new FormData();
       formData.append('projectId', values.projectId.toString());
       formData.append('executionAmount', values.executionAmount.toString());
-      formData.append('executionDate', values.executionDate.format('YYYY-MM-DD'));
       formData.append('executionStatus', values.executionStatus);
-      formData.append('description', values.description);
       formData.append('createdBy', values.createdBy);
-      
+
       if (values.voucher && values.voucher.fileList && values.voucher.fileList.length > 0) {
         formData.append('voucher', values.voucher.fileList[0].originFileObj);
       }
@@ -73,9 +69,6 @@ const ExecutionReport: React.FC = () => {
         form={form}
         layout="vertical"
         onFinish={onFinish}
-        initialValues={{
-          executionDate: dayjs(),
-        }}
       >
         <Form.Item
           name="projectId"
@@ -133,18 +126,6 @@ const ExecutionReport: React.FC = () => {
         </Form.Item>
 
         <Form.Item
-          name="executionDate"
-          label="执行日期"
-          rules={[{ required: true, message: '请选择执行日期' }]}
-        >
-          <DatePicker
-            style={{ width: '100%' }}
-            placeholder="请选择执行日期"
-            disabledDate={(current) => current && current > dayjs().endOf('day')}
-          />
-        </Form.Item>
-
-        <Form.Item
           name="executionStatus"
           label="执行情况"
           rules={[{ required: true, message: '请选择执行情况' }]}
@@ -154,17 +135,6 @@ const ExecutionReport: React.FC = () => {
             <Option value="方案设计60%">方案设计60%</Option>
             <Option value="样机测试完成20%">样机测试完成20%</Option>
           </Select>
-        </Form.Item>
-
-        <Form.Item
-          name="description"
-          label="执行说明"
-          rules={[{ required: true, message: '请输入执行说明' }]}
-        >
-          <TextArea
-            rows={4}
-            placeholder="请详细说明本次预算执行的具体内容和用途"
-          />
         </Form.Item>
 
         <Form.Item

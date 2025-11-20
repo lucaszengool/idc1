@@ -3,8 +3,7 @@ interface BudgetExecutionAttributes {
     id: number;
     projectId: number;
     executionAmount: number;
-    executionDate: Date;
-    description: string;
+    executionStatus: string;
     voucherUrl?: string;
     createdBy: string;
     createdAt?: Date;
@@ -16,8 +15,7 @@ declare class BudgetExecution extends Model<BudgetExecutionAttributes, BudgetExe
     id: number;
     projectId: number;
     executionAmount: number;
-    executionDate: Date;
-    description: string;
+    executionStatus: string;
     voucherUrl?: string;
     createdBy: string;
     readonly createdAt: Date;

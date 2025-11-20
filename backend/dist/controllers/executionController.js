@@ -5,7 +5,7 @@ const models_1 = require("../models");
 const sequelize_1 = require("sequelize");
 const createExecution = async (req, res) => {
     try {
-        const { projectId, executionAmount, executionDate, description, createdBy } = req.body;
+        const { projectId, executionAmount, executionStatus, createdBy } = req.body;
         let { voucherUrl } = req.body;
         // Check if project exists and has enough remaining budget
         const project = await models_1.Project.findByPk(projectId, {
@@ -34,8 +34,7 @@ const createExecution = async (req, res) => {
         const execution = await models_1.BudgetExecution.create({
             projectId: parseInt(projectId),
             executionAmount: parseFloat(executionAmount),
-            executionDate: new Date(executionDate),
-            description,
+            executionStatus,
             voucherUrl,
             createdBy,
         });
@@ -59,21 +58,16 @@ const createExecution = async (req, res) => {
 exports.createExecution = createExecution;
 const getExecutions = async (req, res) => {
     try {
-        const { projectId, startDate, endDate, page = 1, limit = 10 } = req.query;
+        const { projectId, page = 1, limit = 10 } = req.query;
         const offset = (parseInt(page) - 1) * parseInt(limit);
         const whereClause = {};
         if (projectId)
             whereClause.projectId = projectId;
-        if (startDate && endDate) {
-            whereClause.executionDate = {
-                [sequelize_1.Op.between]: [new Date(startDate), new Date(endDate)],
-            };
-        }
         const { count, rows } = await models_1.BudgetExecution.findAndCountAll({
             where: whereClause,
             limit: parseInt(limit),
             offset,
-            order: [['executionDate', 'DESC']],
+            order: [['createdAt', 'DESC']],
             include: [{
                     model: models_1.Project,
                     as: 'executionProject',
@@ -101,7 +95,7 @@ const getExecutionsByProject = async (req, res) => {
         const { projectId } = req.params;
         const executions = await models_1.BudgetExecution.findAll({
             where: { projectId },
-            order: [['executionDate', 'DESC']],
+            order: [['createdAt', 'DESC']],
             include: [{
                     model: models_1.Project,
                     as: 'executionProject',
@@ -126,7 +120,7 @@ exports.getExecutionsByProject = getExecutionsByProject;
 const updateExecution = async (req, res) => {
     try {
         const { id } = req.params;
-        const { executionAmount, executionDate, description } = req.body;
+        const { executionAmount, executionStatus } = req.body;
         const execution = await models_1.BudgetExecution.findByPk(id, {
             include: [{
                     model: models_1.Project,
@@ -159,8 +153,7 @@ const updateExecution = async (req, res) => {
         const newAmount = executionAmount ? parseFloat(executionAmount) : oldAmount;
         await execution.update({
             executionAmount: newAmount,
-            executionDate: executionDate ? new Date(executionDate) : execution.executionDate,
-            description: description || execution.description,
+            executionStatus: executionStatus || execution.executionStatus,
         });
         // 更新项目的budgetExecuted字段
         const project = execution.get('executionProject');

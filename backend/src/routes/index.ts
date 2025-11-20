@@ -8,7 +8,7 @@ import totalBudgetRoutes from './totalBudget';
 import authRoutes from './auth';
 import groupRoutes from './groups';
 import approvalRoutes from './approvals';
-import projectTransferRoutes from './projectTransfers';
+// import projectTransferRoutes from './projectTransfers';
 
 const router = express.Router();
 
@@ -21,8 +21,8 @@ router.use('/groups', groupRoutes);
 // 审核工作流路由
 router.use('/approvals', approvalRoutes);
 
-// 项目转移路由
-router.use('/project-transfers', projectTransferRoutes);
+// 项目转移路由 - 已删除
+// router.use('/project-transfers', projectTransferRoutes);
 
 // 现有路由
 router.use('/projects', projectRoutes);

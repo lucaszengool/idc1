@@ -26,13 +26,10 @@ BudgetExecution.init({
         type: sequelize_1.DataTypes.DECIMAL(12, 2),
         allowNull: false,
     },
-    executionDate: {
-        type: sequelize_1.DataTypes.DATE,
+    executionStatus: {
+        type: sequelize_1.DataTypes.ENUM('合同签订付款20%', '方案设计60%', '样机测试完成20%'),
         allowNull: false,
-    },
-    description: {
-        type: sequelize_1.DataTypes.TEXT,
-        allowNull: false,
+        comment: '执行情况',
     },
     voucherUrl: {
         type: sequelize_1.DataTypes.STRING,

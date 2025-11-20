@@ -5,14 +5,24 @@ const models_1 = require("../models");
 // 基础认证中间件
 const authenticateUser = async (req, res, next) => {
     try {
+        console.log('=== Authentication Middleware ===');
+        console.log('Headers:', {
+            authorization: req.headers.authorization,
+            'x-access-key': req.headers['x-access-key'],
+            'x-username': req.headers['x-username'],
+            'x-display-name': req.headers['x-display-name']
+        });
         const authHeader = req.headers.authorization;
         const accessKey = req.headers['x-access-key'] || authHeader?.replace('Bearer ', '');
+        console.log('Extracted access key:', accessKey);
         if (!accessKey) {
+            console.log('No access key provided');
             return res.status(401).json({
                 success: false,
                 message: 'Access key required'
             });
         }
+        console.log('Looking up user with access key:', accessKey);
         const user = await models_1.User.findOne({
             where: { accessKey, isActive: true },
             include: [
@@ -39,13 +49,16 @@ const authenticateUser = async (req, res, next) => {
                 }
             ]
         });
+        console.log('User lookup result:', user ? `Found user: ${user.username}` : 'User not found');
         if (!user) {
+            console.log('Invalid access key - user not found or not active');
             return res.status(401).json({
                 success: false,
                 message: 'Invalid access key'
             });
         }
         req.user = user;
+        console.log('Authentication successful for user:', user.username);
         next();
     }
     catch (error) {

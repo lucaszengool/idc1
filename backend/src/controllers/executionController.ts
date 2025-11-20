@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 
 export const createExecution = async (req: Request, res: Response) => {
   try {
-    const { projectId, executionAmount, executionDate, executionStatus, description, createdBy } = req.body;
+    const { projectId, executionAmount, executionStatus, createdBy } = req.body;
     let { voucherUrl } = req.body;
 
     // Check if project exists and has enough remaining budget
@@ -39,9 +39,7 @@ export const createExecution = async (req: Request, res: Response) => {
     const execution = await BudgetExecution.create({
       projectId: parseInt(projectId),
       executionAmount: parseFloat(executionAmount),
-      executionDate: new Date(executionDate),
       executionStatus,
-      description,
       voucherUrl,
       createdBy,
     });
@@ -67,22 +65,17 @@ export const createExecution = async (req: Request, res: Response) => {
 
 export const getExecutions = async (req: Request, res: Response) => {
   try {
-    const { projectId, startDate, endDate, page = 1, limit = 10 } = req.query;
+    const { projectId, page = 1, limit = 10 } = req.query;
     const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
 
     const whereClause: any = {};
     if (projectId) whereClause.projectId = projectId;
-    if (startDate && endDate) {
-      whereClause.executionDate = {
-        [Op.between]: [new Date(startDate as string), new Date(endDate as string)],
-      };
-    }
 
     const { count, rows } = await BudgetExecution.findAndCountAll({
       where: whereClause,
       limit: parseInt(limit as string),
       offset,
-      order: [['executionDate', 'DESC']],
+      order: [['createdAt', 'DESC']],
       include: [{
         model: Project,
         as: 'executionProject',
@@ -111,7 +104,7 @@ export const getExecutionsByProject = async (req: Request, res: Response) => {
 
     const executions = await BudgetExecution.findAll({
       where: { projectId },
-      order: [['executionDate', 'DESC']],
+      order: [['createdAt', 'DESC']],
       include: [{
         model: Project,
         as: 'executionProject',
@@ -137,7 +130,7 @@ export const getExecutionsByProject = async (req: Request, res: Response) => {
 export const updateExecution = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { executionAmount, executionDate, executionStatus, description } = req.body;
+    const { executionAmount, executionStatus } = req.body;
 
     const execution = await BudgetExecution.findByPk(id, {
       include: [{
@@ -177,9 +170,7 @@ export const updateExecution = async (req: Request, res: Response) => {
 
     await execution.update({
       executionAmount: newAmount,
-      executionDate: executionDate ? new Date(executionDate) : execution.executionDate,
       executionStatus: executionStatus || execution.executionStatus,
-      description: description || execution.description,
     });
 
     // 更新项目的budgetExecuted字段

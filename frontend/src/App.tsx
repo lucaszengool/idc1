@@ -5,15 +5,10 @@ import zhCN from 'antd/locale/zh_CN';
 import 'dayjs/locale/zh-cn';
 import dayjs from 'dayjs';
 
-import AppLayout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import PMDashboard from './pages/PMDashboard';
-import ProjectList from './pages/ProjectList';
-import ProjectCreate from './pages/ProjectCreate';
-import ProjectView from './pages/ProjectView';
-import ProjectEdit from './pages/ProjectEdit';
 import ExecutionReport from './pages/ExecutionReport';
 import ExecutionHistory from './pages/ExecutionHistory';
 import StatisticsOverview from './pages/StatisticsOverview';
@@ -22,7 +17,6 @@ import StatisticsByOwner from './pages/StatisticsByOwner';
 import BudgetAdjustment from './pages/BudgetAdjustment';
 import BudgetManagement from './pages/BudgetManagement';
 import GroupManagement from './pages/GroupManagement';
-import ProjectTransfer from './pages/ProjectTransfer';
 
 dayjs.locale('zh-cn');
 
@@ -40,10 +34,6 @@ function App() {
 
             {/* 普通员工和PM都能访问的路由 */}
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="projects/list" element={<ProjectList />} />
-            <Route path="projects/create" element={<ProjectCreate />} />
-            <Route path="projects/:id" element={<ProjectView />} />
-            <Route path="projects/:id/edit" element={<ProjectEdit />} />
             <Route path="execution/report" element={<ExecutionReport />} />
             <Route path="execution/history" element={<ExecutionHistory />} />
             <Route path="statistics/overview" element={<StatisticsOverview />} />
@@ -52,7 +42,6 @@ function App() {
             <Route path="budget/adjustment" element={<BudgetAdjustment />} />
             <Route path="budget/management" element={<BudgetManagement />} />
             <Route path="groups" element={<GroupManagement />} />
-            <Route path="project-transfers" element={<ProjectTransfer />} />
 
             {/* PM专用路由 */}
             <Route path="pm-dashboard" element={<PMDashboard />} />

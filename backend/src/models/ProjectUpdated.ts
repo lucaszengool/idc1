@@ -64,7 +64,7 @@ export interface ProjectCreationAttributes extends Optional<ProjectAttributes,
   'septemberActualExecution' | 'octoberPlan' | 'novemberPlan' | 'decemberPlan' |
   'septemberActual' | 'octoberActual' | 'novemberActual' | 'decemberActual' |
   'riskLevel' | 'priority' | 'submittedBy' | 'approvedBy' | 'approvedAt' | 'rejectionReason' |
-  'category' | 'subProjectName' | 'budgetAmount' | 'content' | 'createdAt' | 'updatedAt'
+  'category' | 'subProjectName' | 'budgetAmount' | 'content' | 'remainingBudget' | 'createdAt' | 'updatedAt'
 > {}
 
 export class Project extends Model<ProjectAttributes, ProjectCreationAttributes> implements ProjectAttributes {
