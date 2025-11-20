@@ -30,6 +30,36 @@ const ExecutionReport: React.FC = () => {
   const handleProjectChange = (projectId: number) => {
     const project = projects.find(p => p.id === projectId);
     setSelectedProject(project || null);
+    // Reset execution status and amount when project changes
+    form.setFieldsValue({
+      executionStatus: undefined,
+      executionAmount: undefined
+    });
+  };
+
+  const handleExecutionStatusChange = (status: string) => {
+    if (!selectedProject) return;
+
+    const totalBudget = parseFloat(String(selectedProject.budgetOccupied || selectedProject.budgetAmount || 0));
+    let percentage = 0;
+
+    // Calculate percentage based on status
+    switch(status) {
+      case '合同签订付款20%':
+        percentage = 0.20;
+        break;
+      case '方案设计60%':
+        percentage = 0.60;
+        break;
+      case '样机测试完成20%':
+        percentage = 0.20;
+        break;
+    }
+
+    const calculatedAmount = totalBudget * percentage;
+    form.setFieldsValue({
+      executionAmount: parseFloat(calculatedAmount.toFixed(2))
+    });
   };
 
   const onFinish = async (values: any) => {
@@ -97,44 +127,78 @@ const ExecutionReport: React.FC = () => {
             padding: 16,
             marginBottom: 16,
           }}>
-            <h4>项目信息</h4>
-            <p><strong>项目分类：</strong>{selectedProject.category}</p>
-            <p><strong>项目名称：</strong>{selectedProject.projectName}</p>
-            <p><strong>子项目：</strong>{selectedProject.subProjectName}</p>
-            <p><strong>负责人：</strong>{selectedProject.owner}</p>
-            <p><strong>预算金额：</strong>¥{parseFloat(String(selectedProject.budgetOccupied || selectedProject.budgetAmount || 0)).toFixed(2)}万元</p>
-            <p><strong>已执行：</strong>¥{parseFloat(String(selectedProject.budgetExecuted || selectedProject.executedAmount || 0)).toFixed(2)}万元</p>
-            <p><strong>剩余预算：</strong>¥{parseFloat(String(selectedProject.remainingBudget || ((parseFloat(String(selectedProject.budgetOccupied || 0)) - parseFloat(String(selectedProject.budgetExecuted || 0)))))).toFixed(2)}万元</p>
+            <h4 style={{ marginBottom: 12, color: '#52c41a' }}>项目信息</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 16px' }}>
+              <p style={{ margin: '4px 0' }}><strong>项目分类：</strong>{selectedProject.category}</p>
+              <p style={{ margin: '4px 0' }}><strong>负责人：</strong>{selectedProject.owner}</p>
+              <p style={{ margin: '4px 0' }}><strong>项目名称：</strong>{selectedProject.projectName}</p>
+              <p style={{ margin: '4px 0' }}><strong>子项目：</strong>{selectedProject.subProjectName}</p>
+            </div>
+            <div style={{
+              marginTop: 12,
+              paddingTop: 12,
+              borderTop: '1px solid #d9f7be',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr',
+              gap: '8px 16px'
+            }}>
+              <div>
+                <div style={{ fontSize: '12px', color: '#666' }}>总预算</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1890ff' }}>
+                  ¥{parseFloat(String(selectedProject.budgetOccupied || selectedProject.budgetAmount || 0)).toFixed(2)}万
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: '#666' }}>已执行</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#52c41a' }}>
+                  ¥{parseFloat(String(selectedProject.budgetExecuted || selectedProject.executedAmount || 0)).toFixed(2)}万
+                  <span style={{ fontSize: '12px', marginLeft: 4, color: '#999' }}>
+                    ({((parseFloat(String(selectedProject.budgetExecuted || 0)) / parseFloat(String(selectedProject.budgetOccupied || 1))) * 100).toFixed(1)}%)
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: '#666' }}>剩余预算</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#faad14' }}>
+                  ¥{parseFloat(String(selectedProject.remainingBudget || ((parseFloat(String(selectedProject.budgetOccupied || 0)) - parseFloat(String(selectedProject.budgetExecuted || 0)))))).toFixed(2)}万
+                </div>
+              </div>
+            </div>
           </div>
         )}
-
-        <Form.Item
-          name="executionAmount"
-          label="本期执行金额（万元）"
-          rules={[
-            { required: true, message: '请输入执行金额' },
-            { type: 'number', min: 0.01, message: '执行金额必须大于0' }
-          ]}
-        >
-          <InputNumber
-            placeholder="请输入执行金额（万元）"
-            style={{ width: '100%' }}
-            precision={2}
-            min={0.01}
-            addonAfter="万元"
-          />
-        </Form.Item>
 
         <Form.Item
           name="executionStatus"
           label="执行情况"
           rules={[{ required: true, message: '请选择执行情况' }]}
         >
-          <Select placeholder="请选择执行情况">
+          <Select
+            placeholder="请选择执行情况"
+            onChange={handleExecutionStatusChange}
+          >
             <Option value="合同签订付款20%">合同签订付款20%</Option>
             <Option value="方案设计60%">方案设计60%</Option>
             <Option value="样机测试完成20%">样机测试完成20%</Option>
           </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="executionAmount"
+          label="本期执行金额（万元）"
+          rules={[
+            { required: true, message: '请先选择执行情况以计算金额' },
+            { type: 'number', min: 0.01, message: '执行金额必须大于0' }
+          ]}
+        >
+          <InputNumber
+            placeholder="选择执行情况后自动计算"
+            style={{ width: '100%' }}
+            precision={2}
+            min={0.01}
+            addonAfter="万元"
+            disabled
+            readOnly
+          />
         </Form.Item>
 
         <Form.Item
