@@ -391,6 +391,9 @@ const initializeDatabase = async () => {
         console.log('Model associations defined successfully.');
         // Seed 2026 budget projects
         await seed2026BudgetProjects();
+        // Seed 2025 budget projects
+        const { seed2025BudgetProjects } = await Promise.resolve().then(() => __importStar(require('./seed2025')));
+        await seed2025BudgetProjects();
     }
     catch (error) {
         console.error('Database initialization error:', error);
