@@ -110,24 +110,20 @@ const ExecutionHistory: React.FC = () => {
       title: '执行金额（万元）',
       dataIndex: 'executionAmount',
       key: 'executionAmount',
-      render: (amount: number | string) => `¥${(parseFloat(String(amount)) / 10000).toFixed(2)}`,
+      render: (amount: number | string) => `¥${parseFloat(String(amount || 0)).toFixed(2)}`,
     },
     {
-      title: '执行日期',
-      dataIndex: 'executionDate',
-      key: 'executionDate',
-      render: (date: string) => new Date(date).toLocaleDateString(),
+      title: '执行情况',
+      dataIndex: 'executionStatus',
+      key: 'executionStatus',
+      render: (status: string) => (
+        <Tag color="blue">{status}</Tag>
+      ),
     },
     {
       title: '创建人',
       dataIndex: 'createdBy',
       key: 'createdBy',
-    },
-    {
-      title: '执行说明',
-      dataIndex: 'description',
-      key: 'description',
-      ellipsis: true,
     },
     {
       title: '凭证',

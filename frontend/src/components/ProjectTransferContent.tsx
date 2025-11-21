@@ -157,10 +157,20 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
     if (!currentUser) return;
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/project-transfers`, {
-        ...values,
+      // 将输入的名称转换为简化格式
+      const transferData = {
+        projectId: values.projectId,
+        transferType: values.transferType,
+        fromUserName: values.fromUserName,
+        fromGroupName: values.fromGroupName,
+        toUserName: values.toUserName,
+        toGroupName: values.toGroupName,
+        transferAmount: values.transferAmount,
+        reason: values.reason,
         requesterId: currentUser.id
-      });
+      };
+
+      const response = await axios.post(`${API_BASE_URL}/project-transfers`, transferData);
 
       if (response.data.success) {
         message.success('项目转移请求已提交');
@@ -293,50 +303,19 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
         return (
           <Space direction="vertical" style={{ width: '100%' }}>
             <Form.Item
-              name="fromUserId"
+              name="fromUserName"
               label="当前负责人"
-              rules={[{ required: true, message: '请选择当前负责人' }]}
+              rules={[{ required: true, message: '请输入当前负责人' }]}
             >
-              <Select
-                placeholder="选择当前负责人"
-                showSearch
-                onSearch={searchUsers}
-                filterOption={(input, option: any) => {
-                  return String(option?.children || '').toLowerCase().includes(input.toLowerCase());
-                }}
-              >
-                {users.length > 0 ? (
-                  users.map((user) => (
-                    <Option key={user.id} value={user.id}>
-                      {user.displayName} ({user.username})
-                    </Option>
-                  ))
-                ) : (
-                  <Option value="" disabled>
-                    请先加载用户数据...
-                  </Option>
-                )}
-              </Select>
+              <Input placeholder="输入当前负责人姓名或用户名" />
             </Form.Item>
 
             <Form.Item
-              name="fromGroupId"
+              name="fromGroupName"
               label="当前所属组"
-              rules={[{ required: true, message: '请选择当前所属组' }]}
+              rules={[{ required: true, message: '请输入当前所属组' }]}
             >
-              <Select placeholder="选择当前所属组" showSearch optionFilterProp="children">
-                {groups.length > 0 ? (
-                  groups.map((group) => (
-                    <Option key={group.id} value={group.id}>
-                      {group.groupName} (PM: {group.pm?.displayName || '无'})
-                    </Option>
-                  ))
-                ) : (
-                  <Option value="" disabled>
-                    暂无可用组
-                  </Option>
-                )}
-              </Select>
+              <Input placeholder="输入当前所属组名称" />
             </Form.Item>
           </Space>
         );
@@ -345,50 +324,19 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
         return (
           <Space direction="vertical" style={{ width: '100%' }}>
             <Form.Item
-              name="toUserId"
+              name="toUserName"
               label="目标负责人"
-              rules={[{ required: true, message: '请选择目标负责人' }]}
+              rules={[{ required: true, message: '请输入目标负责人' }]}
             >
-              <Select
-                placeholder="选择目标负责人"
-                showSearch
-                onSearch={searchUsers}
-                filterOption={(input, option: any) => {
-                  return String(option?.children || '').toLowerCase().includes(input.toLowerCase());
-                }}
-              >
-                {users.length > 0 ? (
-                  users.map((user) => (
-                    <Option key={user.id} value={user.id}>
-                      {user.displayName} ({user.username})
-                    </Option>
-                  ))
-                ) : (
-                  <Option value="" disabled>
-                    请先加载用户数据...
-                  </Option>
-                )}
-              </Select>
+              <Input placeholder="输入目标负责人姓名或用户名" />
             </Form.Item>
 
             <Form.Item
-              name="toGroupId"
+              name="toGroupName"
               label="目标组"
-              rules={[{ required: true, message: '请选择目标组' }]}
+              rules={[{ required: true, message: '请输入目标组' }]}
             >
-              <Select placeholder="选择目标组" showSearch optionFilterProp="children">
-                {groups.length > 0 ? (
-                  groups.map((group) => (
-                    <Option key={group.id} value={group.id}>
-                      {group.groupName} (PM: {group.pm?.displayName || '无'})
-                    </Option>
-                  ))
-                ) : (
-                  <Option value="" disabled>
-                    暂无可用组
-                  </Option>
-                )}
-              </Select>
+              <Input placeholder="输入目标组名称" />
             </Form.Item>
 
             <Form.Item
@@ -522,7 +470,25 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
               {currentStep < 3 ? (
                 <Button
                   type="primary"
-                  onClick={() => setCurrentStep(currentStep + 1)}
+                  onClick={async () => {
+                    // 验证当前步骤的表单字段
+                    try {
+                      let fieldsToValidate: string[] = [];
+                      if (currentStep === 0) {
+                        fieldsToValidate = ['projectId', 'transferType'];
+                      } else if (currentStep === 1) {
+                        fieldsToValidate = ['fromUserName', 'fromGroupName'];
+                      } else if (currentStep === 2) {
+                        fieldsToValidate = ['toUserName', 'toGroupName'];
+                      }
+
+                      await form.validateFields(fieldsToValidate);
+                      setCurrentStep(currentStep + 1);
+                    } catch (error) {
+                      // 验证失败，不进入下一步
+                      console.log('Validation failed:', error);
+                    }
+                  }}
                 >
                   下一步
                 </Button>
