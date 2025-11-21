@@ -90,6 +90,7 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
       loadTransfers(user.id);
       loadProjects();
       loadGroups();
+      loadAllUsers(); // 初始加载所有用户
     }
   }, []);
 
@@ -128,16 +129,24 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
     }
   };
 
-  const searchUsers = async (query: string) => {
-    if (!query.trim()) {
-      setUsers([]);
-      return;
-    }
-
+  const loadAllUsers = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/auth/search-users?query=${query}`);
+      const response = await axios.get(`${API_BASE_URL}/auth/users`);
       if (response.data.success) {
-        setUsers(response.data.data);
+        setUsers(response.data.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to load users:', error);
+      // 如果没有users endpoint，尝试搜索
+      searchUsers('');
+    }
+  };
+
+  const searchUsers = async (query: string) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/auth/search-users?query=${query || ''}`);
+      if (response.data.success) {
+        setUsers(response.data.data || []);
       }
     } catch (error) {
       console.error('Failed to search users:', error);
@@ -289,16 +298,24 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
               rules={[{ required: true, message: '请选择当前负责人' }]}
             >
               <Select
-                placeholder="搜索当前负责人..."
+                placeholder="选择当前负责人"
                 showSearch
                 onSearch={searchUsers}
-                filterOption={false}
+                filterOption={(input, option: any) => {
+                  return String(option?.children || '').toLowerCase().includes(input.toLowerCase());
+                }}
               >
-                {users.map((user) => (
-                  <Option key={user.id} value={user.id}>
-                    {user.displayName} ({user.username})
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <Option key={user.id} value={user.id}>
+                      {user.displayName} ({user.username})
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="" disabled>
+                    请先加载用户数据...
                   </Option>
-                ))}
+                )}
               </Select>
             </Form.Item>
 
@@ -307,12 +324,18 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
               label="当前所属组"
               rules={[{ required: true, message: '请选择当前所属组' }]}
             >
-              <Select placeholder="选择当前所属组">
-                {groups.map((group) => (
-                  <Option key={group.id} value={group.id}>
-                    {group.groupName} (PM: {group.pm.displayName})
+              <Select placeholder="选择当前所属组" showSearch optionFilterProp="children">
+                {groups.length > 0 ? (
+                  groups.map((group) => (
+                    <Option key={group.id} value={group.id}>
+                      {group.groupName} (PM: {group.pm?.displayName || '无'})
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="" disabled>
+                    暂无可用组
                   </Option>
-                ))}
+                )}
               </Select>
             </Form.Item>
           </Space>
@@ -327,16 +350,24 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
               rules={[{ required: true, message: '请选择目标负责人' }]}
             >
               <Select
-                placeholder="搜索目标负责人..."
+                placeholder="选择目标负责人"
                 showSearch
                 onSearch={searchUsers}
-                filterOption={false}
+                filterOption={(input, option: any) => {
+                  return String(option?.children || '').toLowerCase().includes(input.toLowerCase());
+                }}
               >
-                {users.map((user) => (
-                  <Option key={user.id} value={user.id}>
-                    {user.displayName} ({user.username})
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <Option key={user.id} value={user.id}>
+                      {user.displayName} ({user.username})
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="" disabled>
+                    请先加载用户数据...
                   </Option>
-                ))}
+                )}
               </Select>
             </Form.Item>
 
@@ -345,12 +376,18 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
               label="目标组"
               rules={[{ required: true, message: '请选择目标组' }]}
             >
-              <Select placeholder="选择目标组">
-                {groups.map((group) => (
-                  <Option key={group.id} value={group.id}>
-                    {group.groupName} (PM: {group.pm.displayName})
+              <Select placeholder="选择目标组" showSearch optionFilterProp="children">
+                {groups.length > 0 ? (
+                  groups.map((group) => (
+                    <Option key={group.id} value={group.id}>
+                      {group.groupName} (PM: {group.pm?.displayName || '无'})
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="" disabled>
+                    暂无可用组
                   </Option>
-                ))}
+                )}
               </Select>
             </Form.Item>
 
