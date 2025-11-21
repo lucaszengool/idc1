@@ -103,15 +103,15 @@ export const executionAPI = {
 
 // Statistics APIs
 export const statisticsAPI = {
-  getDashboard: () =>
-    api.get<ApiResponse<DashboardStats>>('/statistics/dashboard'),
-  
+  getDashboard: (year?: string) =>
+    api.get<ApiResponse<DashboardStats>>('/statistics/dashboard', { params: { year } }),
+
   getByCategory: () =>
     api.get<ApiResponse<any[]>>('/statistics/by-category'),
-  
+
   getByOwner: () =>
     api.get<ApiResponse<any[]>>('/statistics/by-owner'),
-  
+
   getTotal: () =>
     api.get<ApiResponse<any>>('/statistics/total'),
 };

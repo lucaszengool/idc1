@@ -5,15 +5,19 @@ import sequelize from '../config/database';
 
 export const getDashboard = async (req: Request, res: Response) => {
   try {
-    const currentYear = new Date().getFullYear().toString();
+    // Get year from query parameter, default to current year
+    const budgetYear = req.query.year as string || new Date().getFullYear().toString();
 
-    // Get total budget for current year
+    // Get total budget for the specified year
     const totalBudgetRecord = await TotalBudget.findOne({
-      where: { budgetYear: currentYear }
+      where: { budgetYear }
     });
 
-    // Get all projects with their executions
+    // Get all projects for the specified year with their executions
     const projects = await Project.findAll({
+      where: {
+        budgetYear: budgetYear
+      },
       include: [{
         model: BudgetExecution,
         as: 'executions',

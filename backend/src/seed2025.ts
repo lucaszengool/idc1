@@ -21,7 +21,7 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "TB运营研发-辅助工具",
         budgetYear: "2025",
-        budgetOccupied: 200000,
+        budgetOccupied: 20,
         budgetExecuted: 0,
         orderAmount: 0,
         acceptanceAmount: 0,
@@ -45,7 +45,7 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "TB架构研发-暖通",
         budgetYear: "2025",
-        budgetOccupied: 450000,
+        budgetOccupied: 45,
         budgetExecuted: 0,
         orderAmount: 0,
         acceptanceAmount: 0,
@@ -69,7 +69,7 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "TB架构研发-电气",
         budgetYear: "2025",
-        budgetOccupied: 440000,
+        budgetOccupied: 44,
         budgetExecuted: 0,
         orderAmount: 0,
         acceptanceAmount: 0,
@@ -93,7 +93,7 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "TB架构研发-暖通",
         budgetYear: "2025",
-        budgetOccupied: 400000,
+        budgetOccupied: 40,
         budgetExecuted: 0,
         orderAmount: 0,
         acceptanceAmount: 0,
@@ -117,7 +117,7 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "TB架构研发-弱电",
         budgetYear: "2025",
-        budgetOccupied: 200000,
+        budgetOccupied: 20,
         budgetExecuted: 0,
         orderAmount: 0,
         acceptanceAmount: 0,
@@ -141,8 +141,8 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "TB架构研发-电气",
         budgetYear: "2025",
-        budgetOccupied: 236485,
-        budgetExecuted: 47297,
+        budgetOccupied: 23.6485,
+        budgetExecuted: 4.7297,
         orderAmount: 0,
         acceptanceAmount: 0,
         contractOrderNumber: "T102-TEG-2025082700001",
@@ -165,7 +165,7 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "TB运营研发-辅助工具",
         budgetYear: "2025",
-        budgetOccupied: 100000,
+        budgetOccupied: 10,
         budgetExecuted: 0,
         orderAmount: 0,
         acceptanceAmount: 0,
@@ -189,10 +189,10 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "TB架构研发-弱电",
         budgetYear: "2025",
-        budgetOccupied: 21515,
-        budgetExecuted: 5958,
+        budgetOccupied: 2.1515,
+        budgetExecuted: 0.5958,
         orderAmount: 0,
-        acceptanceAmount: 5958,
+        acceptanceAmount: 0.5958,
         contractOrderNumber: "",
         approvalStatus: "draft"
       },
@@ -213,8 +213,8 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "TB架构研发-电气",
         budgetYear: "2025",
-        budgetOccupied: 154000,
-        budgetExecuted: 62000,
+        budgetOccupied: 15.4,
+        budgetExecuted: 6.2,
         orderAmount: 0,
         acceptanceAmount: 0,
         contractOrderNumber: "",
@@ -237,10 +237,10 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "已结项",
         relatedBudgetProject: "TB架构研发-电气",
         budgetYear: "2025",
-        budgetOccupied: 230000,
-        budgetExecuted: 230000,
+        budgetOccupied: 23,
+        budgetExecuted: 23,
         orderAmount: 0,
-        acceptanceAmount: 230000,
+        acceptanceAmount: 23,
         contractOrderNumber: "",
         approvalStatus: "draft"
       },
@@ -261,7 +261,7 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "TB架构研发-电气",
         budgetYear: "2025",
-        budgetOccupied: 140000,
+        budgetOccupied: 14,
         budgetExecuted: 0,
         orderAmount: 0,
         acceptanceAmount: 0,
@@ -273,10 +273,10 @@ export const seed2025BudgetProjects = async () => {
     console.log('📝 Seeding 2025 budget projects...');
     for (const projectData of projects2025) {
       await Project.create(projectData as any);
-      console.log(`  ✓ Created: ${projectData.projectName} - ¥${(projectData.budgetOccupied / 10000).toFixed(1)}万`);
+      console.log(`  ✓ Created: ${projectData.projectName} - ¥${projectData.budgetOccupied.toFixed(1)}万`);
     }
     console.log(`✅ Successfully seeded ${projects2025.length} projects for 2025`);
-    console.log(`💰 Total 2025 budget: ¥${(projects2025.reduce((sum, p) => sum + p.budgetOccupied, 0) / 10000).toFixed(1)}万元`);
+    console.log(`💰 Total 2025 budget: ¥${(projects2025.reduce((sum, p) => sum + p.budgetOccupied, 0)).toFixed(1)}万元`);
 
   } catch (error) {
     console.error('❌ Error seeding 2025 budget projects:', error);

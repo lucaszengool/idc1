@@ -12,17 +12,19 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isEditBudgetModalVisible, setIsEditBudgetModalVisible] = useState(false);
   const [budgetForm] = Form.useForm();
+  const [selectedYear, setSelectedYear] = useState<string>('2026');
 
   const currentYear = new Date().getFullYear().toString();
   const currentUsername = localStorage.getItem('username') || '';
 
   useEffect(() => {
     loadDashboardData();
-  }, []);
+  }, [selectedYear]);
 
   const loadDashboardData = async () => {
     try {
-      const response = await statisticsAPI.getDashboard();
+      setLoading(true);
+      const response = await statisticsAPI.getDashboard(selectedYear);
       if (response.data.success) {
         setDashboardData(response.data.data!);
       }
@@ -130,7 +132,16 @@ const Dashboard: React.FC = () => {
           </Button>
         )}
       </div>
-      
+
+      <Tabs
+        activeKey={selectedYear}
+        onChange={setSelectedYear}
+        style={{ marginBottom: 24 }}
+      >
+        <TabPane tab="2025年" key="2025" />
+        <TabPane tab="2026年" key="2026" />
+      </Tabs>
+
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={4}>
           <Card>
@@ -224,7 +235,7 @@ const Dashboard: React.FC = () => {
 
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={24}>
-          <Card title="2026年研发费预算评审目录">
+          <Card title={`${selectedYear}年研发费预算评审目录`}>
             <Row gutter={16}>
               {dashboardData.categoryStats.map((stat, index) => (
                 <Col span={8} key={index}>
