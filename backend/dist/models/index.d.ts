@@ -8,6 +8,7 @@ import Group from './Group';
 import GroupMember from './GroupMember';
 import Approval from './Approval';
 import ProjectTransfer from './ProjectTransfer';
+import BudgetVersion from './BudgetVersion';
 declare const defineAssociations: () => void;
-export { Project, BudgetExecution, BudgetAdjustment, MonthlyExecution, TotalBudget, User, Group, GroupMember, Approval, ProjectTransfer, defineAssociations, };
+export { Project, BudgetExecution, BudgetAdjustment, MonthlyExecution, TotalBudget, User, Group, GroupMember, Approval, ProjectTransfer, BudgetVersion, defineAssociations, };
 //# sourceMappingURL=index.d.ts.map

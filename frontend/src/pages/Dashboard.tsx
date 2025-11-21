@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Row, Col, Statistic, Table, Tag, Typography, Button, Modal, Form, InputNumber, message } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
-import { statisticsAPI, totalBudgetAPI } from '../services/api';
+import { Card, Row, Col, Statistic, Table, Tag, Typography, Button, Modal, Form, InputNumber, message, Tabs, Upload, Input, List, Badge } from 'antd';
+import { EditOutlined, UploadOutlined, FileImageOutlined, DeleteOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { statisticsAPI, totalBudgetAPI, budgetVersionAPI } from '../services/api';
 import { DashboardStats } from '../types';
 
 const { Title } = Typography;
+const { TabPane } = Tabs;
 
 const Dashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardStats | null>(null);

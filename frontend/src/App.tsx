@@ -17,6 +17,7 @@ import StatisticsByOwner from './pages/StatisticsByOwner';
 import BudgetAdjustment from './pages/BudgetAdjustment';
 import BudgetManagement from './pages/BudgetManagement';
 import GroupManagement from './pages/GroupManagement';
+import BudgetVersionManagement from './pages/BudgetVersionManagement';
 
 dayjs.locale('zh-cn');
 
@@ -41,6 +42,7 @@ function App() {
             <Route path="statistics/by-owner" element={<StatisticsByOwner />} />
             <Route path="budget/adjustment" element={<BudgetAdjustment />} />
             <Route path="budget/management" element={<BudgetManagement />} />
+            <Route path="budget/versions" element={<BudgetVersionManagement />} />
             <Route path="groups" element={<GroupManagement />} />
 
             {/* PM专用路由 */}

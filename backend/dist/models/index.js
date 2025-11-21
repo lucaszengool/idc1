@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineAssociations = exports.ProjectTransfer = exports.Approval = exports.GroupMember = exports.Group = exports.User = exports.TotalBudget = exports.MonthlyExecution = exports.BudgetAdjustment = exports.BudgetExecution = exports.Project = void 0;
+exports.defineAssociations = exports.BudgetVersion = exports.ProjectTransfer = exports.Approval = exports.GroupMember = exports.Group = exports.User = exports.TotalBudget = exports.MonthlyExecution = exports.BudgetAdjustment = exports.BudgetExecution = exports.Project = void 0;
 const ProjectUpdated_1 = __importDefault(require("./ProjectUpdated")); // 使用更新的项目模型
 exports.Project = ProjectUpdated_1.default;
 const BudgetExecution_1 = __importDefault(require("./BudgetExecution"));
@@ -24,6 +24,8 @@ const Approval_1 = __importDefault(require("./Approval"));
 exports.Approval = Approval_1.default;
 const ProjectTransfer_1 = __importDefault(require("./ProjectTransfer"));
 exports.ProjectTransfer = ProjectTransfer_1.default;
+const BudgetVersion_1 = __importDefault(require("./BudgetVersion"));
+exports.BudgetVersion = BudgetVersion_1.default;
 // 定义关联关系
 const defineAssociations = () => {
     // User 与 Project 的关联

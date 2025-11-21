@@ -8,6 +8,7 @@ import Group from './Group';
 import GroupMember from './GroupMember';
 import Approval from './Approval';
 import ProjectTransfer from './ProjectTransfer';
+import BudgetVersion from './BudgetVersion';
 
 // 定义关联关系
 const defineAssociations = () => {
@@ -67,5 +68,6 @@ export {
   GroupMember,
   Approval,
   ProjectTransfer,
+  BudgetVersion,
   defineAssociations,
 };

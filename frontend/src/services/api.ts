@@ -137,4 +137,24 @@ export const totalBudgetAPI = {
     }),
 };
 
+// Budget Version APIs
+export const budgetVersionAPI = {
+  create: (data: FormData) =>
+    api.post<ApiResponse<any>>('/budget-versions', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+
+  getAll: (params?: { budgetYear?: string; page?: number; limit?: number }) =>
+    api.get<ApiResponse<{ versions: any[]; totalCount: number; currentPage: number; totalPages: number }>>('/budget-versions', { params }),
+
+  getActive: (budgetYear: string) =>
+    api.get<ApiResponse<any>>(`/budget-versions/active/${budgetYear}`),
+
+  setActive: (id: number) =>
+    api.put<ApiResponse<any>>(`/budget-versions/${id}/activate`),
+
+  delete: (id: number) =>
+    api.delete<ApiResponse<void>>(`/budget-versions/${id}`),
+};
+
 export default api;
