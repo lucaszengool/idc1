@@ -9,7 +9,7 @@ import authRoutes from './auth';
 import groupRoutes from './groups';
 import approvalRoutes from './approvals';
 import budgetVersionRoutes from './budgetVersions';
-// import projectTransferRoutes from './projectTransfers';
+import projectTransferRoutes from './projectTransfers';
 
 const router = express.Router();
 
@@ -25,8 +25,8 @@ router.use('/approvals', approvalRoutes);
 // 预算版本路由
 router.use('/budget-versions', budgetVersionRoutes);
 
-// 项目转移路由 - 已删除
-// router.use('/project-transfers', projectTransferRoutes);
+// 项目转移路由
+router.use('/project-transfers', projectTransferRoutes);
 
 // 现有路由
 router.use('/projects', projectRoutes);

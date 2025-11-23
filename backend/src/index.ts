@@ -373,6 +373,13 @@ const initializeDatabase = async () => {
     defineAssociations();
     console.log('Model associations defined successfully.');
 
+    // Create total budgets for 2025 and 2026
+    console.log('Creating total budgets...');
+    const { TotalBudget } = await import('./models');
+    await TotalBudget.create({ budgetYear: '2025', totalAmount: 300, createdBy: 'Admin' });
+    await TotalBudget.create({ budgetYear: '2026', totalAmount: 0, createdBy: 'Admin' });
+    console.log('✅ Total budgets created');
+
     // Seed 2026 budget projects
     await seed2026BudgetProjects();
 
