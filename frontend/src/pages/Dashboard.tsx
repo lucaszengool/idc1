@@ -270,6 +270,11 @@ const Dashboard: React.FC = () => {
                                 子项目: {project.subProjectName}
                               </div>
                             )}
+                            {project.owner && (
+                              <div style={{ fontSize: '12px', color: '#888', marginTop: 2 }}>
+                                负责人: {project.owner}
+                              </div>
+                            )}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '12px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>

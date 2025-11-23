@@ -61,6 +61,7 @@ export const getDashboard = async (req: Request, res: Response) => {
           id: project.id,
           subProjectName: project.subProjectName || project.projectName,
           projectName: project.projectName,
+          owner: project.owner,
           budgetAmount,
           executedAmount,
         });
@@ -74,6 +75,7 @@ export const getDashboard = async (req: Request, res: Response) => {
             id: project.id,
             subProjectName: project.subProjectName || project.projectName,
             projectName: project.projectName,
+            owner: project.owner,
             budgetAmount,
             executedAmount,
           }],
