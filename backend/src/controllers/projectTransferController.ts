@@ -10,16 +10,21 @@ export const initiateProjectTransfer = async (req: Request, res: Response) => {
       toUserId,
       fromGroupId,
       toGroupId,
+      fromUserName,
+      toUserName,
+      fromGroupName,
+      toGroupName,
       transferType,
       transferAmount,
       reason,
       requesterId
     } = req.body;
 
-    if (!projectId || !fromUserId || !toUserId || !fromGroupId || !toGroupId || !transferType || !reason || !requesterId) {
+    // 验证必填字段
+    if (!projectId || !transferType || !reason || !requesterId) {
       return res.status(400).json({
         success: false,
-        message: 'All required fields must be provided'
+        message: 'Project, transfer type, reason and requester are required'
       });
     }
 
@@ -32,33 +37,75 @@ export const initiateProjectTransfer = async (req: Request, res: Response) => {
       });
     }
 
-    // 验证用户存在
-    const fromUser = await User.findByPk(fromUserId);
-    const toUser = await User.findByPk(toUserId);
-    if (!fromUser || !toUser) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
+    // 查找用户（支持ID或用户名/显示名）
+    let fromUser, toUser;
+
+    if (fromUserId) {
+      fromUser = await User.findByPk(fromUserId);
+    } else if (fromUserName) {
+      fromUser = await User.findOne({
+        where: {
+          [Op.or]: [
+            { username: fromUserName },
+            { displayName: fromUserName }
+          ]
+        }
       });
     }
 
-    // 验证组存在
-    const fromGroup = await Group.findByPk(fromGroupId);
-    const toGroup = await Group.findByPk(toGroupId);
+    if (toUserId) {
+      toUser = await User.findByPk(toUserId);
+    } else if (toUserName) {
+      toUser = await User.findOne({
+        where: {
+          [Op.or]: [
+            { username: toUserName },
+            { displayName: toUserName }
+          ]
+        }
+      });
+    }
+
+    if (!fromUser || !toUser) {
+      return res.status(404).json({
+        success: false,
+        message: `User not found: ${!fromUser ? 'fromUser' : 'toUser'}`
+      });
+    }
+
+    // 查找组（支持ID或组名）
+    let fromGroup, toGroup;
+
+    if (fromGroupId) {
+      fromGroup = await Group.findByPk(fromGroupId);
+    } else if (fromGroupName) {
+      fromGroup = await Group.findOne({
+        where: { groupName: fromGroupName }
+      });
+    }
+
+    if (toGroupId) {
+      toGroup = await Group.findByPk(toGroupId);
+    } else if (toGroupName) {
+      toGroup = await Group.findOne({
+        where: { groupName: toGroupName }
+      });
+    }
+
     if (!fromGroup || !toGroup) {
       return res.status(404).json({
         success: false,
-        message: 'Group not found'
+        message: `Group not found: ${!fromGroup ? fromGroupName || 'fromGroup' : toGroupName || 'toGroup'}`
       });
     }
 
     // 创建项目转移记录
     const transfer = await ProjectTransfer.create({
       projectId: parseInt(projectId),
-      fromUserId: parseInt(fromUserId),
-      toUserId: parseInt(toUserId),
-      fromGroupId: parseInt(fromGroupId),
-      toGroupId: parseInt(toGroupId),
+      fromUserId: fromUser.id,
+      toUserId: toUser.id,
+      fromGroupId: fromGroup.id,
+      toGroupId: toGroup.id,
       transferType,
       transferAmount: transferAmount ? parseFloat(transferAmount) : undefined,
       reason,

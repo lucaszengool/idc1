@@ -14,7 +14,7 @@ const auth_1 = __importDefault(require("./auth"));
 const groups_1 = __importDefault(require("./groups"));
 const approvals_1 = __importDefault(require("./approvals"));
 const budgetVersions_1 = __importDefault(require("./budgetVersions"));
-// import projectTransferRoutes from './projectTransfers';
+const projectTransfers_1 = __importDefault(require("./projectTransfers"));
 const router = express_1.default.Router();
 // 认证路由
 router.use('/auth', auth_1.default);
@@ -24,8 +24,8 @@ router.use('/groups', groups_1.default);
 router.use('/approvals', approvals_1.default);
 // 预算版本路由
 router.use('/budget-versions', budgetVersions_1.default);
-// 项目转移路由 - 已删除
-// router.use('/project-transfers', projectTransferRoutes);
+// 项目转移路由
+router.use('/project-transfers', projectTransfers_1.default);
 // 现有路由
 router.use('/projects', projects_1.default);
 router.use('/executions', executions_1.default);

@@ -365,19 +365,79 @@ const initializeDatabase = async () => {
 
     // Sync database models BEFORE defining associations to avoid conflicts
     console.log('Syncing database models...');
-    await sequelize.sync({ force: true });
-    console.log('Database models synchronized with force recreate.');
+    await sequelize.sync({ alter: true });
+    console.log('Database models synchronized.');
 
     // Define model associations after sync
     console.log('Defining model associations...');
     defineAssociations();
     console.log('Model associations defined successfully.');
 
+    // Create initial users and groups if they don't exist
+    console.log('Creating initial users and groups...');
+    const { User, Group } = await import('./models');
+    const crypto = await import('crypto');
+
+    // Create test PM users if not exists
+    const pmUsers = [
+      { username: 'keisenzeng', displayName: '曾启森', role: 'pm' as const },
+      { username: 'jamesdqli', displayName: '李大强', role: 'pm' as const },
+      { username: 'keweiliu', displayName: '刘克威', role: 'pm' as const },
+      { username: 'tianqingwu', displayName: '吴天青', role: 'employee' as const },
+      { username: 'jiabinzhang', displayName: '张家斌', role: 'employee' as const },
+      { username: 'qingzhuhuo', displayName: '霍青竹', role: 'employee' as const },
+      { username: 'mshuangliu', displayName: '刘明双', role: 'employee' as const }
+    ];
+
+    for (const pmData of pmUsers) {
+      let user = await User.findOne({ where: { username: pmData.username } });
+      if (!user) {
+        const accessKey = crypto.randomBytes(16).toString('hex');
+        await User.create({
+          accessKey,
+          username: pmData.username,
+          displayName: pmData.displayName,
+          role: pmData.role,
+          isActive: true
+        });
+        console.log(`✅ User ${pmData.displayName} created`);
+      }
+    }
+
+    // Create test groups if not exists
+    const pm1 = await User.findOne({ where: { username: 'keisenzeng' } });
+    const pm2 = await User.findOne({ where: { username: 'jamesdqli' } });
+    const pm3 = await User.findOne({ where: { username: 'keweiliu' } });
+
+    if (pm1 && pm2 && pm3) {
+      const testGroups = [
+        { groupName: 'IDC架构研发', pmId: pm1.id, createdBy: pm1.id },
+        { groupName: 'IDC运营研发', pmId: pm2.id, createdBy: pm2.id },
+        { groupName: 'TB架构研发', pmId: pm3.id, createdBy: pm3.id }
+      ];
+
+      for (const groupData of testGroups) {
+        let group = await Group.findOne({ where: { groupName: groupData.groupName } });
+        if (!group) {
+          await Group.create(groupData);
+          console.log(`✅ Group ${groupData.groupName} created`);
+        }
+      }
+    }
+
+    console.log('✅ Initial users and groups ready');
+
     // Create total budgets for 2025 and 2026
     console.log('Creating total budgets...');
     const { TotalBudget } = await import('./models');
-    await TotalBudget.create({ budgetYear: '2025', totalAmount: 300, createdBy: 'Admin' });
-    await TotalBudget.create({ budgetYear: '2026', totalAmount: 0, createdBy: 'Admin' });
+    let budget2025 = await TotalBudget.findOne({ where: { budgetYear: '2025' } });
+    if (!budget2025) {
+      await TotalBudget.create({ budgetYear: '2025', totalAmount: 300, createdBy: 'Admin' });
+    }
+    let budget2026 = await TotalBudget.findOne({ where: { budgetYear: '2026' } });
+    if (!budget2026) {
+      await TotalBudget.create({ budgetYear: '2026', totalAmount: 0, createdBy: 'Admin' });
+    }
     console.log('✅ Total budgets created');
 
     // Seed 2026 budget projects

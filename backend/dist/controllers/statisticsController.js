@@ -4,13 +4,17 @@ exports.getTotalStatistics = exports.getStatisticsByOwner = exports.getStatistic
 const models_1 = require("../models");
 const getDashboard = async (req, res) => {
     try {
-        const currentYear = new Date().getFullYear().toString();
-        // Get total budget for current year
+        // Get year from query parameter, default to current year
+        const budgetYear = req.query.year || new Date().getFullYear().toString();
+        // Get total budget for the specified year
         const totalBudgetRecord = await models_1.TotalBudget.findOne({
-            where: { budgetYear: currentYear }
+            where: { budgetYear }
         });
-        // Get all projects with their executions
+        // Get all projects for the specified year with their executions
         const projects = await models_1.Project.findAll({
+            where: {
+                budgetYear: budgetYear
+            },
             include: [{
                     model: models_1.BudgetExecution,
                     as: 'executions',
@@ -28,8 +32,8 @@ const getDashboard = async (req, res) => {
         projects.forEach((project) => {
             const budgetAmount = parseFloat(project.budgetOccupied || project.budgetAmount || 0);
             allocatedBudget += budgetAmount;
-            const executions = project.executions || [];
-            const executedAmount = executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount), 0);
+            // Use budgetExecuted field from project instead of calculating from executions
+            const executedAmount = parseFloat(project.budgetExecuted || 0);
             totalExecuted += executedAmount;
             // Calculate predicted execution amount from project data
             // Use acceptanceAmount if available, otherwise use orderAmount, otherwise use budgetOccupied
@@ -47,6 +51,7 @@ const getDashboard = async (req, res) => {
                     id: project.id,
                     subProjectName: project.subProjectName || project.projectName,
                     projectName: project.projectName,
+                    owner: project.owner,
                     budgetAmount,
                     executedAmount,
                 });
@@ -61,6 +66,7 @@ const getDashboard = async (req, res) => {
                             id: project.id,
                             subProjectName: project.subProjectName || project.projectName,
                             projectName: project.projectName,
+                            owner: project.owner,
                             budgetAmount,
                             executedAmount,
                         }],
