@@ -260,8 +260,8 @@ const Dashboard: React.FC = () => {
                           borderBottom: pIndex < stat.projects.length - 1 ? '1px solid #f0f0f0' : 'none'
                         }}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <div style={{ flex: 1, marginRight: 8 }}>
+                        <div>
+                          <div style={{ marginBottom: 8 }}>
                             <div style={{ fontSize: '14px', fontWeight: 500, marginBottom: 4 }}>
                               {project.projectName}
                             </div>
@@ -271,15 +271,19 @@ const Dashboard: React.FC = () => {
                               </div>
                             )}
                           </div>
-                          <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                            <div style={{ fontSize: '14px', color: '#1890ff', fontWeight: 500 }}>
-                              {project.budgetAmount.toFixed(0)}万
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '12px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span style={{ color: '#666' }}>预算占用(B):</span>
+                              <span style={{ color: '#1890ff', fontWeight: 500 }}>{project.budgetAmount.toFixed(2)}万</span>
                             </div>
-                            {project.executedAmount > 0 && (
-                              <div style={{ fontSize: '12px', color: '#52c41a' }}>
-                                已执行: {project.executedAmount.toFixed(2)}万
-                              </div>
-                            )}
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span style={{ color: '#666' }}>预算执行(C):</span>
+                              <span style={{ color: '#52c41a', fontWeight: 500 }}>{project.executedAmount.toFixed(2)}万</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span style={{ color: '#666' }}>立项剩余(B-C):</span>
+                              <span style={{ color: '#faad14', fontWeight: 500 }}>{(project.budgetAmount - project.executedAmount).toFixed(2)}万</span>
+                            </div>
                           </div>
                         </div>
                       </div>

@@ -39,9 +39,8 @@ export const getDashboard = async (req: Request, res: Response) => {
       const budgetAmount = parseFloat(project.budgetOccupied || project.budgetAmount || 0);
       allocatedBudget += budgetAmount;
 
-      const executions = project.executions || [];
-      const executedAmount = executions.reduce((sum: number, exec: any) =>
-        sum + parseFloat(exec.executionAmount), 0);
+      // Use budgetExecuted field from project instead of calculating from executions
+      const executedAmount = parseFloat(project.budgetExecuted || 0);
       totalExecuted += executedAmount;
 
       // Calculate predicted execution amount from project data
