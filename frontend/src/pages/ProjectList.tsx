@@ -4,6 +4,7 @@ import { EditOutlined, DeleteOutlined, SearchOutlined, EyeOutlined } from '@ant-
 import { useNavigate } from 'react-router-dom';
 import { projectAPI } from '../services/api';
 import { Project } from '../types';
+import { safeToFixed, formatCurrency, safeParseFloat } from '../utils/number';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -148,37 +149,40 @@ const ProjectList: React.FC = () => {
       title: '预算金额（万元）',
       dataIndex: 'budgetAmount',
       key: 'budgetAmount',
-      render: (amount: number | string) => `¥${parseFloat(String(amount)).toFixed(2)}`,
+      render: (amount: number | string) => formatCurrency(amount, 2),
       sorter: true,
     },
     {
       title: '已执行（万元）',
       dataIndex: 'executedAmount',
       key: 'executedAmount',
-      render: (amount?: number | string) => amount ? `¥${parseFloat(String(amount)).toFixed(2)}` : '¥0.00',
+      render: (amount?: number | string) => formatCurrency(amount || 0, 2),
     },
     {
       title: '剩余预算（万元）',
       dataIndex: 'remainingAmount',
       key: 'remainingAmount',
-      render: (amount?: number | string) => amount ? `¥${parseFloat(String(amount)).toFixed(2)}` : '¥0.00',
+      render: (amount?: number | string) => formatCurrency(amount || 0, 2),
     },
     {
       title: '执行率',
       dataIndex: 'executionRate',
       key: 'executionRate',
-      render: (rate?: number) => (
-        <div>
-          <Progress
-            percent={rate || 0}
-            size="small"
-            status={rate && rate > 80 ? 'exception' : 'active'}
-          />
-          <span style={{ marginLeft: 8 }}>
-            {rate ? `${parseFloat(String(rate)).toFixed(1)}%` : '0%'}
-          </span>
-        </div>
-      ),
+      render: (rate?: number) => {
+        const safeRate = safeParseFloat(rate);
+        return (
+          <div>
+            <Progress
+              percent={safeRate}
+              size="small"
+              status={safeRate > 80 ? 'exception' : 'active'}
+            />
+            <span style={{ marginLeft: 8 }}>
+              {safeToFixed(safeRate, 1)}%
+            </span>
+          </div>
+        );
+      },
     },
     {
       title: '创建时间',

@@ -3,6 +3,7 @@ import { Card, Row, Col, Statistic, Table, Tag, Typography, Button, Modal, Form,
 import { EditOutlined, UploadOutlined, FileImageOutlined, DeleteOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { statisticsAPI, totalBudgetAPI, budgetVersionAPI } from '../services/api';
 import { DashboardStats } from '../types';
+import { safeToFixed, formatCurrency, safeParseFloat } from '../utils/number';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -63,7 +64,7 @@ const Dashboard: React.FC = () => {
       title: '执行金额（万元）',
       dataIndex: 'executionAmount',
       key: 'executionAmount',
-      render: (amount: number | string) => `¥${parseFloat(String(amount)).toFixed(2)}`,
+      render: (amount: number | string) => formatCurrency(amount, 2),
     },
     {
       title: '执行日期',
@@ -88,23 +89,23 @@ const Dashboard: React.FC = () => {
       title: '预算金额',
       dataIndex: 'budgetAmount',
       key: 'budgetAmount',
-      render: (amount: number | string) => `¥${parseFloat(String(amount)).toFixed(2)}万`,
+      render: (amount: number | string) => `${formatCurrency(amount, 2)}万`,
     },
     {
       title: '已执行',
       dataIndex: 'executedAmount',
       key: 'executedAmount',
-      render: (amount: number | string) => `¥${parseFloat(String(amount)).toFixed(2)}万`,
+      render: (amount: number | string) => `${formatCurrency(amount, 2)}万`,
     },
     {
       title: '执行率',
       dataIndex: 'executionRate',
       key: 'executionRate',
       render: (rate: number | string) => {
-        const numRate = parseFloat(String(rate));
+        const numRate = safeParseFloat(rate);
         return (
           <Tag color={numRate > 90 ? 'red' : 'orange'}>
-            {numRate.toFixed(1)}%
+            {safeToFixed(numRate, 1)}%
           </Tag>
         );
       },
@@ -245,7 +246,7 @@ const Dashboard: React.FC = () => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{stat.category}</span>
                         <span style={{ fontSize: '14px', color: '#1890ff' }}>
-                          {stat.totalBudget.toFixed(0)}万元
+                          {safeToFixed(stat.totalBudget, 0)}万元
                         </span>
                       </div>
                     }
@@ -279,15 +280,15 @@ const Dashboard: React.FC = () => {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '12px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#666' }}>预算占用(B):</span>
-                              <span style={{ color: '#1890ff', fontWeight: 500 }}>{project.budgetAmount.toFixed(2)}万</span>
+                              <span style={{ color: '#1890ff', fontWeight: 500 }}>{safeToFixed(project.budgetAmount, 2)}万</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#666' }}>预算执行(C):</span>
-                              <span style={{ color: '#52c41a', fontWeight: 500 }}>{project.executedAmount.toFixed(2)}万</span>
+                              <span style={{ color: '#52c41a', fontWeight: 500 }}>{safeToFixed(project.executedAmount, 2)}万</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#666' }}>立项剩余(B-C):</span>
-                              <span style={{ color: '#faad14', fontWeight: 500 }}>{(project.budgetAmount - project.executedAmount).toFixed(2)}万</span>
+                              <span style={{ color: '#faad14', fontWeight: 500 }}>{safeToFixed(safeParseFloat(project.budgetAmount) - safeParseFloat(project.executedAmount), 2)}万</span>
                             </div>
                           </div>
                         </div>
@@ -296,7 +297,7 @@ const Dashboard: React.FC = () => {
                     <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #f0f0f0' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#666' }}>
                         <span>{stat.projectCount} 个子项目</span>
-                        <span>已执行: {stat.executedAmount.toFixed(2)}万元</span>
+                        <span>已执行: {safeToFixed(stat.executedAmount, 2)}万元</span>
                       </div>
                     </div>
                   </Card>
