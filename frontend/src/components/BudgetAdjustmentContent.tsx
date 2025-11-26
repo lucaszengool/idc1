@@ -18,6 +18,7 @@ import {
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { adjustmentAPI, totalBudgetAPI } from '../services/api';
 import { Project, BudgetAdjustment as BudgetAdjustmentType } from '../types';
+import { safeToFixed, formatCurrency } from '../utils/number';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -130,7 +131,7 @@ const BudgetAdjustmentContent: React.FC<BudgetAdjustmentContentProps> = ({
       title: '调整金额（万元）',
       dataIndex: 'adjustmentAmount',
       key: 'adjustmentAmount',
-      render: (amount: number) => `¥${amount.toFixed(2)}`,
+      render: (amount: number) => formatCurrency(amount, 2),
     },
     {
       title: '目标类别',
@@ -212,7 +213,7 @@ const BudgetAdjustmentContent: React.FC<BudgetAdjustmentContentProps> = ({
             >
               {projects.map(project => (
                 <Option key={project.id} value={project.id}>
-                  {project.projectName} (剩余: ¥{project.remainingBudget?.toFixed(2) || '0.00'}万)
+                  {project.projectName} (剩余: {formatCurrency(project.remainingBudget || 0, 2)}万)
                 </Option>
               ))}
             </Select>
