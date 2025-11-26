@@ -345,6 +345,11 @@ const initializeDatabase = async () => {
   try {
     console.log('Initializing database...');
 
+    // Define model associations BEFORE sync
+    console.log('Defining model associations...');
+    defineAssociations();
+    console.log('Model associations defined successfully.');
+
     // Test database connection with retry logic
     let retries = 5;
     while (retries > 0) {
@@ -363,15 +368,10 @@ const initializeDatabase = async () => {
       }
     }
 
-    // Sync database models BEFORE defining associations to avoid conflicts
+    // Sync database models AFTER defining associations
     console.log('Syncing database models...');
     await sequelize.sync({ alter: true });
     console.log('Database models synchronized.');
-
-    // Define model associations after sync
-    console.log('Defining model associations...');
-    defineAssociations();
-    console.log('Model associations defined successfully.');
 
     // Create initial users and groups if they don't exist
     console.log('Creating initial users and groups...');

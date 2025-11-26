@@ -363,6 +363,10 @@ const seed2026BudgetProjects = async () => {
 const initializeDatabase = async () => {
     try {
         console.log('Initializing database...');
+        // Define model associations BEFORE sync
+        console.log('Defining model associations...');
+        (0, models_1.defineAssociations)();
+        console.log('Model associations defined successfully.');
         // Test database connection with retry logic
         let retries = 5;
         while (retries > 0) {
@@ -381,14 +385,10 @@ const initializeDatabase = async () => {
                 await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
             }
         }
-        // Sync database models BEFORE defining associations to avoid conflicts
+        // Sync database models AFTER defining associations
         console.log('Syncing database models...');
         await database_1.default.sync({ alter: true });
         console.log('Database models synchronized.');
-        // Define model associations after sync
-        console.log('Defining model associations...');
-        (0, models_1.defineAssociations)();
-        console.log('Model associations defined successfully.');
         // Create initial users and groups if they don't exist
         console.log('Creating initial users and groups...');
         const { User, Group } = await Promise.resolve().then(() => __importStar(require('./models')));
