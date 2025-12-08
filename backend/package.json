@@ -7,6 +7,8 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "init-data": "ts-node src/scripts/initializeData.ts",
+    "update-2025": "ts-node src/scripts/update2025Data.ts",
+    "setup-2025": "ts-node src/scripts/setup2025Budget.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

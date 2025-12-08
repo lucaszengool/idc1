@@ -92,12 +92,13 @@ export const createProject = async (req: Request, res: Response) => {
 
 export const getProjects = async (req: Request, res: Response) => {
   try {
-    const { category, owner, page = 1, limit = 10 } = req.query;
+    const { category, owner, year, page = 1, limit = 10 } = req.query;
     const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
 
     const whereClause: any = {};
     if (category) whereClause.category = category;
     if (owner) whereClause.owner = { [Op.iLike]: `%${owner}%` };
+    if (year) whereClause.budgetYear = year;
 
     const { count, rows } = await Project.findAndCountAll({
       where: whereClause,

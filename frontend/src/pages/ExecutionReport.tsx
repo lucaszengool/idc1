@@ -1,30 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Select, InputNumber, Input, Button, Upload, Card, message } from 'antd';
+import { Form, Select, InputNumber, Input, Button, Upload, Card, message, Tabs } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { projectAPI, executionAPI } from '../services/api';
 import { Project } from '../types';
 
 const { Option } = Select;
+const { TabPane } = Tabs;
 
 const ExecutionReport: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string>('2025');
 
   useEffect(() => {
     loadProjects();
-  }, []);
+  }, [selectedYear]);
 
   const loadProjects = async () => {
     try {
-      const response = await projectAPI.getAll({ limit: 1000 }); // Get all projects
+      const response = await projectAPI.getAll({ year: selectedYear, limit: 1000 }); // Get projects for selected year
       if (response.data.success && response.data.data) {
         setProjects(response.data.data.projects);
       }
     } catch (error) {
       message.error('加载项目列表失败');
     }
+  };
+
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
+    setSelectedProject(null);
+    form.resetFields();
   };
 
   const handleProjectChange = (projectId: number) => {
@@ -95,6 +103,15 @@ const ExecutionReport: React.FC = () => {
 
   return (
     <Card title="预算执行填报">
+      <Tabs
+        activeKey={selectedYear}
+        onChange={handleYearChange}
+        style={{ marginBottom: 16 }}
+      >
+        <TabPane tab="2025年" key="2025" />
+        <TabPane tab="2026年" key="2026" />
+      </Tabs>
+
       <Form
         form={form}
         layout="vertical"

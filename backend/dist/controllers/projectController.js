@@ -65,13 +65,15 @@ const createProject = async (req, res) => {
 exports.createProject = createProject;
 const getProjects = async (req, res) => {
     try {
-        const { category, owner, page = 1, limit = 10 } = req.query;
+        const { category, owner, year, page = 1, limit = 10 } = req.query;
         const offset = (parseInt(page) - 1) * parseInt(limit);
         const whereClause = {};
         if (category)
             whereClause.category = category;
         if (owner)
             whereClause.owner = { [sequelize_1.Op.iLike]: `%${owner}%` };
+        if (year)
+            whereClause.budgetYear = year;
         const { count, rows } = await models_1.Project.findAndCountAll({
             where: whereClause,
             limit: parseInt(limit),

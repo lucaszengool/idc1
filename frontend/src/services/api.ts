@@ -68,7 +68,7 @@ export const projectAPI = {
   create: (data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) =>
     api.post<ApiResponse<Project>>('/projects', data),
   
-  getAll: (params?: { category?: string; owner?: string; page?: number; limit?: number }) =>
+  getAll: (params?: { category?: string; owner?: string; year?: string; page?: number; limit?: number }) =>
     api.get<ApiResponse<{ projects: Project[]; totalCount: number; currentPage: number; totalPages: number }>>('/projects', { params }),
   
   getById: (id: number) =>
