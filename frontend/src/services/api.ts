@@ -67,18 +67,22 @@ api.interceptors.response.use(
 export const projectAPI = {
   create: (data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) =>
     api.post<ApiResponse<Project>>('/projects', data),
-  
+
   getAll: (params?: { category?: string; owner?: string; year?: string; page?: number; limit?: number }) =>
     api.get<ApiResponse<{ projects: Project[]; totalCount: number; currentPage: number; totalPages: number }>>('/projects', { params }),
-  
+
   getById: (id: number) =>
     api.get<ApiResponse<Project>>(`/projects/${id}`),
-  
+
   update: (id: number, data: Partial<Project>) =>
     api.put<ApiResponse<Project>>(`/projects/${id}`, data),
-  
+
   delete: (id: number) =>
     api.delete<ApiResponse<void>>(`/projects/${id}`),
+
+  // 批量导入项目预算数据
+  batchImport: (projects: any[], budgetYear?: string) =>
+    api.post<ApiResponse<{ created: number; updated: number; errors: string[] }>>('/projects/batch-import', { projects, budgetYear }),
 };
 
 // Budget Execution APIs

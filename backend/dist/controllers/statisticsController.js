@@ -28,6 +28,11 @@ const getDashboard = async (req, res) => {
         let totalPredictedExecution = 0; // Add predicted execution total
         const categoryStats = [];
         const highRiskProjects = [];
+        // 新增：预算分类统计
+        let pendingBudget = 0; // 预提待使用预算（budgetExecuted = 0的项目）
+        let completedBudget = 0; // 已完成验收预算
+        const pendingProjects = []; // 预提待使用的项目列表
+        const completedProjects = []; // 已完成验收的项目列表
         const categoryMap = new Map();
         projects.forEach((project) => {
             const budgetAmount = parseFloat(project.budgetOccupied || project.budgetAmount || 0);
@@ -40,6 +45,28 @@ const getDashboard = async (req, res) => {
             const predictedAmount = parseFloat(project.acceptanceAmount || project.orderAmount || project.budgetOccupied || 0);
             totalPredictedExecution += predictedAmount;
             const executionRate = budgetAmount > 0 ? (executedAmount / budgetAmount) * 100 : 0;
+            // 判断项目是预提待使用还是已完成验收
+            // 如果执行金额为0，则为预提待使用；否则按验收金额计入已完成验收
+            if (executedAmount === 0 && budgetAmount > 0) {
+                pendingBudget += budgetAmount;
+                pendingProjects.push({
+                    id: project.id,
+                    projectName: project.projectName,
+                    budgetAmount,
+                    executedAmount: 0,
+                    category: project.category || '未分类',
+                });
+            }
+            else if (executedAmount > 0) {
+                completedBudget += executedAmount;
+                completedProjects.push({
+                    id: project.id,
+                    projectName: project.projectName,
+                    budgetAmount,
+                    executedAmount,
+                    category: project.category || '未分类',
+                });
+            }
             // Track category stats with executed amounts from execution data and subprojects
             const category = project.category || project.projectType || '未分类';
             if (categoryMap.has(category)) {
@@ -101,6 +128,8 @@ const getDashboard = async (req, res) => {
         const remainingBudget = totalBudgetAmount - totalExecuted; // Use total budget instead of allocated
         const executionRate = totalBudgetAmount > 0 ? (totalExecuted / totalBudgetAmount) * 100 : 0; // Calculate based on total budget
         const predictedRemainingBudget = totalBudgetAmount - totalPredictedExecution;
+        // 计算剩余未使用预算（总预算 - 预提待使用 - 已完成验收）
+        const unusedBudget = totalBudgetAmount - pendingBudget - completedBudget;
         res.json({
             success: true,
             data: {
@@ -116,6 +145,12 @@ const getDashboard = async (req, res) => {
                 categoryStats,
                 recentExecutions,
                 highRiskProjects,
+                // 新增预算分类数据
+                预提待使用预算: pendingBudget,
+                已完成验收预算: completedBudget,
+                剩余未使用预算: unusedBudget,
+                预提待使用项目: pendingProjects,
+                已完成验收项目: completedProjects,
             },
         });
     }

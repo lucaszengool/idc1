@@ -1,21 +1,28 @@
-// Seed 2025 Budget Projects - 更新于 2025-12-08
+// Seed 2025 Budget Projects - 更新于 2025-01-18
 // 数据来源：用户提供的最新2025年研发项目执行情况
+//
+// 25年架构研发中心总预算：300万元
+// - 预提待使用预算：98.2万元
+// - 已完成验收预算：101.24万元
+// - 高校合作费：30万元
+// - IDC运营研发费：30万元
+// - 剩余未使用预算：40.56万元
 
 export const seed2025BudgetProjects = async () => {
   try {
     const { Project } = await import('./models');
 
-    // ==================== 类别一：研发费-架构 (IDC架构研发) ====================
-    // 总计: 2,272,000元 = 227.2万元
-    const architectureProjects = [
-      // 1. 节水版-一体冷源&风墙研发
+    // ==================== 预提待使用的预算：98.2万元 ====================
+    // 这些项目已立项但尚未执行验收
+    const pendingProjects = [
+      // 1. 节水版一体冷源&风墙研发项目：45万元
       {
         projectCode: "RDBP202507280003",
-        projectName: "TEG-2025-节水版-一体冷源&风墙研发",
+        projectName: "TEG-2025-节水版一体冷源&风墙研发项目",
         category: "IDC架构研发",
         subProjectName: "TB架构研发-暖通",
         projectType: "重点",
-        projectStatus: "完成",
+        projectStatus: "进行中",
         owner: "keweiliu",
         members: "keweiliu;jamesdqli;tianqingwu;jiabinzhang",
         projectGoal: "完成节水版一体冷源和双冷源风墙的研发和测试",
@@ -25,21 +32,21 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "N-TEG-2025-TB架构研发-暖通",
         budgetYear: "2025",
-        budgetOccupied: 45, // 450,000元
-        budgetExecuted: 0,
+        budgetOccupied: 45, // 预算占用45万元
+        budgetExecuted: 0, // 预提待使用，尚未执行
         orderAmount: 0,
         acceptanceAmount: 0,
         contractOrderNumber: "",
         approvalStatus: "draft"
       },
-      // 2. 弹性直流系统2.0自研项目
+      // 2. 弹性直流系统2.0自研项目：44万元
       {
         projectCode: "RDBP202507240006",
         projectName: "TEG-2025-弹性直流系统2.0自研项目",
         category: "IDC架构研发",
         subProjectName: "TB架构研发-电气",
         projectType: "重点",
-        projectStatus: "完成",
+        projectStatus: "进行中",
         owner: "jiabinzhang",
         members: "jiabinzhang;helenjwang;johnnyxia;mshuangliu",
         projectGoal: "输出一套一体柜2.0的技术方案和测试验证数据",
@@ -49,86 +56,43 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "未结项",
         relatedBudgetProject: "N-TEG-2025-TB架构研发-电气",
         budgetYear: "2025",
-        budgetOccupied: 44, // 440,000元
-        budgetExecuted: 0,
+        budgetOccupied: 44, // 预算占用44万元
+        budgetExecuted: 0, // 预提待使用，尚未执行
         orderAmount: 0,
         acceptanceAmount: 0,
         contractOrderNumber: "",
         approvalStatus: "draft"
       },
-      // 3. TB架构研发-暖通-分体氟系
+      // 3. 数据中心PDU合作研发项目：9.2万元
       {
-        projectCode: "RDBP202507210001",
-        projectName: "TEG-2025-TB架构研发-暖通-分体氟系",
-        category: "IDC架构研发",
-        subProjectName: "TB架构研发-暖通",
-        projectType: "重点",
-        projectStatus: "完成",
-        owner: "tianqingwu",
-        members: "aggieliu;jamesdqli;keweiliu;tianqingwu;fennyliu",
-        projectGoal: "新增多层建筑制冷解决方案（适配无水/缺水地区）",
-        projectBackground: "匹配兼容未来高密的风/液机房需求和新的多层库TB架构",
-        projectExplanation: "机组研发费用20万；样机测试费用20万",
-        procurementCode: "RDBP202507210001",
-        completionStatus: "未结项",
-        relatedBudgetProject: "N-TEG-2025-TB架构研发-暖通",
-        budgetYear: "2025",
-        budgetOccupied: 40, // 400,000元
-        budgetExecuted: 0,
-        orderAmount: 0,
-        acceptanceAmount: 0,
-        contractOrderNumber: "",
-        approvalStatus: "draft"
-      },
-      // 4. T-DOOR门禁产品自研项目
-      {
-        projectCode: "RDBP202507070001",
-        projectName: "TEG-2025-T-DOOR门禁产品自研项目",
-        category: "IDC架构研发",
-        subProjectName: "TB架构研发-弱电",
-        projectType: "重点",
-        projectStatus: "完成",
-        owner: "davidlong",
-        members: "davidlong;samizhang;terryxyan",
-        projectGoal: "由集中布线改为就近布线，提升建设效率；统一自建机房门禁硬件软件",
-        projectBackground: "为了提升数据中心安防门禁系统的建设效率，优化认证方式提升安全性",
-        projectExplanation: "定制开发费用10万元；开模费用10万元",
-        procurementCode: "RDBP202507070001",
-        completionStatus: "未结项",
-        relatedBudgetProject: "N-TEG-2025-TB架构研发-弱电",
-        budgetYear: "2025",
-        budgetOccupied: 20, // 200,000元
-        budgetExecuted: 0,
-        orderAmount: 0,
-        acceptanceAmount: 0,
-        contractOrderNumber: "",
-        approvalStatus: "draft"
-      },
-      // 5. 自研低压柜研发项目
-      {
-        projectCode: "RDBP202506270004",
-        projectName: "TEG-2025-自研低压柜研发项目",
+        projectCode: "RDBP202412180006",
+        projectName: "TEG-2025-数据中心PDU合作研发项目",
         category: "IDC架构研发",
         subProjectName: "TB架构研发-电气",
         projectType: "重点",
-        projectStatus: "完成",
-        owner: "leozhzou",
-        members: "leozhzou;weikezheng;tomhuang;charlesgao",
-        projectGoal: "三个合作厂家每家输出技术方案",
-        projectBackground: "低压柜采用三大合资柜型，相同授权柜型开关不兼容，成本高",
-        projectExplanation: "研发预算合计236485元",
-        procurementCode: "RDBP202506270004",
+        projectStatus: "进行中",
+        owner: "robinmqwu",
+        members: "robinmqwu;johnnyxia;leozhzhou;felixjydeng;helenjwang",
+        projectGoal: "通过PDU全面自研，申请腾讯自有专利，统一PDU规格",
+        projectBackground: "当前集采PDU各厂商的PDU产品在外形尺寸、外观、接线形式差异较大",
+        projectExplanation: "项目设计费用约2万元/家；研发及正式样机费用约6万元/家",
+        procurementCode: "RDBP202412180006",
         completionStatus: "未结项",
         relatedBudgetProject: "N-TEG-2025-TB架构研发-电气",
         budgetYear: "2025",
-        budgetOccupied: 23.6485, // 236,485元
-        budgetExecuted: 4.7297, // 47,297元
+        budgetOccupied: 9.2, // 预算占用9.2万元
+        budgetExecuted: 0, // 预提待使用，尚未执行
         orderAmount: 0,
-        acceptanceAmount: 4.7297,
-        contractOrderNumber: "T102-TEG-2025082700001",
+        acceptanceAmount: 0,
+        contractOrderNumber: "",
         approvalStatus: "draft"
-      },
-      // 6. TONE扩展模块自研项目 (原7号)
+      }
+    ];
+
+    // ==================== 已完成验收预算：101.24万元 ====================
+    // 这些项目已经完成验收
+    const completedProjects = [
+      // 1. TONE扩展模块自研项目：0.5958万元
       {
         projectCode: "RDBP202505060002",
         projectName: "TEG-2025-TONE扩展模块自研项目",
@@ -140,46 +104,46 @@ export const seed2025BudgetProjects = async () => {
         members: "samizhang;terryxyan",
         projectGoal: "提升TONE接入能力和扩展能力，实现对基础设施更全面更深入的监控",
         projectBackground: "为提升TONE的设备接入能力和扩展能力",
-        projectExplanation: "测试物料采购费用21515元",
+        projectExplanation: "测试物料采购费用",
         procurementCode: "RDBP202505060002",
-        completionStatus: "未结项",
+        completionStatus: "已结项",
         relatedBudgetProject: "N-TEG-2025-TB架构研发-弱电",
         budgetYear: "2025",
-        budgetOccupied: 2.1515, // 21,515元
-        budgetExecuted: 0.5958, // 5,958元
-        orderAmount: 0,
+        budgetOccupied: 0.5958, // 预算占用0.5958万元
+        budgetExecuted: 0.5958, // 已验收0.5958万元
+        orderAmount: 0.5958,
         acceptanceAmount: 0.5958,
         contractOrderNumber: "",
-        approvalStatus: "draft"
+        approvalStatus: "approved"
       },
-      // 7. 数据中心PDU合作研发 (原8号)
+      // 2. 2.5MW分布式柴发方仓研发项目：14万元
       {
-        projectCode: "RDBP202412180006",
-        projectName: "TEG-2024-数据中心PDU合作研发",
+        projectCode: "RDBP202412050003-2",
+        projectName: "TEG-2025-2.5MW分布式柴发方仓研发项目",
         category: "IDC架构研发",
         subProjectName: "TB架构研发-电气",
-        projectType: "重点",
+        projectType: "常规",
         projectStatus: "完成",
-        owner: "robinmqwu",
-        members: "robinmqwu;johnnyxia;leozhzhou;felixjydeng;helenjwang",
-        projectGoal: "通过PDU全面自研，申请腾讯自有专利，统一PDU规格",
-        projectBackground: "当前集采PDU各厂商的PDU产品在外形尺寸、外观、接线形式差异较大",
-        projectExplanation: "项目设计费用约2万元/家；研发及正式样机费用约6万元/家",
-        procurementCode: "RDBP202412180006",
-        completionStatus: "未结项",
+        owner: "mshuangliu",
+        members: "mshuangliu",
+        projectGoal: "研发2.5MW分布式柴发方仓",
+        projectBackground: "分布式柴发备电方案研发",
+        projectExplanation: "柴发方仓研发项目",
+        procurementCode: "RDBP202412050003",
+        completionStatus: "已结项",
         relatedBudgetProject: "N-TEG-2025-TB架构研发-电气",
         budgetYear: "2025",
-        budgetOccupied: 15.4, // 154,000元
-        budgetExecuted: 6.2, // 62,000元
-        orderAmount: 0,
-        acceptanceAmount: 6.2,
+        budgetOccupied: 14, // 预算占用14万元
+        budgetExecuted: 14, // 已验收14万元
+        orderAmount: 14,
+        acceptanceAmount: 14,
         contractOrderNumber: "",
-        approvalStatus: "draft"
+        approvalStatus: "approved"
       },
-      // 8. 分布式备电架构自研项目 (原9号)
+      // 3. 分布式备电架构自研项目：23万元
       {
         projectCode: "RDBP202412050003",
-        projectName: "TEG-2024-分布式备电架构自研项目",
+        projectName: "TEG-2025-分布式备电架构自研项目",
         category: "IDC架构研发",
         subProjectName: "TB架构研发-电气",
         projectType: "常规",
@@ -193,94 +157,64 @@ export const seed2025BudgetProjects = async () => {
         completionStatus: "已结项",
         relatedBudgetProject: "N-TEG-2025-TB架构研发-电气",
         budgetYear: "2025",
-        budgetOccupied: 23, // 230,000元
-        budgetExecuted: 23, // 230,000元 (已全部执行)
-        orderAmount: 0,
+        budgetOccupied: 23, // 预算占用23万元
+        budgetExecuted: 23, // 已验收23万元
+        orderAmount: 23,
         acceptanceAmount: 23,
         contractOrderNumber: "",
-        approvalStatus: "draft"
+        approvalStatus: "approved"
       },
-      // 9. 2.5MW分布式柴油发电研发项目 (原10号 - RDBP202412050003第二条)
+      // 4. 自研低压柜研发项目：23.6485万元
       {
-        projectCode: "RDBP202412050003-2",
-        projectName: "2.5MW 分布式柴油发电研发项目",
+        projectCode: "RDBP202506270004",
+        projectName: "TEG-2025-自研低压柜研发项目",
         category: "IDC架构研发",
         subProjectName: "TB架构研发-电气",
-        projectType: "常规",
-        projectStatus: "进行中",
-        owner: "mshuangliu",
-        members: "mshuangliu",
-        projectGoal: "研发2.5MW分布式柴发方仓",
-        projectBackground: "分布式柴发备电方案研发",
-        projectExplanation: "柴发方仓研发项目",
-        procurementCode: "RDBP202412050003",
-        completionStatus: "未结项",
-        relatedBudgetProject: "—",
-        budgetYear: "2025",
-        budgetOccupied: 14, // 140,000元
-        budgetExecuted: 0,
-        orderAmount: 0,
-        acceptanceAmount: 0,
-        contractOrderNumber: "",
-        approvalStatus: "draft"
-      }
-    ];
-
-    // ==================== 类别二：研发费-运营 (IDC运营-研发) ====================
-    // 总计: 300,000元 = 30万元
-    const operationProjects = [
-      // 1. TB运营研发-辅助工具
-      {
-        projectCode: "RDBP202506230002",
-        projectName: "TEG-2025-TB运营研发-辅助工具",
-        category: "IDC运营-研发",
-        subProjectName: "TB运营研发-辅助工具",
         projectType: "重点",
         projectStatus: "完成",
-        owner: "shaunzhang",
-        members: "shaunzhang;qingzhuhuo;marcowang;alanqykong;jzxjiang",
-        projectGoal: "柴发维护优化、AHU运行优化、UPS电容实时监控",
-        projectBackground: "柴油发电机虽然使用频次低，但仍需定期维护以保证启动可靠性",
-        projectExplanation: "试点柴发检查改造5万；行业策略研究5万；AHU性能AI调优工具5万等",
-        procurementCode: "RDBP202506230002",
-        completionStatus: "未结项",
-        relatedBudgetProject: "N-TEG-2025-TB运营研发-辅助工具",
+        owner: "leozhzou",
+        members: "leozhzou;weikezheng;tomhuang;charlesgao",
+        projectGoal: "三个合作厂家每家输出技术方案",
+        projectBackground: "低压柜采用三大合资柜型，相同授权柜型开关不兼容，成本高",
+        projectExplanation: "研发预算合计236485元",
+        procurementCode: "RDBP202506270004",
+        completionStatus: "已结项",
+        relatedBudgetProject: "N-TEG-2025-TB架构研发-电气",
         budgetYear: "2025",
-        budgetOccupied: 10, // 100,000元
-        budgetExecuted: 0,
-        orderAmount: 0,
-        acceptanceAmount: 0,
-        contractOrderNumber: "",
-        approvalStatus: "draft"
+        budgetOccupied: 23.6485, // 预算占用23.6485万元
+        budgetExecuted: 23.6485, // 已验收23.6485万元
+        orderAmount: 23.6485,
+        acceptanceAmount: 23.6485,
+        contractOrderNumber: "T102-TEG-2025082700001",
+        approvalStatus: "approved"
       },
-      // 2. TB运营研发-电池全容量核容工具
+      // 5. 暖通-分体氟泵SHU项目：40万元
       {
-        projectCode: "RDBP202507280004",
-        projectName: "TEG-2025-TB运营研发-电池全容量核容工具",
-        category: "IDC运营-研发",
-        subProjectName: "TB运营研发-辅助工具",
+        projectCode: "RDBP202507210001",
+        projectName: "TEG-2025-暖通-分体氟泵SHU项目",
+        category: "IDC架构研发",
+        subProjectName: "TB架构研发-暖通",
         projectType: "重点",
         projectStatus: "完成",
-        owner: "qingzhuhuo",
-        members: "ariestzhang;chadxie;shaunzhang;dragonzhao",
-        projectGoal: "核容工具实现电池按需维护",
-        projectBackground: "蓄电池实际寿命与现场维护、使用情况有关，若仅按照生命周期年限触发更换，会产生很大的运营成本",
-        projectExplanation: "电池全容量核容工具厂家合作研发费用15万；厂家实验室搭建测试平台进行安规测试、功能测试，现场安装调试费用及改造用配套物料的供应费用约5万",
-        procurementCode: "RDBP202507280004",
-        completionStatus: "未结项",
-        relatedBudgetProject: "N-TEG-2025-TB运营研发-辅助工具",
+        owner: "tianqingwu",
+        members: "aggieliu;jamesdqli;keweiliu;tianqingwu;fennyliu",
+        projectGoal: "新增多层建筑制冷解决方案（适配无水/缺水地区）",
+        projectBackground: "匹配兼容未来高密的风/液机房需求和新的多层库TB架构",
+        projectExplanation: "机组研发费用20万；样机测试费用20万",
+        procurementCode: "RDBP202507210001",
+        completionStatus: "已结项",
+        relatedBudgetProject: "N-TEG-2025-TB架构研发-暖通",
         budgetYear: "2025",
-        budgetOccupied: 20, // 200,000元
-        budgetExecuted: 0,
-        orderAmount: 0,
-        acceptanceAmount: 0,
+        budgetOccupied: 40, // 预算占用40万元
+        budgetExecuted: 40, // 已验收40万元
+        orderAmount: 40,
+        acceptanceAmount: 40,
         contractOrderNumber: "",
-        approvalStatus: "draft"
+        approvalStatus: "approved"
       }
     ];
 
-    // ==================== 类别三：高校合作 ====================
-    // 总计: 300,000元 = 30万元 (放在总看板上)
+    // ==================== 高校合作费：30万元 ====================
     const universityProjects = [
       {
         projectCode: "UNIV-2025-001",
@@ -288,54 +222,92 @@ export const seed2025BudgetProjects = async () => {
         category: "高校合作",
         subProjectName: "高校合作",
         projectType: "常规",
-        projectStatus: "进行中",
+        projectStatus: "完成",
         owner: "admin",
         members: "",
         projectGoal: "产学研合作",
         projectBackground: "与高校进行技术合作研究",
         projectExplanation: "高校合作费用30万",
         procurementCode: "",
-        completionStatus: "未结项",
+        completionStatus: "已结项",
         relatedBudgetProject: "高校合作",
         budgetYear: "2025",
-        budgetOccupied: 30, // 300,000元
-        budgetExecuted: 0,
-        orderAmount: 0,
-        acceptanceAmount: 0,
+        budgetOccupied: 30, // 预算占用30万元
+        budgetExecuted: 30, // 已执行30万元
+        orderAmount: 30,
+        acceptanceAmount: 30,
         contractOrderNumber: "",
-        approvalStatus: "draft"
+        approvalStatus: "approved"
       }
     ];
 
-    const allProjects = [...architectureProjects, ...operationProjects, ...universityProjects];
+    // ==================== IDC运营研发费：30万元 ====================
+    const operationProjects = [
+      {
+        projectCode: "OPER-2025-001",
+        projectName: "2025年IDC运营研发项目",
+        category: "IDC运营-研发",
+        subProjectName: "IDC运营研发",
+        projectType: "常规",
+        projectStatus: "完成",
+        owner: "admin",
+        members: "",
+        projectGoal: "IDC运营研发相关费用",
+        projectBackground: "IDC运营研发费用",
+        projectExplanation: "IDC运营研发费用30万",
+        procurementCode: "",
+        completionStatus: "已结项",
+        relatedBudgetProject: "IDC运营研发",
+        budgetYear: "2025",
+        budgetOccupied: 30, // 预算占用30万元
+        budgetExecuted: 30, // 已执行30万元
+        orderAmount: 30,
+        acceptanceAmount: 30,
+        contractOrderNumber: "",
+        approvalStatus: "approved"
+      }
+    ];
+
+    const allProjects = [...pendingProjects, ...completedProjects, ...universityProjects, ...operationProjects];
 
     console.log('📝 Seeding 2025 budget projects...');
     console.log('');
 
     // 输出类别统计
-    const archTotal = architectureProjects.reduce((sum, p) => sum + p.budgetOccupied, 0);
-    const archExecuted = architectureProjects.reduce((sum, p) => sum + p.budgetExecuted, 0);
-    console.log(`📦 类别一 [研发费-架构]: ${architectureProjects.length}个项目`);
-    console.log(`   预算占用: ${archTotal.toFixed(2)}万元 | 预算执行: ${archExecuted.toFixed(4)}万元 | 剩余: ${(archTotal - archExecuted).toFixed(2)}万元`);
+    const pendingTotal = pendingProjects.reduce((sum, p) => sum + p.budgetOccupied, 0);
+    const pendingExecuted = pendingProjects.reduce((sum, p) => sum + p.budgetExecuted, 0);
+    console.log(`📦 预提待使用预算: ${pendingProjects.length}个项目`);
+    console.log(`   预算占用: ${pendingTotal.toFixed(2)}万元 | 预算执行: ${pendingExecuted.toFixed(2)}万元`);
+
+    const completedTotal = completedProjects.reduce((sum, p) => sum + p.budgetOccupied, 0);
+    const completedExecuted = completedProjects.reduce((sum, p) => sum + p.budgetExecuted, 0);
+    console.log(`📦 已完成验收预算: ${completedProjects.length}个项目`);
+    console.log(`   预算占用: ${completedTotal.toFixed(4)}万元 | 预算执行: ${completedExecuted.toFixed(4)}万元`);
+
+    const univTotal = universityProjects.reduce((sum, p) => sum + p.budgetOccupied, 0);
+    const univExecuted = universityProjects.reduce((sum, p) => sum + p.budgetExecuted, 0);
+    console.log(`📦 高校合作费: ${universityProjects.length}个项目`);
+    console.log(`   预算占用: ${univTotal.toFixed(2)}万元 | 预算执行: ${univExecuted.toFixed(2)}万元`);
 
     const opTotal = operationProjects.reduce((sum, p) => sum + p.budgetOccupied, 0);
     const opExecuted = operationProjects.reduce((sum, p) => sum + p.budgetExecuted, 0);
-    console.log(`📦 类别二 [研发费-运营]: ${operationProjects.length}个项目`);
-    console.log(`   预算占用: ${opTotal.toFixed(2)}万元 | 预算执行: ${opExecuted.toFixed(2)}万元 | 剩余: ${(opTotal - opExecuted).toFixed(2)}万元`);
-
-    const univTotal = universityProjects.reduce((sum, p) => sum + p.budgetOccupied, 0);
-    console.log(`📦 类别三 [高校合作]: ${universityProjects.length}个项目`);
-    console.log(`   预算占用: ${univTotal.toFixed(2)}万元`);
+    console.log(`📦 IDC运营研发费: ${operationProjects.length}个项目`);
+    console.log(`   预算占用: ${opTotal.toFixed(2)}万元 | 预算执行: ${opExecuted.toFixed(2)}万元`);
 
     console.log('');
     console.log('----------------------------');
-    const totalOccupied = archTotal + opTotal;
-    const totalExecuted = archExecuted + opExecuted;
-    console.log(`💰 研发费合计: 预算占用 ${totalOccupied.toFixed(2)}万元 = ${(totalOccupied * 10000).toFixed(0)}元`);
-    console.log(`💰 研发费执行: ${totalExecuted.toFixed(4)}万元`);
-    console.log(`💰 研发费待执行: ${(270 - totalOccupied).toFixed(2)}万元 = 12.8万元`);
-    console.log(`💰 高校合作: ${univTotal.toFixed(2)}万元`);
-    console.log(`💰 总预算: 270万(研发费) + 30万(高校合作) = 300万元`);
+    const totalOccupied = pendingTotal + completedTotal + univTotal + opTotal;
+    const totalExecuted = pendingExecuted + completedExecuted + univExecuted + opExecuted;
+    const remainingBudget = 300 - totalOccupied;
+    console.log(`💰 预算汇总:`);
+    console.log(`   总预算: 300万元`);
+    console.log(`   预提待使用: ${pendingTotal.toFixed(2)}万元`);
+    console.log(`   已完成验收: ${completedTotal.toFixed(4)}万元`);
+    console.log(`   高校合作费: ${univTotal.toFixed(2)}万元`);
+    console.log(`   IDC运营研发费: ${opTotal.toFixed(2)}万元`);
+    console.log(`   剩余未使用预算: ${remainingBudget.toFixed(2)}万元`);
+    console.log(`   已占用总计: ${totalOccupied.toFixed(4)}万元`);
+    console.log(`   已执行总计: ${totalExecuted.toFixed(4)}万元`);
     console.log('----------------------------');
     console.log('');
 

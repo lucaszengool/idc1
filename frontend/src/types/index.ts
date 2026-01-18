@@ -86,6 +86,24 @@ export interface DashboardStats {
   预计执行金额: number;
   预计剩余预算: number;
   项目总数: number;
+  // 新增预算分类数据
+  预提待使用预算: number;
+  已完成验收预算: number;
+  剩余未使用预算: number;
+  预提待使用项目: Array<{
+    id: number;
+    projectName: string;
+    budgetAmount: number;
+    executedAmount: number;
+    category: string;
+  }>;
+  已完成验收项目: Array<{
+    id: number;
+    projectName: string;
+    budgetAmount: number;
+    executedAmount: number;
+    category: string;
+  }>;
   categoryStats: Array<{
     category: string;
     projectCount: number;

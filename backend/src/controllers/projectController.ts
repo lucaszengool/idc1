@@ -347,3 +347,101 @@ export const deleteProject = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: 'Failed to delete project' });
   }
 };
+
+// 批量导入项目预算数据
+export const batchImportProjects = async (req: Request, res: Response) => {
+  try {
+    const { projects, budgetYear } = req.body;
+
+    if (!Array.isArray(projects)) {
+      return res.status(400).json({ success: false, message: '数据格式错误，请提供项目数组' });
+    }
+
+    const targetYear = budgetYear || new Date().getFullYear().toString();
+    const results = {
+      created: 0,
+      updated: 0,
+      errors: [] as string[],
+    };
+
+    for (const projectData of projects) {
+      try {
+        if (projectData.id) {
+          // 更新现有项目
+          const existingProject = await Project.findByPk(projectData.id);
+          if (existingProject) {
+            const budgetAmount = parseFloat(projectData.budgetAmount || projectData.budgetOccupied || existingProject.budgetOccupied);
+            const executedAmount = parseFloat(projectData.executedAmount || projectData.budgetExecuted || 0);
+
+            await existingProject.update({
+              budgetOccupied: budgetAmount,
+              budgetExecuted: executedAmount,
+              budgetYear: projectData.budgetYear || targetYear,
+              ...(projectData.projectName && { projectName: projectData.projectName }),
+              ...(projectData.category && { category: projectData.category }),
+              ...(projectData.owner && { owner: projectData.owner }),
+            });
+            results.updated++;
+          } else {
+            results.errors.push(`项目ID ${projectData.id} 不存在`);
+          }
+        } else if (projectData.projectCode) {
+          // 根据projectCode查找并更新，或创建新项目
+          const existingProject = await Project.findOne({ where: { projectCode: projectData.projectCode } });
+          const budgetAmount = parseFloat(projectData.budgetAmount || projectData.budgetOccupied || 0);
+          const executedAmount = parseFloat(projectData.executedAmount || projectData.budgetExecuted || 0);
+
+          if (existingProject) {
+            await existingProject.update({
+              budgetOccupied: budgetAmount,
+              budgetExecuted: executedAmount,
+              budgetYear: projectData.budgetYear || targetYear,
+              ...(projectData.projectName && { projectName: projectData.projectName }),
+              ...(projectData.category && { category: projectData.category }),
+              ...(projectData.owner && { owner: projectData.owner }),
+            });
+            results.updated++;
+          } else {
+            // 创建新项目
+            await Project.create({
+              projectCode: projectData.projectCode,
+              projectName: projectData.projectName || '未命名项目',
+              category: projectData.category || 'IDC架构研发',
+              subProjectName: projectData.subProjectName || projectData.projectName || '未命名',
+              projectType: projectData.projectType || '常规',
+              projectStatus: projectData.projectStatus || '进行中',
+              owner: projectData.owner || 'admin',
+              members: projectData.members || '',
+              projectGoal: projectData.projectGoal || '',
+              projectBackground: projectData.projectBackground || '',
+              projectExplanation: projectData.projectExplanation || '',
+              procurementCode: projectData.procurementCode || projectData.projectCode,
+              completionStatus: projectData.completionStatus || '未结项',
+              relatedBudgetProject: projectData.relatedBudgetProject || '',
+              budgetYear: projectData.budgetYear || targetYear,
+              budgetOccupied: budgetAmount,
+              budgetExecuted: executedAmount,
+              orderAmount: parseFloat(projectData.orderAmount || 0),
+              acceptanceAmount: parseFloat(projectData.acceptanceAmount || executedAmount),
+              approvalStatus: projectData.approvalStatus || 'draft',
+            } as any);
+            results.created++;
+          }
+        } else {
+          results.errors.push(`项目 "${projectData.projectName || '未知'}" 缺少id或projectCode`);
+        }
+      } catch (err: any) {
+        results.errors.push(`处理项目 "${projectData.projectName || projectData.id || '未知'}" 时出错: ${err.message}`);
+      }
+    }
+
+    res.json({
+      success: true,
+      data: results,
+      message: `成功创建 ${results.created} 个项目，更新 ${results.updated} 个项目${results.errors.length > 0 ? `，${results.errors.length} 个错误` : ''}`,
+    });
+  } catch (error) {
+    console.error('Batch import projects error:', error);
+    res.status(500).json({ success: false, message: 'Failed to batch import projects' });
+  }
+};
