@@ -10,6 +10,7 @@ import groupRoutes from './groups';
 import approvalRoutes from './approvals';
 import budgetVersionRoutes from './budgetVersions';
 import projectTransferRoutes from './projectTransfers';
+import adminRoutes from './admin';
 
 const router = express.Router();
 
@@ -35,5 +36,8 @@ router.use('/statistics', statisticsRoutes);
 router.use('/adjustments', adjustmentRoutes);
 router.use('/monthly-executions', monthlyExecutionRoutes);
 router.use('/total-budget', totalBudgetRoutes);
+
+// 管理员路由
+router.use('/admin', adminRoutes);
 
 export default router;

@@ -15,6 +15,7 @@ const groups_1 = __importDefault(require("./groups"));
 const approvals_1 = __importDefault(require("./approvals"));
 const budgetVersions_1 = __importDefault(require("./budgetVersions"));
 const projectTransfers_1 = __importDefault(require("./projectTransfers"));
+const admin_1 = __importDefault(require("./admin"));
 const router = express_1.default.Router();
 // 认证路由
 router.use('/auth', auth_1.default);
@@ -33,5 +34,7 @@ router.use('/statistics', statistics_1.default);
 router.use('/adjustments', adjustments_1.default);
 router.use('/monthly-executions', monthlyExecutions_1.default);
 router.use('/total-budget', totalBudget_1.default);
+// 管理员路由
+router.use('/admin', admin_1.default);
 exports.default = router;
 //# sourceMappingURL=index.js.map
