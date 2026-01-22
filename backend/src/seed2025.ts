@@ -10,6 +10,15 @@
 export const seed2025BudgetProjects = async () => {
   try {
     const { Project } = await import('./models');
+    const { Op } = await import('sequelize');
+
+    console.log('📝 开始更新2025年预算数据...');
+
+    // 首先删除2025年所有旧项目，确保数据一致性
+    const deletedCount = await Project.destroy({
+      where: { budgetYear: '2025' }
+    });
+    console.log(`🗑️ 已删除 ${deletedCount} 个旧的2025年项目`);
 
     // ==================== 预提待使用的预算：98.2万元 ====================
     // 这些项目已立项但尚未执行验收
