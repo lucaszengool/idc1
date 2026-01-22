@@ -130,7 +130,7 @@ export const initiateProjectTransfer = async (req: Request, res: Response) => {
       },
       requesterId: parseInt(requesterId),
       approverId: toGroup.pmId,
-      groupId: parseInt(toGroupId),
+      groupId: toGroup.id,
       submittedAt: new Date(),
       status: 'pending' as const
     };

@@ -153,20 +153,26 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
     }
   };
 
-  const handleCreateTransfer = async (values: any) => {
+  const handleCreateTransfer = async () => {
     if (!currentUser) return;
 
     try {
+      // 获取所有字段值（包括之前步骤的值）
+      const allValues = form.getFieldsValue();
+
+      // 验证最后一步
+      await form.validateFields(['reason']);
+
       // 将输入的名称转换为简化格式
       const transferData = {
-        projectId: values.projectId,
-        transferType: values.transferType,
-        fromUserName: values.fromUserName,
-        fromGroupName: values.fromGroupName,
-        toUserName: values.toUserName,
-        toGroupName: values.toGroupName,
-        transferAmount: values.transferAmount,
-        reason: values.reason,
+        projectId: allValues.projectId,
+        transferType: allValues.transferType,
+        fromUserName: allValues.fromUserName,
+        fromGroupName: allValues.fromGroupName,
+        toUserName: allValues.toUserName,
+        toGroupName: allValues.toGroupName,
+        transferAmount: allValues.transferAmount,
+        reason: allValues.reason,
         requesterId: currentUser.id
       };
 
@@ -455,7 +461,6 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
 
         <Form
           form={form}
-          onFinish={handleCreateTransfer}
           layout="vertical"
         >
           {renderStepContent()}
@@ -501,7 +506,7 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
                   }}>
                     取消
                   </Button>
-                  <Button type="primary" htmlType="submit">
+                  <Button type="primary" onClick={handleCreateTransfer}>
                     提交转移请求
                   </Button>
                 </Space>
