@@ -1,13 +1,12 @@
 "use strict";
-// Seed 2025 Budget Projects - 更新于 2025-01-18
+// Seed 2025 Budget Projects - 更新于 2025-01-22
 // 数据来源：用户提供的最新2025年研发项目执行情况
 //
 // 25年架构研发中心总预算：300万元
-// - 预提待使用预算：98.2万元
-// - 已完成验收预算：101.24万元
-// - 高校合作费：30万元
-// - IDC运营研发费：30万元
+// - 预提待使用预算：98.2万元 (3个项目)
+// - 已完成验收预算：161.24万元 (7个项目，包含高校合作和IDC运营研发)
 // - 剩余未使用预算：40.56万元
+// 验证: 98.2 + 161.24 + 40.56 = 300万元 ✓
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -49,7 +48,7 @@ const seed2025BudgetProjects = async () => {
         // ==================== 预提待使用的预算：98.2万元 ====================
         // 这些项目已立项但尚未执行验收
         const pendingProjects = [
-            // 1. 节水版一体冷源&风墙研发项目：45万元
+            // a. 节水版一体冷源&风墙研发项目：45万元
             {
                 projectCode: "RDBP202507280003",
                 projectName: "TEG-2025-节水版一体冷源&风墙研发项目",
@@ -73,7 +72,7 @@ const seed2025BudgetProjects = async () => {
                 contractOrderNumber: "",
                 approvalStatus: "draft"
             },
-            // 2. 弹性直流系统2.0自研项目：44万元
+            // b. 弹性直流系统2.0自研项目：44万元
             {
                 projectCode: "RDBP202507240006",
                 projectName: "TEG-2025-弹性直流系统2.0自研项目",
@@ -97,7 +96,7 @@ const seed2025BudgetProjects = async () => {
                 contractOrderNumber: "",
                 approvalStatus: "draft"
             },
-            // 3. 数据中心PDU合作研发项目：9.2万元
+            // c. 数据中心PDU合作研发项目：9.2万元
             {
                 projectCode: "RDBP202412180006",
                 projectName: "TEG-2025-数据中心PDU合作研发项目",
@@ -122,10 +121,11 @@ const seed2025BudgetProjects = async () => {
                 approvalStatus: "draft"
             }
         ];
-        // ==================== 已完成验收预算：101.24万元 ====================
-        // 这些项目已经完成验收
+        // ==================== 已完成验收预算：161.24万元 ====================
+        // 这些项目已经完成验收（包含高校合作和IDC运营研发）
+        // 0.5958 + 14 + 23 + 23.6485 + 40 + 30 + 30 = 161.2443 ≈ 161.24万元
         const completedProjects = [
-            // 1. TONE扩展模块自研项目：0.5958万元
+            // a. TONE扩展模块自研项目：0.5958万元
             {
                 projectCode: "RDBP202505060002",
                 projectName: "TEG-2025-TONE扩展模块自研项目",
@@ -149,7 +149,7 @@ const seed2025BudgetProjects = async () => {
                 contractOrderNumber: "",
                 approvalStatus: "approved"
             },
-            // 2. 2.5MW分布式柴发方仓研发项目：14万元
+            // b. 2.5MW分布式柴发方仓研发项目：14万元
             {
                 projectCode: "RDBP202412050003-2",
                 projectName: "TEG-2025-2.5MW分布式柴发方仓研发项目",
@@ -173,7 +173,7 @@ const seed2025BudgetProjects = async () => {
                 contractOrderNumber: "",
                 approvalStatus: "approved"
             },
-            // 3. 分布式备电架构自研项目：23万元
+            // c. 分布式备电架构自研项目：23万元
             {
                 projectCode: "RDBP202412050003",
                 projectName: "TEG-2025-分布式备电架构自研项目",
@@ -197,7 +197,7 @@ const seed2025BudgetProjects = async () => {
                 contractOrderNumber: "",
                 approvalStatus: "approved"
             },
-            // 4. 自研低压柜研发项目：23.6485万元
+            // d. 自研低压柜研发项目：23.6485万元
             {
                 projectCode: "RDBP202506270004",
                 projectName: "TEG-2025-自研低压柜研发项目",
@@ -221,7 +221,7 @@ const seed2025BudgetProjects = async () => {
                 contractOrderNumber: "T102-TEG-2025082700001",
                 approvalStatus: "approved"
             },
-            // 5. 暖通-分体氟泵SHU项目：40万元
+            // e. 暖通-分体氟泵SHU项目：40万元
             {
                 projectCode: "RDBP202507210001",
                 projectName: "TEG-2025-暖通-分体氟泵SHU项目",
@@ -244,10 +244,8 @@ const seed2025BudgetProjects = async () => {
                 acceptanceAmount: 40,
                 contractOrderNumber: "",
                 approvalStatus: "approved"
-            }
-        ];
-        // ==================== 高校合作费：30万元 ====================
-        const universityProjects = [
+            },
+            // f. 高校合作费：30万元
             {
                 projectCode: "UNIV-2025-001",
                 projectName: "2025年高校合作项目",
@@ -265,15 +263,13 @@ const seed2025BudgetProjects = async () => {
                 relatedBudgetProject: "高校合作",
                 budgetYear: "2025",
                 budgetOccupied: 30, // 预算占用30万元
-                budgetExecuted: 30, // 已执行30万元
+                budgetExecuted: 30, // 已验收30万元
                 orderAmount: 30,
                 acceptanceAmount: 30,
                 contractOrderNumber: "",
                 approvalStatus: "approved"
-            }
-        ];
-        // ==================== IDC运营研发费：30万元 ====================
-        const operationProjects = [
+            },
+            // g. IDC运营研发费：30万元
             {
                 projectCode: "OPER-2025-001",
                 projectName: "2025年IDC运营研发项目",
@@ -291,14 +287,14 @@ const seed2025BudgetProjects = async () => {
                 relatedBudgetProject: "IDC运营研发",
                 budgetYear: "2025",
                 budgetOccupied: 30, // 预算占用30万元
-                budgetExecuted: 30, // 已执行30万元
+                budgetExecuted: 30, // 已验收30万元
                 orderAmount: 30,
                 acceptanceAmount: 30,
                 contractOrderNumber: "",
                 approvalStatus: "approved"
             }
         ];
-        const allProjects = [...pendingProjects, ...completedProjects, ...universityProjects, ...operationProjects];
+        const allProjects = [...pendingProjects, ...completedProjects];
         console.log('📝 Seeding 2025 budget projects...');
         console.log('');
         // 输出类别统计
@@ -306,32 +302,19 @@ const seed2025BudgetProjects = async () => {
         const pendingExecuted = pendingProjects.reduce((sum, p) => sum + p.budgetExecuted, 0);
         console.log(`📦 预提待使用预算: ${pendingProjects.length}个项目`);
         console.log(`   预算占用: ${pendingTotal.toFixed(2)}万元 | 预算执行: ${pendingExecuted.toFixed(2)}万元`);
-        const completedTotal = completedProjects.reduce((sum, p) => sum + p.budgetOccupied, 0);
-        const completedExecuted = completedProjects.reduce((sum, p) => sum + p.budgetExecuted, 0);
+        const completedTotal = completedProjects.reduce((sum, p) => sum + p.budgetExecuted, 0);
         console.log(`📦 已完成验收预算: ${completedProjects.length}个项目`);
-        console.log(`   预算占用: ${completedTotal.toFixed(4)}万元 | 预算执行: ${completedExecuted.toFixed(4)}万元`);
-        const univTotal = universityProjects.reduce((sum, p) => sum + p.budgetOccupied, 0);
-        const univExecuted = universityProjects.reduce((sum, p) => sum + p.budgetExecuted, 0);
-        console.log(`📦 高校合作费: ${universityProjects.length}个项目`);
-        console.log(`   预算占用: ${univTotal.toFixed(2)}万元 | 预算执行: ${univExecuted.toFixed(2)}万元`);
-        const opTotal = operationProjects.reduce((sum, p) => sum + p.budgetOccupied, 0);
-        const opExecuted = operationProjects.reduce((sum, p) => sum + p.budgetExecuted, 0);
-        console.log(`📦 IDC运营研发费: ${operationProjects.length}个项目`);
-        console.log(`   预算占用: ${opTotal.toFixed(2)}万元 | 预算执行: ${opExecuted.toFixed(2)}万元`);
+        console.log(`   已验收金额: ${completedTotal.toFixed(4)}万元`);
         console.log('');
         console.log('----------------------------');
-        const totalOccupied = pendingTotal + completedTotal + univTotal + opTotal;
-        const totalExecuted = pendingExecuted + completedExecuted + univExecuted + opExecuted;
+        const totalOccupied = pendingTotal + completedTotal;
         const remainingBudget = 300 - totalOccupied;
         console.log(`💰 预算汇总:`);
         console.log(`   总预算: 300万元`);
         console.log(`   预提待使用: ${pendingTotal.toFixed(2)}万元`);
         console.log(`   已完成验收: ${completedTotal.toFixed(4)}万元`);
-        console.log(`   高校合作费: ${univTotal.toFixed(2)}万元`);
-        console.log(`   IDC运营研发费: ${opTotal.toFixed(2)}万元`);
         console.log(`   剩余未使用预算: ${remainingBudget.toFixed(2)}万元`);
-        console.log(`   已占用总计: ${totalOccupied.toFixed(4)}万元`);
-        console.log(`   已执行总计: ${totalExecuted.toFixed(4)}万元`);
+        console.log(`   验证: ${pendingTotal.toFixed(2)} + ${completedTotal.toFixed(4)} + ${remainingBudget.toFixed(2)} = ${(pendingTotal + completedTotal + remainingBudget).toFixed(2)}万元`);
         console.log('----------------------------');
         console.log('');
         for (const projectData of allProjects) {
