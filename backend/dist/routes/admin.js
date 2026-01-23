@@ -278,7 +278,30 @@ router.post('/reinit-2025', async (req, res) => {
 router.post('/fix-2025-data', async (req, res) => {
     try {
         console.log('🔧 开始修复2025年数据...');
-        // 1. 删除测试项目（projectCode以ADJ开头的调整项目）
+        // 0. 先查找要删除的测试项目ID
+        const testProjects = await models_1.Project.findAll({
+            where: {
+                budgetYear: '2025',
+                projectCode: {
+                    [sequelize_1.Op.like]: 'ADJ-%'
+                }
+            }
+        });
+        const testProjectIds = testProjects.map(p => p.id);
+        console.log(`找到 ${testProjectIds.length} 个测试项目: ${testProjectIds.join(', ')}`);
+        // 1. 先删除关联的预算调整记录
+        if (testProjectIds.length > 0) {
+            const deletedAdjustments = await models_1.BudgetAdjustment.destroy({
+                where: {
+                    [sequelize_1.Op.or]: [
+                        { originalProjectId: { [sequelize_1.Op.in]: testProjectIds } },
+                        { newProjectId: { [sequelize_1.Op.in]: testProjectIds } }
+                    ]
+                }
+            });
+            console.log(`🗑️ 已删除 ${deletedAdjustments} 条关联的预算调整记录`);
+        }
+        // 2. 删除测试项目
         const deletedCount = await models_1.Project.destroy({
             where: {
                 budgetYear: '2025',
