@@ -1,5 +1,6 @@
 import express from 'express';
 import { Project } from '../models';
+import { Op } from 'sequelize';
 
 const router = express.Router();
 
@@ -275,6 +276,82 @@ router.post('/reinit-2025', async (req, res) => {
   } catch (error) {
     console.error('重新初始化2025年数据失败:', error);
     res.status(500).json({ success: false, message: '重新初始化失败' });
+  }
+});
+
+// 修复2025年数据 - 删除测试项目并恢复正确的预算值
+router.post('/fix-2025-data', async (req, res) => {
+  try {
+    console.log('🔧 开始修复2025年数据...');
+
+    // 1. 删除测试项目（projectCode以ADJ开头的调整项目）
+    const deletedCount = await Project.destroy({
+      where: {
+        budgetYear: '2025',
+        projectCode: {
+          [Op.like]: 'ADJ-%'
+        }
+      }
+    });
+    console.log(`🗑️ 已删除 ${deletedCount} 个测试/调整项目`);
+
+    // 2. 修复已完成验收项目的预算值
+    const completedProjectFixes = [
+      { projectCode: 'RDBP202505060002', budgetOccupied: 0.5958, budgetExecuted: 0.5958 },
+      { projectCode: 'RDBP202412050003-2', budgetOccupied: 14, budgetExecuted: 14 },
+      { projectCode: 'RDBP202412050003', budgetOccupied: 23, budgetExecuted: 23 },
+      { projectCode: 'RDBP202506270004', budgetOccupied: 23.6485, budgetExecuted: 23.6485 },
+      { projectCode: 'RDBP202507210001', budgetOccupied: 40, budgetExecuted: 40 },
+      { projectCode: 'UNIV-2025-001', budgetOccupied: 30, budgetExecuted: 30 },
+      { projectCode: 'OPER-2025-001', budgetOccupied: 30, budgetExecuted: 30 }
+    ];
+
+    let fixedCount = 0;
+    for (const fix of completedProjectFixes) {
+      const [updated] = await Project.update(
+        {
+          budgetOccupied: fix.budgetOccupied,
+          budgetExecuted: fix.budgetExecuted,
+          orderAmount: fix.budgetOccupied,
+          acceptanceAmount: fix.budgetOccupied
+        },
+        { where: { projectCode: fix.projectCode, budgetYear: '2025' } }
+      );
+      if (updated > 0) {
+        fixedCount++;
+        console.log(`✅ 已修复: ${fix.projectCode} -> ${fix.budgetOccupied}万元`);
+      }
+    }
+
+    // 3. 计算统计
+    const projects2025 = await Project.findAll({ where: { budgetYear: '2025' } });
+    const pendingTotal = projects2025
+      .filter(p => p.completionStatus === '未结项')
+      .reduce((sum, p) => sum + parseFloat(p.budgetOccupied.toString()), 0);
+    const completedTotal = projects2025
+      .filter(p => p.completionStatus === '已结项')
+      .reduce((sum, p) => sum + parseFloat(p.budgetExecuted.toString()), 0);
+    const remaining = 300 - pendingTotal - completedTotal;
+
+    console.log('\n📊 修复后统计:');
+    console.log(`   预提待使用: ${pendingTotal.toFixed(2)}万元`);
+    console.log(`   已完成验收: ${completedTotal.toFixed(4)}万元`);
+    console.log(`   剩余未使用: ${remaining.toFixed(2)}万元`);
+
+    res.json({
+      success: true,
+      message: '2025年数据已修复',
+      data: {
+        deletedTestProjects: deletedCount,
+        fixedProjects: fixedCount,
+        预提待使用: pendingTotal,
+        已完成验收: completedTotal,
+        剩余未使用: remaining
+      }
+    });
+  } catch (error) {
+    console.error('修复2025年数据失败:', error);
+    res.status(500).json({ success: false, message: '修复失败', error: String(error) });
   }
 });
 
