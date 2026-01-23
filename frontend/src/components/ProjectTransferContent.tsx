@@ -154,14 +154,46 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
   };
 
   const handleCreateTransfer = async () => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      message.error('用户未登录');
+      return;
+    }
 
     try {
       // 获取所有字段值（包括之前步骤的值）
       const allValues = form.getFieldsValue();
+      console.log('表单数据:', allValues);
 
       // 验证最后一步
-      await form.validateFields(['reason']);
+      try {
+        await form.validateFields(['reason']);
+      } catch (validationError) {
+        console.log('验证失败:', validationError);
+        message.error('请填写转移原因（至少10个字符）');
+        return;
+      }
+
+      // 检查必填字段
+      if (!allValues.projectId) {
+        message.error('请选择要转移的项目');
+        setCurrentStep(0);
+        return;
+      }
+      if (!allValues.transferType) {
+        message.error('请选择转移类型');
+        setCurrentStep(0);
+        return;
+      }
+      if (!allValues.fromUserName || !allValues.fromGroupName) {
+        message.error('请填写当前归属信息');
+        setCurrentStep(1);
+        return;
+      }
+      if (!allValues.toUserName || !allValues.toGroupName) {
+        message.error('请填写目标归属信息');
+        setCurrentStep(2);
+        return;
+      }
 
       // 将输入的名称转换为简化格式
       const transferData = {
@@ -176,6 +208,7 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
         requesterId: currentUser.id
       };
 
+      console.log('提交数据:', transferData);
       const response = await axios.post(`${API_BASE_URL}/project-transfers`, transferData);
 
       if (response.data.success) {
@@ -185,9 +218,12 @@ const ProjectTransferContent: React.FC<ProjectTransferContentProps> = ({ onRefre
         setCurrentStep(0);
         loadTransfers(currentUser.id);
         onRefresh();
+      } else {
+        message.error(response.data.message || '提交失败');
       }
     } catch (error: any) {
-      message.error(error.response?.data?.message || '提交转移请求失败');
+      console.error('提交转移请求失败:', error);
+      message.error(error.response?.data?.message || '提交转移请求失败，请检查网络连接');
     }
   };
 

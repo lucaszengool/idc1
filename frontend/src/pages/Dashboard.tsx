@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Row, Col, Statistic, Table, Tag, Typography, Button, Modal, Form, InputNumber, message, Tabs, Input, Divider, Space } from 'antd';
-import { EditOutlined, UploadOutlined, ClockCircleOutlined, CheckSquareOutlined, WalletOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Statistic, Table, Tag, Typography, Button, Modal, Form, InputNumber, message, Tabs, Input, Divider, Space, Tooltip } from 'antd';
+import { EditOutlined, UploadOutlined, ClockCircleOutlined, CheckSquareOutlined, WalletOutlined, LockOutlined } from '@ant-design/icons';
 import { statisticsAPI, totalBudgetAPI, projectAPI } from '../services/api';
 import { DashboardStats } from '../types';
 import { safeToFixed, formatCurrency, safeParseFloat } from '../utils/number';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
+
+// 锁定的年份 - 这些年份的数据不能被修改
+const LOCKED_YEARS = ['2025'];
 
 const Dashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardStats | null>(null);
@@ -169,22 +172,36 @@ const Dashboard: React.FC = () => {
         <Title level={2}>预算执行总览</Title>
         {currentUsername === 'jessyyang' && (
           <Space>
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => {
-                budgetForm.setFieldsValue({ totalAmount: dashboardData?.总预算 || 0 });
-                setIsEditBudgetModalVisible(true);
-              }}
-            >
-              编辑总预算
-            </Button>
-            <Button
-              icon={<UploadOutlined />}
-              onClick={() => setIsUploadModalVisible(true)}
-            >
-              上传预算数据
-            </Button>
+            {LOCKED_YEARS.includes(selectedYear) ? (
+              <Tooltip title={`${selectedYear}年数据已锁定，仅供查看`}>
+                <Button
+                  type="primary"
+                  icon={<LockOutlined />}
+                  disabled
+                >
+                  数据已锁定
+                </Button>
+              </Tooltip>
+            ) : (
+              <>
+                <Button
+                  type="primary"
+                  icon={<EditOutlined />}
+                  onClick={() => {
+                    budgetForm.setFieldsValue({ totalAmount: dashboardData?.总预算 || 0 });
+                    setIsEditBudgetModalVisible(true);
+                  }}
+                >
+                  编辑总预算
+                </Button>
+                <Button
+                  icon={<UploadOutlined />}
+                  onClick={() => setIsUploadModalVisible(true)}
+                >
+                  上传预算数据
+                </Button>
+              </>
+            )}
           </Space>
         )}
       </div>
