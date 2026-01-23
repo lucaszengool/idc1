@@ -300,10 +300,7 @@ router.post('/fix-2025-data', async (req, res) => {
     if (testProjectIds.length > 0) {
       const deletedAdjustments = await BudgetAdjustment.destroy({
         where: {
-          [Op.or]: [
-            { originalProjectId: { [Op.in]: testProjectIds } },
-            { newProjectId: { [Op.in]: testProjectIds } }
-          ]
+          originalProjectId: { [Op.in]: testProjectIds }
         }
       });
       console.log(`🗑️ 已删除 ${deletedAdjustments} 条关联的预算调整记录`);
