@@ -73,7 +73,7 @@ export const initiateProjectTransfer = async (req: Request, res: Response) => {
       });
     }
 
-    // 查找组（支持ID或组名）
+    // 查找组（支持ID或组名），如果组不存在则自动创建
     let fromGroup, toGroup;
 
     if (fromGroupId) {
@@ -82,6 +82,14 @@ export const initiateProjectTransfer = async (req: Request, res: Response) => {
       fromGroup = await Group.findOne({
         where: { groupName: fromGroupName }
       });
+      // 如果组不存在，自动创建
+      if (!fromGroup) {
+        fromGroup = await Group.create({
+          groupName: fromGroupName,
+          pmId: fromUser.id
+        } as any);
+        console.log(`自动创建组: ${fromGroupName}`);
+      }
     }
 
     if (toGroupId) {
@@ -90,12 +98,20 @@ export const initiateProjectTransfer = async (req: Request, res: Response) => {
       toGroup = await Group.findOne({
         where: { groupName: toGroupName }
       });
+      // 如果组不存在，自动创建
+      if (!toGroup) {
+        toGroup = await Group.create({
+          groupName: toGroupName,
+          pmId: toUser.id
+        } as any);
+        console.log(`自动创建组: ${toGroupName}`);
+      }
     }
 
     if (!fromGroup || !toGroup) {
-      return res.status(404).json({
+      return res.status(400).json({
         success: false,
-        message: `Group not found: ${!fromGroup ? fromGroupName || 'fromGroup' : toGroupName || 'toGroup'}`
+        message: '请填写来源组和目标组名称'
       });
     }
 

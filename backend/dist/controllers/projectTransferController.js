@@ -55,7 +55,7 @@ const initiateProjectTransfer = async (req, res) => {
                 message: `User not found: ${!fromUser ? 'fromUser' : 'toUser'}`
             });
         }
-        // 查找组（支持ID或组名）
+        // 查找组（支持ID或组名），如果组不存在则自动创建
         let fromGroup, toGroup;
         if (fromGroupId) {
             fromGroup = await models_1.Group.findByPk(fromGroupId);
@@ -64,6 +64,14 @@ const initiateProjectTransfer = async (req, res) => {
             fromGroup = await models_1.Group.findOne({
                 where: { groupName: fromGroupName }
             });
+            // 如果组不存在，自动创建
+            if (!fromGroup) {
+                fromGroup = await models_1.Group.create({
+                    groupName: fromGroupName,
+                    pmId: fromUser.id
+                });
+                console.log(`自动创建组: ${fromGroupName}`);
+            }
         }
         if (toGroupId) {
             toGroup = await models_1.Group.findByPk(toGroupId);
@@ -72,11 +80,19 @@ const initiateProjectTransfer = async (req, res) => {
             toGroup = await models_1.Group.findOne({
                 where: { groupName: toGroupName }
             });
+            // 如果组不存在，自动创建
+            if (!toGroup) {
+                toGroup = await models_1.Group.create({
+                    groupName: toGroupName,
+                    pmId: toUser.id
+                });
+                console.log(`自动创建组: ${toGroupName}`);
+            }
         }
         if (!fromGroup || !toGroup) {
-            return res.status(404).json({
+            return res.status(400).json({
                 success: false,
-                message: `Group not found: ${!fromGroup ? fromGroupName || 'fromGroup' : toGroupName || 'toGroup'}`
+                message: '请填写来源组和目标组名称'
             });
         }
         // 创建项目转移记录
