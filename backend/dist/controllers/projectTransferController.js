@@ -152,7 +152,8 @@ const initiateProjectTransfer = async (req, res) => {
         console.error('Initiate project transfer error:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to initiate project transfer'
+            message: 'Failed to initiate project transfer',
+            error: error.message || String(error)
         });
     }
 };

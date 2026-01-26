@@ -172,11 +172,12 @@ export const initiateProjectTransfer = async (req: Request, res: Response) => {
       message: 'Project transfer initiated successfully'
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Initiate project transfer error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to initiate project transfer'
+      message: 'Failed to initiate project transfer',
+      error: error.message || String(error)
     });
   }
 };
