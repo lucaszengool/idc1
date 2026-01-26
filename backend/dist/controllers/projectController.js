@@ -88,17 +88,22 @@ const getProjects = async (req, res) => {
                 },
             ],
         });
-        // 更新每个项目的budgetExecuted字段
+        // 更新每个项目的budgetExecuted字段（仅当有execution记录时才覆盖）
         for (const project of rows) {
             const executions = project.get('executions');
             const totalExecuted = executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0);
-            // 更新项目的budgetExecuted字段
-            await project.update({ budgetExecuted: totalExecuted });
+            // 只有当有execution记录时才更新budgetExecuted，避免覆盖seed数据中的值
+            if (executions.length > 0) {
+                await project.update({ budgetExecuted: totalExecuted });
+            }
         }
         const projectsWithStats = rows.map(project => {
             const executions = project.get('executions');
             const budgetOccupied = parseFloat(project.budgetOccupied.toString());
-            const budgetExecuted = executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0);
+            // 如果有execution记录则从记录计算，否则使用数据库中已有的budgetExecuted值
+            const budgetExecuted = executions.length > 0
+                ? executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0)
+                : parseFloat(project.budgetExecuted?.toString() || '0');
             const remainingBudget = budgetOccupied - budgetExecuted;
             const executionRate = budgetOccupied > 0
                 ? (budgetExecuted / budgetOccupied) * 100
@@ -147,13 +152,18 @@ const getProjectById = async (req, res) => {
         }
         const executions = project.get('executions');
         const budgetOccupied = parseFloat(project.budgetOccupied.toString());
-        const budgetExecuted = executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0);
+        // 如果有execution记录则从记录计算，否则使用数据库中已有的budgetExecuted值
+        const budgetExecuted = executions.length > 0
+            ? executions.reduce((sum, exec) => sum + parseFloat(exec.executionAmount.toString()), 0)
+            : parseFloat(project.budgetExecuted?.toString() || '0');
         const remainingBudget = budgetOccupied - budgetExecuted;
         const executionRate = budgetOccupied > 0
             ? (budgetExecuted / budgetOccupied) * 100
             : 0;
-        // 更新项目的budgetExecuted字段
-        await project.update({ budgetExecuted });
+        // 只有当有execution记录时才更新budgetExecuted
+        if (executions.length > 0) {
+            await project.update({ budgetExecuted });
+        }
         res.json({
             success: true,
             data: {
