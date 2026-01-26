@@ -68,7 +68,8 @@ const initiateProjectTransfer = async (req, res) => {
             if (!fromGroup) {
                 fromGroup = await models_1.Group.create({
                     groupName: fromGroupName,
-                    pmId: fromUser.id
+                    pmId: fromUser.id,
+                    createdBy: parseInt(requesterId)
                 });
                 console.log(`自动创建组: ${fromGroupName}`);
             }
@@ -84,7 +85,8 @@ const initiateProjectTransfer = async (req, res) => {
             if (!toGroup) {
                 toGroup = await models_1.Group.create({
                     groupName: toGroupName,
-                    pmId: toUser.id
+                    pmId: toUser.id,
+                    createdBy: parseInt(requesterId)
                 });
                 console.log(`自动创建组: ${toGroupName}`);
             }

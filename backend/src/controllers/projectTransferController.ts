@@ -86,7 +86,8 @@ export const initiateProjectTransfer = async (req: Request, res: Response) => {
       if (!fromGroup) {
         fromGroup = await Group.create({
           groupName: fromGroupName,
-          pmId: fromUser.id
+          pmId: fromUser.id,
+          createdBy: parseInt(requesterId)
         } as any);
         console.log(`自动创建组: ${fromGroupName}`);
       }
@@ -102,7 +103,8 @@ export const initiateProjectTransfer = async (req: Request, res: Response) => {
       if (!toGroup) {
         toGroup = await Group.create({
           groupName: toGroupName,
-          pmId: toUser.id
+          pmId: toUser.id,
+          createdBy: parseInt(requesterId)
         } as any);
         console.log(`自动创建组: ${toGroupName}`);
       }
