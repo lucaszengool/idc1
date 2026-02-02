@@ -118,9 +118,9 @@ const Dashboard: React.FC = () => {
     },
     {
       title: '执行日期',
-      dataIndex: 'executionDate',
-      key: 'executionDate',
-      render: (date: string) => new Date(date).toLocaleDateString(),
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (date: string) => date ? new Date(date).toLocaleDateString() : '-',
     },
     {
       title: '执行说明',

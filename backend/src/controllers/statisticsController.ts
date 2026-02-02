@@ -130,12 +130,13 @@ export const getDashboard = async (req: Request, res: Response) => {
       categoryStats.push(value);
     });
 
-    // Get recent executions
+    // Get recent executions filtered by year
     const recentExecutions = await BudgetExecution.findAll({
       include: [{
         model: Project,
         as: 'executionProject',
-        required: false
+        where: { budgetYear },
+        required: true
       }],
       order: [['createdAt', 'DESC']],
       limit: 5,

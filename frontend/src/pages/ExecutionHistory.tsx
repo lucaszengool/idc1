@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Typography, Table, Tag, DatePicker, Select, Space, Button, message, Modal } from 'antd';
-import { SearchOutlined, FileTextOutlined, DeleteOutlined } from '@ant-design/icons';
+import { SearchOutlined, DeleteOutlined } from '@ant-design/icons';
 import { executionAPI } from '../services/api';
 import { BudgetExecution } from '../types';
 
@@ -90,21 +90,23 @@ const ExecutionHistory: React.FC = () => {
   const columns = [
     {
       title: '项目名称',
-      dataIndex: ['project', 'projectName'],
+      dataIndex: ['executionProject', 'projectName'],
       key: 'projectName',
+      render: (name: string, record: any) =>
+        name || record.executionProject?.projectName || record.project?.projectName || '未知项目',
     },
     {
       title: '项目分类',
-      dataIndex: ['project', 'category'],
+      dataIndex: ['executionProject', 'category'],
       key: 'category',
-      render: (category: string) => (
+      render: (category: string) => category ? (
         <Tag color={
-          category === 'IDC-架构研发' ? 'blue' : 
+          category === 'IDC-架构研发' ? 'blue' :
           category === '高校合作' ? 'green' : 'orange'
         }>
           {category}
         </Tag>
-      ),
+      ) : '-',
     },
     {
       title: '执行金额（万元）',
@@ -124,20 +126,6 @@ const ExecutionHistory: React.FC = () => {
       title: '创建人',
       dataIndex: 'createdBy',
       key: 'createdBy',
-    },
-    {
-      title: '凭证',
-      dataIndex: 'voucherUrl',
-      key: 'voucherUrl',
-      render: (url: string) => url ? (
-        <Button 
-          icon={<FileTextOutlined />} 
-          size="small"
-          onClick={() => window.open(url, '_blank')}
-        >
-          查看凭证
-        </Button>
-      ) : '无',
     },
     {
       title: '创建时间',
