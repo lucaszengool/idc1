@@ -94,8 +94,16 @@ export const loginWithAccessKey = async (req: Request, res: Response) => {
       });
     }
 
+    // 如果用户没有密码（旧用户迁移），设置默认密码
+    let userPassword = user.password;
+    if (!userPassword) {
+      const defaultHash = await bcrypt.hash(DEFAULT_PASSWORD, SALT_ROUNDS);
+      await user.update({ password: defaultHash });
+      userPassword = defaultHash;
+    }
+
     // 验证密码
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, userPassword);
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,

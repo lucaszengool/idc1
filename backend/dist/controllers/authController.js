@@ -88,8 +88,15 @@ const loginWithAccessKey = async (req, res) => {
                 pendingApproval: true
             });
         }
+        // 如果用户没有密码（旧用户迁移），设置默认密码
+        let userPassword = user.password;
+        if (!userPassword) {
+            const defaultHash = await bcryptjs_1.default.hash(DEFAULT_PASSWORD, SALT_ROUNDS);
+            await user.update({ password: defaultHash });
+            userPassword = defaultHash;
+        }
         // 验证密码
-        const isPasswordValid = await bcryptjs_1.default.compare(password, user.password);
+        const isPasswordValid = await bcryptjs_1.default.compare(password, userPassword);
         if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
