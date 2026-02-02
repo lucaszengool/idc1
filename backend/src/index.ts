@@ -93,11 +93,19 @@ const seed2026BudgetProjects = async () => {
   try {
     const { Project } = await import('./models');
 
+    // 删除旧的2026年项目，确保数据一致性
+    const deletedCount = await Project.destroy({
+      where: { budgetYear: '2026' }
+    });
+    if (deletedCount > 0) {
+      console.log(`🗑️ 已删除 ${deletedCount} 个旧的2026年项目`);
+    }
+
     const projects2026 = [
-      // IDC架构研发 - T-AIDC架构研发 (315万元)
+      // IDC架构研发 - T-AIDC架构研发 - 拆分为5个子项目 (共160万元)
       {
-        projectCode: "IDC-2026-001",
-        projectName: "T-AIDC(含LC-MDC)结构研发",
+        projectCode: "IDC-2026-001A",
+        projectName: "底座封闭通道等结构设备",
         category: "IDC架构研发",
         subProjectName: "T-AIDC架构研发",
         projectType: "重点",
@@ -105,13 +113,105 @@ const seed2026BudgetProjects = async () => {
         owner: "keisenzeng",
         members: "",
         projectGoal: "研发基础底座、辅助类含封层结构件及分区交互组件",
-        projectBackground: "T-AIDC(含LC-MDC)结构研发",
-        projectExplanation: "1、结构：研发基础底座、辅助类含封层结构件及分区交互组件；2、配电：研发小母线、电容补偿、≥400V高压技术提高配电系统效率及稳定性；3、暖通：研发氟-水/低水温CDU等空调设备，支持风冷热量换兼容设计；4、弱电：研发一体化交付弱电系统，集成配电、暖通等设备监控系统；5、水质：基于25年高校合作机理研究成果，研发液冷水质自动检测装置；",
-        procurementCode: "TBD-2026-001",
+        projectBackground: "T-AIDC(含LC-MDC)架构研发-结构设备",
+        projectExplanation: "研发基础底座、辅助类含封层结构件及分区交互组件",
+        procurementCode: "TBD-2026-001A",
         completionStatus: "未结项",
         relatedBudgetProject: "T-AIDC架构研发",
         budgetYear: "2026",
-        budgetOccupied: 160,
+        budgetOccupied: 30,
+        budgetExecuted: 0,
+        orderAmount: 0,
+        acceptanceAmount: 0,
+        contractOrderNumber: "",
+        approvalStatus: "draft"
+      },
+      {
+        projectCode: "IDC-2026-001B",
+        projectName: "直流一体柜及其配套设备",
+        category: "IDC架构研发",
+        subProjectName: "T-AIDC架构研发",
+        projectType: "重点",
+        projectStatus: "待开始",
+        owner: "keisenzeng",
+        members: "",
+        projectGoal: "研发小母线、电容补偿、≥400V高压技术提高配电系统效率及稳定性",
+        projectBackground: "T-AIDC(含LC-MDC)架构研发-配电设备",
+        projectExplanation: "研发小母线、电容补偿、≥400V高压技术提高配电系统效率及稳定性",
+        procurementCode: "TBD-2026-001B",
+        completionStatus: "未结项",
+        relatedBudgetProject: "T-AIDC架构研发",
+        budgetYear: "2026",
+        budgetOccupied: 30,
+        budgetExecuted: 0,
+        orderAmount: 0,
+        acceptanceAmount: 0,
+        contractOrderNumber: "",
+        approvalStatus: "draft"
+      },
+      {
+        projectCode: "IDC-2026-001C",
+        projectName: "氟-水CDU、CT500/1000等制冷设备",
+        category: "IDC架构研发",
+        subProjectName: "T-AIDC架构研发",
+        projectType: "重点",
+        projectStatus: "待开始",
+        owner: "keisenzeng",
+        members: "",
+        projectGoal: "研发氟-水/低水温CDU等空调设备，支持风冷热量换兼容设计",
+        projectBackground: "T-AIDC(含LC-MDC)架构研发-制冷设备",
+        projectExplanation: "研发氟-水/低水温CDU等空调设备，支持风冷热量换兼容设计",
+        procurementCode: "TBD-2026-001C",
+        completionStatus: "未结项",
+        relatedBudgetProject: "T-AIDC架构研发",
+        budgetYear: "2026",
+        budgetOccupied: 60,
+        budgetExecuted: 0,
+        orderAmount: 0,
+        acceptanceAmount: 0,
+        contractOrderNumber: "",
+        approvalStatus: "draft"
+      },
+      {
+        projectCode: "IDC-2026-001D",
+        projectName: "弱电监控",
+        category: "IDC架构研发",
+        subProjectName: "T-AIDC架构研发",
+        projectType: "重点",
+        projectStatus: "待开始",
+        owner: "keisenzeng",
+        members: "",
+        projectGoal: "研发一体化交付弱电系统，集成配电、暖通等设备监控系统",
+        projectBackground: "T-AIDC(含LC-MDC)架构研发-弱电监控",
+        projectExplanation: "研发一体化交付弱电系统，集成配电、暖通等设备监控系统",
+        procurementCode: "TBD-2026-001D",
+        completionStatus: "未结项",
+        relatedBudgetProject: "T-AIDC架构研发",
+        budgetYear: "2026",
+        budgetOccupied: 15,
+        budgetExecuted: 0,
+        orderAmount: 0,
+        acceptanceAmount: 0,
+        contractOrderNumber: "",
+        approvalStatus: "draft"
+      },
+      {
+        projectCode: "IDC-2026-001E",
+        projectName: "水质检测工具模块",
+        category: "IDC架构研发",
+        subProjectName: "T-AIDC架构研发",
+        projectType: "重点",
+        projectStatus: "待开始",
+        owner: "keisenzeng",
+        members: "",
+        projectGoal: "基于25年高校合作机理研究成果，研发液冷水质自动检测装置",
+        projectBackground: "T-AIDC(含LC-MDC)架构研发-水质检测",
+        projectExplanation: "基于25年高校合作机理研究成果，研发液冷水质自动检测装置",
+        procurementCode: "TBD-2026-001E",
+        completionStatus: "未结项",
+        relatedBudgetProject: "T-AIDC架构研发",
+        budgetYear: "2026",
+        budgetOccupied: 25,
         budgetExecuted: 0,
         orderAmount: 0,
         acceptanceAmount: 0,
@@ -188,22 +288,45 @@ const seed2026BudgetProjects = async () => {
         approvalStatus: "draft"
       },
       {
-        projectCode: "IDC-2026-005",
-        projectName: "传感网络技术研发(弱电)",
+        projectCode: "IDC-2026-005A",
+        projectName: "控制技术",
         category: "IDC架构研发",
-        subProjectName: "T-AIDC架构研发",
+        subProjectName: "传感网络技术研发",
         projectType: "常规",
         projectStatus: "待开始",
         owner: "terryxyan",
         members: "",
-        projectGoal: "研发设施控制器PIC、定位设备及融合摄像头",
-        projectBackground: "传感网络技术研发",
-        projectExplanation: "1、控制技术：研发设施控制器PIC，国产化切换、逻辑自编程自仿真；2、定位技术：研发设施和人员定位设备，建设提效和人员精细化管理；3、视觉技术：研发融合摄像头，探索视觉和设施健康度融合管理。",
-        procurementCode: "TBD-2026-005",
+        projectGoal: "研发设施控制器PIC，国产化切换、逻辑自编程自仿真",
+        projectBackground: "传感网络技术研发-控制技术",
+        projectExplanation: "研发设施控制器PIC，国产化切换、逻辑自编程自仿真",
+        procurementCode: "TBD-2026-005A",
         completionStatus: "未结项",
-        relatedBudgetProject: "T-AIDC架构研发",
+        relatedBudgetProject: "传感网络技术研发",
         budgetYear: "2026",
-        budgetOccupied: 40,
+        budgetOccupied: 20,
+        budgetExecuted: 0,
+        orderAmount: 0,
+        acceptanceAmount: 0,
+        contractOrderNumber: "",
+        approvalStatus: "draft"
+      },
+      {
+        projectCode: "IDC-2026-005B",
+        projectName: "视觉技术",
+        category: "IDC架构研发",
+        subProjectName: "传感网络技术研发",
+        projectType: "常规",
+        projectStatus: "待开始",
+        owner: "terryxyan",
+        members: "",
+        projectGoal: "研发融合摄像头，探索视觉和设施健康度融合管理",
+        projectBackground: "传感网络技术研发-视觉技术",
+        projectExplanation: "研发融合摄像头，探索视觉和设施健康度融合管理",
+        procurementCode: "TBD-2026-005B",
+        completionStatus: "未结项",
+        relatedBudgetProject: "传感网络技术研发",
+        budgetYear: "2026",
+        budgetOccupied: 20,
         budgetExecuted: 0,
         orderAmount: 0,
         acceptanceAmount: 0,
@@ -386,7 +509,9 @@ const initializeDatabase = async () => {
       { username: 'tianqingwu', displayName: '吴天青', role: 'employee' as const },
       { username: 'jiabinzhang', displayName: '张家斌', role: 'employee' as const },
       { username: 'qingzhuhuo', displayName: '霍青竹', role: 'employee' as const },
-      { username: 'mshuangliu', displayName: '刘明双', role: 'employee' as const }
+      { username: 'mshuangliu', displayName: '刘明双', role: 'employee' as const },
+      { username: 'jessyyang', displayName: '杨雯宇', role: 'pm' as const },
+      { username: 'wenyuyang', displayName: '杨雯宇', role: 'pm' as const }
     ];
 
     for (const pmData of pmUsers) {
@@ -436,7 +561,9 @@ const initializeDatabase = async () => {
     }
     let budget2026 = await TotalBudget.findOne({ where: { budgetYear: '2026' } });
     if (!budget2026) {
-      await TotalBudget.create({ budgetYear: '2026', totalAmount: 0, createdBy: 'Admin' });
+      await TotalBudget.create({ budgetYear: '2026', totalAmount: 410, createdBy: 'Admin' });
+    } else if (parseFloat(budget2026.totalAmount?.toString() || '0') === 0) {
+      await budget2026.update({ totalAmount: 410 });
     }
     console.log('✅ Total budgets created');
 

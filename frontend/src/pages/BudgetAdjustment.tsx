@@ -35,7 +35,7 @@ const BudgetAdjustment: React.FC = () => {
   const [form] = Form.useForm();
   const [totalBudgetForm] = Form.useForm();
 
-  const currentYear = new Date().getFullYear().toString();
+  const currentYear = '2026';
   const currentUsername = localStorage.getItem('username') || '';
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const BudgetAdjustment: React.FC = () => {
 
   const loadProjects = async () => {
     try {
-      const response = await projectAPI.getAll();
+      const response = await projectAPI.getAll({ year: currentYear, limit: 1000 });
       if (response.data.success) {
         setProjects(response.data.data!.projects);
       }
@@ -188,7 +188,7 @@ const BudgetAdjustment: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <Title level={2}>预算调整管理</Title>
         <div>
-          {currentUsername === 'jessyyang' && (
+          {(currentUsername === 'jessyyang' || currentUsername === 'wenyuyang') && (
             <Button
               type="default"
               icon={<EditOutlined />}
@@ -422,7 +422,7 @@ const BudgetAdjustment: React.FC = () => {
         </Form>
       </Modal>
 
-      {currentUsername === 'jessyyang' && (
+      {(currentUsername === 'jessyyang' || currentUsername === 'wenyuyang') && (
         <Modal
           title={`编辑${currentYear}年总预算`}
           open={isTotalBudgetModalVisible}

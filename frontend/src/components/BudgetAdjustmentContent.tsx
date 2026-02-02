@@ -156,7 +156,7 @@ const BudgetAdjustmentContent: React.FC<BudgetAdjustmentContentProps> = ({
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
-          {currentDisplayName === '杨雯宇' && (
+          {(currentDisplayName === '杨雯宇' || currentDisplayName === 'jessyyang') && (
             <Button
               type="default"
               icon={<EditOutlined />}
@@ -354,7 +354,7 @@ const BudgetAdjustmentContent: React.FC<BudgetAdjustmentContentProps> = ({
         </Form>
       </Modal>
 
-      {currentDisplayName === '杨雯宇' && (
+      {(currentDisplayName === '杨雯宇' || currentDisplayName === 'jessyyang') && (
         <Modal
           title={`编辑${currentYear}年总预算`}
           open={isTotalBudgetModalVisible}

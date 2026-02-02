@@ -19,7 +19,7 @@ const Dashboard: React.FC = () => {
   const [uploadLoading, setUploadLoading] = useState(false);
   const [budgetForm] = Form.useForm();
   const [uploadForm] = Form.useForm();
-  const [selectedYear, setSelectedYear] = useState<string>('2025');
+  const [selectedYear, setSelectedYear] = useState<string>('2026');
 
   const currentYear = new Date().getFullYear().toString();
   const currentUsername = localStorage.getItem('username') || '';
@@ -170,7 +170,7 @@ const Dashboard: React.FC = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <Title level={2}>预算执行总览</Title>
-        {currentUsername === 'jessyyang' && (
+        {(currentUsername === 'jessyyang' || currentUsername === 'wenyuyang') && (
           <Space>
             {LOCKED_YEARS.includes(selectedYear) ? (
               <Tooltip title={`${selectedYear}年数据已锁定，仅供查看`}>
@@ -211,7 +211,7 @@ const Dashboard: React.FC = () => {
         onChange={setSelectedYear}
         style={{ marginBottom: 24 }}
       >
-        <TabPane tab="2025年" key="2025" />
+        <TabPane tab={<span><LockOutlined style={{ marginRight: 4 }} />2025年（已锁定）</span>} key="2025" />
         <TabPane tab="2026年" key="2026" />
       </Tabs>
 

@@ -50,8 +50,11 @@ export const getDashboard = async (req: Request, res: Response) => {
       totalExecuted += executedAmount;
 
       // Calculate predicted execution amount from project data
-      // Use acceptanceAmount if available, otherwise use orderAmount, otherwise use budgetOccupied
-      const predictedAmount = parseFloat(project.acceptanceAmount || project.orderAmount || project.budgetOccupied || 0);
+      // Use acceptanceAmount if > 0, otherwise orderAmount if > 0, otherwise budgetOccupied
+      // Note: DECIMAL values from SQLite may be strings, so "0" is truthy - must parse first
+      const acceptAmt = parseFloat(project.acceptanceAmount?.toString() || '0');
+      const orderAmt = parseFloat(project.orderAmount?.toString() || '0');
+      const predictedAmount = acceptAmt > 0 ? acceptAmt : (orderAmt > 0 ? orderAmt : budgetAmount);
       totalPredictedExecution += predictedAmount;
 
       const executionRate = budgetAmount > 0 ? (executedAmount / budgetAmount) * 100 : 0;

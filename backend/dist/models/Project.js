@@ -25,12 +25,12 @@ Project.init({
         comment: '项目名称',
     },
     projectType: {
-        type: sequelize_1.DataTypes.ENUM('重点', '常规'),
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
         comment: '项目类型',
     },
     projectStatus: {
-        type: sequelize_1.DataTypes.ENUM('完成', '进行中', '待开始'),
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
         comment: '立项状态',
     },
@@ -65,7 +65,7 @@ Project.init({
         comment: '服采立项单号',
     },
     completionStatus: {
-        type: sequelize_1.DataTypes.ENUM('未结项', '已结项'),
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
         defaultValue: '未结项',
         comment: '结项状态',
@@ -122,7 +122,7 @@ Project.init({
     },
     // 保持向后兼容的字段
     category: {
-        type: sequelize_1.DataTypes.ENUM('IDC-架构研发', '高校合作', 'IDC运营-研发'),
+        type: sequelize_1.DataTypes.STRING,
         allowNull: true,
     },
     subProjectName: {

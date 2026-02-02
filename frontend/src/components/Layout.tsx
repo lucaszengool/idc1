@@ -131,7 +131,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             key: '/budget/versions',
             label: '预算版本',
           },
-        ],
+        ] as any[],
       },
       {
         key: '/groups',

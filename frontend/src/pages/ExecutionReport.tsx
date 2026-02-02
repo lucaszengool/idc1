@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Select, InputNumber, Input, Button, Upload, Card, message, Tabs } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined, LockOutlined } from '@ant-design/icons';
 import { projectAPI, executionAPI } from '../services/api';
 import { Project } from '../types';
 
@@ -12,7 +12,7 @@ const ExecutionReport: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string>('2025');
+  const [selectedYear, setSelectedYear] = useState<string>('2026');
 
   useEffect(() => {
     loadProjects();
@@ -108,7 +108,7 @@ const ExecutionReport: React.FC = () => {
         onChange={handleYearChange}
         style={{ marginBottom: 16 }}
       >
-        <TabPane tab="2025年" key="2025" />
+        <TabPane tab={<span><LockOutlined style={{ marginRight: 4 }} />2025年（已锁定）</span>} key="2025" disabled />
         <TabPane tab="2026年" key="2026" />
       </Tabs>
 
