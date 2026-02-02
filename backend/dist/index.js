@@ -540,6 +540,10 @@ const initializeDatabase = async () => {
                 });
                 console.log(`✅ User ${pmData.displayName} created`);
             }
+            else if (user.displayName !== pmData.displayName) {
+                await user.update({ displayName: pmData.displayName, role: pmData.role });
+                console.log(`✅ User ${pmData.displayName} updated`);
+            }
         }
         // Create test groups if not exists
         const pm1 = await User.findOne({ where: { username: 'keisenzeng' } });

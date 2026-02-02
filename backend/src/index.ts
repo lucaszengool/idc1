@@ -526,6 +526,9 @@ const initializeDatabase = async () => {
           isActive: true
         });
         console.log(`✅ User ${pmData.displayName} created`);
+      } else if (user.displayName !== pmData.displayName) {
+        await user.update({ displayName: pmData.displayName, role: pmData.role });
+        console.log(`✅ User ${pmData.displayName} updated`);
       }
     }
 
