@@ -142,7 +142,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     ];
 
     // Add user management for admin users
-    const adminUsernames = ['jessyyang', 'wenyuyang'];
+    const adminUsernames = ['jessyyang', 'wenyuyang', 'yangwenyu'];
     if (adminUsernames.includes(currentUser?.username || '')) {
       baseItems.push({
         key: '/users',

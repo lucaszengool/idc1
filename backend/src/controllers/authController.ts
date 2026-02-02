@@ -14,9 +14,9 @@ export const loginWithAccessKey = async (req: Request, res: Response) => {
       });
     }
 
-    // 查找或创建用户
+    // 查找用户（包括未激活的）
     let user = await User.findOne({
-      where: { username, isActive: true },
+      where: { username },
       include: [
         {
           model: GroupMember,
@@ -42,16 +42,8 @@ export const loginWithAccessKey = async (req: Request, res: Response) => {
       ]
     });
 
-    // 如果用户不存在，创建新用户
+    // 如果用户不存在，创建待审批用户
     if (!user) {
-      if (!role || !['employee', 'pm'].includes(role)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Role selection required for new user',
-          requiresRoleSelection: true
-        });
-      }
-
       // 生成唯一的access key
       let accessKey: string = '';
       let isUnique = false;
@@ -63,40 +55,28 @@ export const loginWithAccessKey = async (req: Request, res: Response) => {
         }
       }
 
-      // 创建新用户
+      // 创建待审批用户（isActive=false）
       user = await User.create({
         accessKey,
         username,
-        displayName: username, // 使用用户名作为显示名
-        role,
-        isActive: true
+        displayName: username,
+        role: 'employee',
+        isActive: false
       });
 
-      // 重新查询以包含关联数据
-      user = await User.findByPk(user.id, {
-        include: [
-          {
-            model: GroupMember,
-            as: 'groupMemberships',
-            include: [
-              {
-                model: Group,
-                as: 'group',
-                include: [
-                  {
-                    model: User,
-                    as: 'pm',
-                    attributes: ['id', 'username', 'displayName']
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            model: Group,
-            as: 'managedGroups'
-          }
-        ]
+      return res.status(403).json({
+        success: false,
+        message: '您的账号注册申请已提交，请等待管理员审批。',
+        pendingApproval: true
+      });
+    }
+
+    // 用户存在但未激活 - 等待审批
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: '您的账号正在等待管理员审批，请稍后再试。',
+        pendingApproval: true
       });
     }
 

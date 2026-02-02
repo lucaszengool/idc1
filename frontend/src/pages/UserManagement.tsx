@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Typography, Table, Button, Modal, Form, Input, Select, message, Tag, Space } from 'antd';
-import { PlusOutlined, EditOutlined, StopOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { Card, Typography, Table, Button, Modal, Form, Input, Select, message, Tag, Space, Badge, Tabs } from 'antd';
+import { PlusOutlined, EditOutlined, StopOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { userAPI } from '../services/api';
 
 const { Title } = Typography;
 const { Option } = Select;
 
-const ADMIN_USERNAMES = ['jessyyang', 'wenyuyang'];
+const ADMIN_USERNAMES = ['jessyyang', 'wenyuyang', 'yangwenyu'];
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -81,7 +81,22 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const columns = [
+  const handleApprove = async (user: any) => {
+    try {
+      const response = await userAPI.toggleActive(user.id);
+      if (response.data.success) {
+        message.success(`已批准用户 ${user.username} 的注册申请`);
+        loadUsers();
+      }
+    } catch (error: any) {
+      message.error('批准失败');
+    }
+  };
+
+  const pendingUsers = users.filter(u => !u.isActive);
+  const activeUsers = users.filter(u => u.isActive);
+
+  const activeColumns = [
     {
       title: '用户名',
       dataIndex: 'username',
@@ -99,16 +114,6 @@ const UserManagement: React.FC = () => {
       render: (role: string) => (
         <Tag color={role === 'pm' ? 'blue' : 'green'}>
           {role === 'pm' ? '项目经理' : '普通员工'}
-        </Tag>
-      ),
-    },
-    {
-      title: '状态',
-      dataIndex: 'isActive',
-      key: 'isActive',
-      render: (isActive: boolean) => (
-        <Tag color={isActive ? 'green' : 'red'}>
-          {isActive ? '启用' : '禁用'}
         </Tag>
       ),
     },
@@ -145,11 +150,60 @@ const UserManagement: React.FC = () => {
           </Button>
           <Button
             size="small"
-            danger={record.isActive}
-            icon={record.isActive ? <StopOutlined /> : <CheckCircleOutlined />}
+            danger
+            icon={<StopOutlined />}
             onClick={() => handleToggleActive(record)}
           >
-            {record.isActive ? '禁用' : '启用'}
+            禁用
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
+  const pendingColumns = [
+    {
+      title: '用户名',
+      dataIndex: 'username',
+      key: 'username',
+    },
+    {
+      title: '显示名',
+      dataIndex: 'displayName',
+      key: 'displayName',
+    },
+    {
+      title: '申请时间',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (date: string) => new Date(date).toLocaleString(),
+    },
+    {
+      title: '操作',
+      key: 'actions',
+      render: (_: any, record: any) => (
+        <Space>
+          <Button
+            type="primary"
+            size="small"
+            icon={<CheckCircleOutlined />}
+            onClick={() => handleApprove(record)}
+          >
+            批准
+          </Button>
+          <Button
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setEditingUser(record);
+              editForm.setFieldsValue({
+                displayName: record.displayName,
+                role: record.role,
+              });
+              setIsEditModalVisible(true);
+            }}
+          >
+            编辑后批准
           </Button>
         </Space>
       ),
@@ -178,15 +232,51 @@ const UserManagement: React.FC = () => {
         </Button>
       </div>
 
-      <Card>
-        <Table
-          columns={columns}
-          dataSource={users}
-          loading={loading}
-          rowKey="id"
-          pagination={{ pageSize: 20 }}
-        />
-      </Card>
+      <Tabs
+        defaultActiveKey={pendingUsers.length > 0 ? 'pending' : 'active'}
+        items={[
+          {
+            key: 'pending',
+            label: (
+              <Badge count={pendingUsers.length} offset={[10, 0]}>
+                <span>待审批</span>
+              </Badge>
+            ),
+            children: (
+              <Card>
+                {pendingUsers.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>
+                    暂无待审批的注册申请
+                  </div>
+                ) : (
+                  <Table
+                    columns={pendingColumns}
+                    dataSource={pendingUsers}
+                    loading={loading}
+                    rowKey="id"
+                    pagination={false}
+                  />
+                )}
+              </Card>
+            ),
+          },
+          {
+            key: 'active',
+            label: `已启用 (${activeUsers.length})`,
+            children: (
+              <Card>
+                <Table
+                  columns={activeColumns}
+                  dataSource={activeUsers}
+                  loading={loading}
+                  rowKey="id"
+                  pagination={{ pageSize: 20 }}
+                />
+              </Card>
+            ),
+          },
+        ]}
+      />
 
       <Modal
         title="新建用户"
