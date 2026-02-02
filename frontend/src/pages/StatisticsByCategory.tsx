@@ -36,7 +36,7 @@ const StatisticsByCategory: React.FC = () => {
       setLoading(true);
       
       // Get all projects grouped by category
-      const projectResponse = await projectAPI.getAll({ limit: 1000 });
+      const projectResponse = await projectAPI.getAll({ limit: 1000, year: '2026' });
       if (projectResponse.data.success && projectResponse.data.data) {
         const projects = projectResponse.data.data.projects;
         

@@ -29,7 +29,7 @@ const StatisticsOverview: React.FC = () => {
   const loadStatistics = async () => {
     try {
       setLoading(true);
-      const response = await statisticsAPI.getDashboard();
+      const response = await statisticsAPI.getDashboard('2026');
       if (response.data.success && response.data.data) {
         const data = response.data.data;
         setStatsData({
