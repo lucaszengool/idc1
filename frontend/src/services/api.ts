@@ -161,4 +161,19 @@ export const budgetVersionAPI = {
     api.delete<ApiResponse<void>>(`/budget-versions/${id}`),
 };
 
+// User Management APIs
+export const userAPI = {
+  getAll: () =>
+    api.get<ApiResponse<any[]>>('/auth/users'),
+
+  create: (data: { username: string; displayName: string; role: string }) =>
+    api.post<ApiResponse<any>>('/auth/register', data),
+
+  update: (id: number, data: any) =>
+    api.put<ApiResponse<any>>(`/auth/profile/${id}`, data),
+
+  toggleActive: (id: number) =>
+    api.put<ApiResponse<any>>(`/auth/users/${id}/toggle-active`),
+};
+
 export default api;

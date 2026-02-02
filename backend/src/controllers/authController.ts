@@ -327,6 +327,41 @@ export const getUserProfile = async (req: Request, res: Response) => {
   }
 };
 
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await User.findAll({
+      attributes: ['id', 'username', 'displayName', 'role', 'department', 'position', 'phone', 'isActive', 'lastLoginAt', 'createdAt'],
+      order: [['createdAt', 'ASC']]
+    });
+
+    res.json({
+      success: true,
+      data: users
+    });
+  } catch (error) {
+    console.error('Get all users error:', error);
+    res.status(500).json({ success: false, message: 'Failed to get users' });
+  }
+};
+
+export const toggleUserActive = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    await user.update({ isActive: !user.isActive });
+    res.json({
+      success: true,
+      data: { id: user.id, username: user.username, isActive: user.isActive }
+    });
+  } catch (error) {
+    console.error('Toggle user active error:', error);
+    res.status(500).json({ success: false, message: 'Failed to toggle user status' });
+  }
+};
+
 export const searchUsers = async (req: Request, res: Response) => {
   try {
     const { query, role } = req.query;

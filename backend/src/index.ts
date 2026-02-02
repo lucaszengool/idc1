@@ -110,7 +110,7 @@ const seed2026BudgetProjects = async () => {
         subProjectName: "T-AIDC架构研发",
         projectType: "重点",
         projectStatus: "待开始",
-        owner: "keisenzeng",
+        owner: "seanzeng",
         members: "",
         projectGoal: "研发基础底座、辅助类含封层结构件及分区交互组件",
         projectBackground: "T-AIDC(含LC-MDC)架构研发-结构设备",
@@ -133,7 +133,7 @@ const seed2026BudgetProjects = async () => {
         subProjectName: "T-AIDC架构研发",
         projectType: "重点",
         projectStatus: "待开始",
-        owner: "keisenzeng",
+        owner: "seanzeng",
         members: "",
         projectGoal: "研发小母线、电容补偿、≥400V高压技术提高配电系统效率及稳定性",
         projectBackground: "T-AIDC(含LC-MDC)架构研发-配电设备",
@@ -156,7 +156,7 @@ const seed2026BudgetProjects = async () => {
         subProjectName: "T-AIDC架构研发",
         projectType: "重点",
         projectStatus: "待开始",
-        owner: "keisenzeng",
+        owner: "seanzeng",
         members: "",
         projectGoal: "研发氟-水/低水温CDU等空调设备，支持风冷热量换兼容设计",
         projectBackground: "T-AIDC(含LC-MDC)架构研发-制冷设备",
@@ -179,7 +179,7 @@ const seed2026BudgetProjects = async () => {
         subProjectName: "T-AIDC架构研发",
         projectType: "重点",
         projectStatus: "待开始",
-        owner: "keisenzeng",
+        owner: "seanzeng",
         members: "",
         projectGoal: "研发一体化交付弱电系统，集成配电、暖通等设备监控系统",
         projectBackground: "T-AIDC(含LC-MDC)架构研发-弱电监控",
@@ -202,7 +202,7 @@ const seed2026BudgetProjects = async () => {
         subProjectName: "T-AIDC架构研发",
         projectType: "重点",
         projectStatus: "待开始",
-        owner: "keisenzeng",
+        owner: "seanzeng",
         members: "",
         projectGoal: "基于25年高校合作机理研究成果，研发液冷水质自动检测装置",
         projectBackground: "T-AIDC(含LC-MDC)架构研发-水质检测",
@@ -503,7 +503,7 @@ const initializeDatabase = async () => {
 
     // Create test PM users if not exists
     const pmUsers = [
-      { username: 'keisenzeng', displayName: '曾启森', role: 'pm' as const },
+      { username: 'seanzeng', displayName: '曾启森', role: 'pm' as const },
       { username: 'jamesdqli', displayName: '李大强', role: 'pm' as const },
       { username: 'keweiliu', displayName: '刘克威', role: 'pm' as const },
       { username: 'tianqingwu', displayName: '吴天青', role: 'employee' as const },
@@ -533,7 +533,7 @@ const initializeDatabase = async () => {
     }
 
     // Create test groups if not exists
-    const pm1 = await User.findOne({ where: { username: 'keisenzeng' } });
+    const pm1 = await User.findOne({ where: { username: 'seanzeng' } });
     const pm2 = await User.findOne({ where: { username: 'jamesdqli' } });
     const pm3 = await User.findOne({ where: { username: 'keweiliu' } });
 

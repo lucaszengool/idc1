@@ -9,7 +9,8 @@ import {
   SwapOutlined,
   TeamOutlined,
   LogoutOutlined,
-  CrownOutlined
+  CrownOutlined,
+  UserAddOutlined
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -137,6 +138,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         key: '/groups',
         icon: <TeamOutlined />,
         label: '组管理',
+      },
+      {
+        key: '/users',
+        icon: <UserAddOutlined />,
+        label: '用户管理',
       },
     ];
 

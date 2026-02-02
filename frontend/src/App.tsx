@@ -18,6 +18,7 @@ import BudgetAdjustment from './pages/BudgetAdjustment';
 import BudgetManagement from './pages/BudgetManagement';
 import GroupManagement from './pages/GroupManagement';
 import BudgetVersionManagement from './pages/BudgetVersionManagement';
+import UserManagement from './pages/UserManagement';
 
 dayjs.locale('zh-cn');
 
@@ -44,6 +45,7 @@ function App() {
             <Route path="budget/management" element={<BudgetManagement />} />
             <Route path="budget/versions" element={<BudgetVersionManagement />} />
             <Route path="groups" element={<GroupManagement />} />
+            <Route path="users" element={<UserManagement />} />
 
             {/* PM专用路由 */}
             <Route path="pm-dashboard" element={<PMDashboard />} />

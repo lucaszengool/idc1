@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchUsers = exports.getUserProfile = exports.updateUserProfile = exports.registerUser = exports.loginWithAccessKey = void 0;
+exports.searchUsers = exports.toggleUserActive = exports.getAllUsers = exports.getUserProfile = exports.updateUserProfile = exports.registerUser = exports.loginWithAccessKey = void 0;
 const models_1 = require("../models");
 const sequelize_1 = require("sequelize");
 const crypto_1 = __importDefault(require("crypto"));
@@ -294,6 +294,42 @@ const getUserProfile = async (req, res) => {
     }
 };
 exports.getUserProfile = getUserProfile;
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await models_1.User.findAll({
+            attributes: ['id', 'username', 'displayName', 'role', 'department', 'position', 'phone', 'isActive', 'lastLoginAt', 'createdAt'],
+            order: [['createdAt', 'ASC']]
+        });
+        res.json({
+            success: true,
+            data: users
+        });
+    }
+    catch (error) {
+        console.error('Get all users error:', error);
+        res.status(500).json({ success: false, message: 'Failed to get users' });
+    }
+};
+exports.getAllUsers = getAllUsers;
+const toggleUserActive = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await models_1.User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        await user.update({ isActive: !user.isActive });
+        res.json({
+            success: true,
+            data: { id: user.id, username: user.username, isActive: user.isActive }
+        });
+    }
+    catch (error) {
+        console.error('Toggle user active error:', error);
+        res.status(500).json({ success: false, message: 'Failed to toggle user status' });
+    }
+};
+exports.toggleUserActive = toggleUserActive;
 const searchUsers = async (req, res) => {
     try {
         const { query, role } = req.query;

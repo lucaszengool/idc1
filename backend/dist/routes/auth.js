@@ -8,8 +8,10 @@ const authController_1 = require("../controllers/authController");
 const router = express_1.default.Router();
 router.post('/login', authController_1.loginWithAccessKey);
 router.post('/register', authController_1.registerUser);
+router.get('/users', authController_1.getAllUsers);
 router.get('/profile/:userId', authController_1.getUserProfile);
 router.put('/profile/:userId', authController_1.updateUserProfile);
+router.put('/users/:userId/toggle-active', authController_1.toggleUserActive);
 router.get('/search-users', authController_1.searchUsers);
 exports.default = router;
 //# sourceMappingURL=auth.js.map
