@@ -139,12 +139,17 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         icon: <TeamOutlined />,
         label: '组管理',
       },
-      {
+    ];
+
+    // Add user management for admin users
+    const adminUsernames = ['jessyyang', 'wenyuyang'];
+    if (adminUsernames.includes(currentUser?.username || '')) {
+      baseItems.push({
         key: '/users',
         icon: <UserAddOutlined />,
         label: '用户管理',
-      },
-    ];
+      });
+    }
 
     // Add PM-specific items
     if (currentUser?.role === 'pm') {

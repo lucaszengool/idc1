@@ -6,7 +6,7 @@ import { userAPI } from '../services/api';
 const { Title } = Typography;
 const { Option } = Select;
 
-const ADMIN_USERNAMES = ['jessyyang', 'wenyuyang', 'seanzeng'];
+const ADMIN_USERNAMES = ['jessyyang', 'wenyuyang'];
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
