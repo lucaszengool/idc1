@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, theme, Typography, Space, Button, Select, message } from 'antd';
+import { Layout, Menu, theme, Typography, Space, Button, Select, message, Modal, Form, Input } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { userAPI } from '../services/api';
 import {
   DashboardOutlined,
   BarChartOutlined,
@@ -10,7 +11,8 @@ import {
   TeamOutlined,
   LogoutOutlined,
   CrownOutlined,
-  UserAddOutlined
+  UserAddOutlined,
+  KeyOutlined
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -30,6 +32,25 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation();
   const { token: { colorBgContainer } } = theme.useToken();
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [passwordForm] = Form.useForm();
+
+  const handleChangePassword = async (values: any) => {
+    if (!currentUser) return;
+    try {
+      const response = await userAPI.changePassword(currentUser.id, {
+        oldPassword: values.oldPassword,
+        newPassword: values.newPassword,
+      });
+      if (response.data.success) {
+        message.success('密码修改成功');
+        setIsPasswordModalVisible(false);
+        passwordForm.resetFields();
+      }
+    } catch (error: any) {
+      message.error(error.response?.data?.message || '密码修改失败');
+    }
+  };
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -223,6 +244,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <Option value="pm">项目经理</Option>
               </Select>
               <Button
+                icon={<KeyOutlined />}
+                onClick={() => setIsPasswordModalVisible(true)}
+                type="text"
+                size="small"
+              >
+                修改密码
+              </Button>
+              <Button
                 icon={<LogoutOutlined />}
                 onClick={handleLogout}
                 type="text"
@@ -243,6 +272,58 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {children}
         </Content>
       </Layout>
+
+      <Modal
+        title="修改密码"
+        open={isPasswordModalVisible}
+        onCancel={() => {
+          setIsPasswordModalVisible(false);
+          passwordForm.resetFields();
+        }}
+        footer={null}
+      >
+        <Form form={passwordForm} onFinish={handleChangePassword} layout="vertical">
+          <Form.Item
+            label="旧密码"
+            name="oldPassword"
+            rules={[{ required: true, message: '请输入旧密码' }]}
+          >
+            <Input.Password placeholder="请输入旧密码" />
+          </Form.Item>
+          <Form.Item
+            label="新密码"
+            name="newPassword"
+            rules={[
+              { required: true, message: '请输入新密码' },
+              { min: 6, message: '密码长度不能少于6位' }
+            ]}
+          >
+            <Input.Password placeholder="请输入新密码（至少6位）" />
+          </Form.Item>
+          <Form.Item
+            label="确认新密码"
+            name="confirmPassword"
+            dependencies={['newPassword']}
+            rules={[
+              { required: true, message: '请确认新密码' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('newPassword') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('两次输入的密码不一致'));
+                },
+              }),
+            ]}
+          >
+            <Input.Password placeholder="请再次输入新密码" />
+          </Form.Item>
+          <div style={{ textAlign: 'right', marginTop: 24 }}>
+            <Button onClick={() => { setIsPasswordModalVisible(false); passwordForm.resetFields(); }} style={{ marginRight: 8 }}>取消</Button>
+            <Button type="primary" htmlType="submit">确认修改</Button>
+          </div>
+        </Form>
+      </Modal>
     </Layout>
   );
 };

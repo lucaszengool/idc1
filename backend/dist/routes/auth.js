@@ -12,6 +12,8 @@ router.get('/users', authController_1.getAllUsers);
 router.get('/profile/:userId', authController_1.getUserProfile);
 router.put('/profile/:userId', authController_1.updateUserProfile);
 router.put('/users/:userId/toggle-active', authController_1.toggleUserActive);
+router.put('/users/:userId/change-password', authController_1.changePassword);
+router.put('/users/:userId/reset-password', authController_1.resetUserPassword);
 router.get('/search-users', authController_1.searchUsers);
 exports.default = router;
 //# sourceMappingURL=auth.js.map

@@ -527,6 +527,8 @@ const initializeDatabase = async () => {
             { username: 'jessyyang', displayName: '杨雯宇', role: 'pm' },
             { username: 'wenyuyang', displayName: '杨雯宇', role: 'pm' }
         ];
+        const bcrypt = await Promise.resolve().then(() => __importStar(require('bcryptjs')));
+        const DEFAULT_HASHED_PASSWORD = await bcrypt.hash('123456', 10);
         for (const pmData of pmUsers) {
             let user = await User.findOne({ where: { username: pmData.username } });
             if (!user) {
@@ -534,6 +536,7 @@ const initializeDatabase = async () => {
                 await User.create({
                     accessKey,
                     username: pmData.username,
+                    password: DEFAULT_HASHED_PASSWORD,
                     displayName: pmData.displayName,
                     role: pmData.role,
                     isActive: true
@@ -544,6 +547,14 @@ const initializeDatabase = async () => {
                 await user.update({ displayName: pmData.displayName, role: pmData.role });
                 console.log(`✅ User ${pmData.displayName} updated`);
             }
+        }
+        // Set default password for all existing users without password
+        const usersWithoutPassword = await User.findAll({
+            where: { password: null }
+        });
+        for (const user of usersWithoutPassword) {
+            await user.update({ password: DEFAULT_HASHED_PASSWORD });
+            console.log(`✅ Default password set for ${user.username}`);
         }
         // Create test groups if not exists
         const pm1 = await User.findOne({ where: { username: 'seanzeng' } });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Typography, Table, Button, Modal, Form, Input, Select, message, Tag, Space, Badge, Tabs } from 'antd';
-import { PlusOutlined, EditOutlined, StopOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, StopOutlined, CheckCircleOutlined, KeyOutlined } from '@ant-design/icons';
 import { userAPI } from '../services/api';
 
 const { Title } = Typography;
@@ -81,6 +81,17 @@ const UserManagement: React.FC = () => {
     }
   };
 
+  const handleResetPassword = async (user: any) => {
+    try {
+      const response = await userAPI.resetPassword(user.id);
+      if (response.data.success) {
+        message.success(`已重置 ${user.username} 的密码为 123456`);
+      }
+    } catch (error: any) {
+      message.error('重置密码失败');
+    }
+  };
+
   const handleApprove = async (user: any) => {
     try {
       const response = await userAPI.toggleActive(user.id);
@@ -147,6 +158,13 @@ const UserManagement: React.FC = () => {
             }}
           >
             编辑
+          </Button>
+          <Button
+            size="small"
+            icon={<KeyOutlined />}
+            onClick={() => handleResetPassword(record)}
+          >
+            重置密码
           </Button>
           <Button
             size="small"

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, Alert, Typography, Result } from 'antd';
-import { UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -12,6 +12,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
 interface LoginFormValues {
   username: string;
+  password: string;
 }
 
 const Login: React.FC = () => {
@@ -28,7 +29,8 @@ const Login: React.FC = () => {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, {
-        username: values.username
+        username: values.username,
+        password: values.password
       });
 
       if (response.data.success) {
@@ -53,7 +55,7 @@ const Login: React.FC = () => {
         setPendingApproval(true);
         setPendingUsername(values.username);
       } else {
-        setError(err.response?.data?.message || '登录失败，请检查用户名');
+        setError(err.response?.data?.message || '登录失败，请检查用户名和密码');
       }
     } finally {
       setLoading(false);
@@ -106,7 +108,7 @@ const Login: React.FC = () => {
       >
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <Title level={2}>DCOPS预算管理系统</Title>
-          <Text type="secondary">请输入您的用户名进入系统</Text>
+          <Text type="secondary">请输入用户名和密码登录</Text>
         </div>
 
         {error && (
@@ -139,6 +141,19 @@ const Login: React.FC = () => {
             />
           </Form.Item>
 
+          <Form.Item
+            name="password"
+            label="密码"
+            rules={[
+              { required: true, message: '请输入密码' }
+            ]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="请输入密码"
+            />
+          </Form.Item>
+
           <Form.Item>
             <Button
               type="primary"
@@ -146,7 +161,7 @@ const Login: React.FC = () => {
               loading={loading}
               block
             >
-              进入系统
+              登录
             </Button>
           </Form.Item>
         </Form>

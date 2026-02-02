@@ -5,6 +5,7 @@ export interface UserAttributes {
   id: number;
   accessKey: string;
   username: string;
+  password: string;
   displayName: string;
   email?: string;
   role: 'employee' | 'pm';
@@ -18,13 +19,14 @@ export interface UserAttributes {
 }
 
 export interface UserCreationAttributes
-  extends Optional<UserAttributes, 'id' | 'email' | 'department' | 'position' | 'phone' | 'isActive' | 'lastLoginAt' | 'createdAt' | 'updatedAt'> {}
+  extends Optional<UserAttributes, 'id' | 'password' | 'email' | 'department' | 'position' | 'phone' | 'isActive' | 'lastLoginAt' | 'createdAt' | 'updatedAt'> {}
 
 export class User extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes {
   public id!: number;
   public accessKey!: string;
   public username!: string;
+  public password!: string;
   public displayName!: string;
   public email?: string;
   public role!: 'employee' | 'pm';
@@ -49,6 +51,10 @@ User.init(
       type: DataTypes.STRING(100),
       allowNull: false,
       unique: true,
+    },
+    password: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
     },
     username: {
       type: DataTypes.STRING(50),

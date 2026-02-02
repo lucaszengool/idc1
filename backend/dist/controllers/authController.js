@@ -3,17 +3,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchUsers = exports.toggleUserActive = exports.getAllUsers = exports.getUserProfile = exports.updateUserProfile = exports.registerUser = exports.loginWithAccessKey = void 0;
+exports.searchUsers = exports.resetUserPassword = exports.toggleUserActive = exports.getAllUsers = exports.getUserProfile = exports.updateUserProfile = exports.changePassword = exports.registerUser = exports.loginWithAccessKey = void 0;
 const models_1 = require("../models");
 const sequelize_1 = require("sequelize");
 const crypto_1 = __importDefault(require("crypto"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const DEFAULT_PASSWORD = '123456';
+const SALT_ROUNDS = 10;
 const loginWithAccessKey = async (req, res) => {
     try {
-        const { username, role } = req.body;
+        const { username, password } = req.body;
         if (!username) {
             return res.status(400).json({
                 success: false,
-                message: 'Username is required'
+                message: '请输入用户名'
+            });
+        }
+        if (!password) {
+            return res.status(400).json({
+                success: false,
+                message: '请输入密码'
             });
         }
         // 查找用户（包括未激活的）
@@ -55,10 +64,12 @@ const loginWithAccessKey = async (req, res) => {
                     isUnique = true;
                 }
             }
+            const hashedPassword = await bcryptjs_1.default.hash(password, SALT_ROUNDS);
             // 创建待审批用户（isActive=false）
             user = await models_1.User.create({
                 accessKey,
                 username,
+                password: hashedPassword,
                 displayName: username,
                 role: 'employee',
                 isActive: false
@@ -77,11 +88,12 @@ const loginWithAccessKey = async (req, res) => {
                 pendingApproval: true
             });
         }
-        // 确保用户存在后再进行操作
-        if (!user) {
-            return res.status(500).json({
+        // 验证密码
+        const isPasswordValid = await bcryptjs_1.default.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({
                 success: false,
-                message: 'Failed to create or find user'
+                message: '密码错误，请重试'
             });
         }
         // 更新最后登录时间
@@ -96,7 +108,7 @@ const loginWithAccessKey = async (req, res) => {
             department: user.department,
             position: user.position,
             phone: user.phone,
-            accessKey: user.accessKey, // 添加 accessKey
+            accessKey: user.accessKey,
             groups: [],
             managedGroups: []
         };
@@ -142,10 +154,13 @@ const registerUser = async (req, res) => {
                 isUnique = true;
             }
         }
+        // 默认密码 123456
+        const hashedPassword = await bcryptjs_1.default.hash(DEFAULT_PASSWORD, SALT_ROUNDS);
         // 创建用户
         const user = await models_1.User.create({
             accessKey,
             username,
+            password: hashedPassword,
             displayName,
             email,
             role,
@@ -176,6 +191,54 @@ const registerUser = async (req, res) => {
     }
 };
 exports.registerUser = registerUser;
+const changePassword = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { oldPassword, newPassword } = req.body;
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: '请输入旧密码和新密码'
+            });
+        }
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: '新密码长度不能少于6位'
+            });
+        }
+        const user = await models_1.User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        // 验证旧密码
+        const isOldPasswordValid = await bcryptjs_1.default.compare(oldPassword, user.password);
+        if (!isOldPasswordValid) {
+            return res.status(401).json({
+                success: false,
+                message: '旧密码不正确'
+            });
+        }
+        // 设置新密码
+        const hashedNewPassword = await bcryptjs_1.default.hash(newPassword, SALT_ROUNDS);
+        await user.update({ password: hashedNewPassword });
+        res.json({
+            success: true,
+            message: '密码修改成功'
+        });
+    }
+    catch (error) {
+        console.error('Change password error:', error);
+        res.status(500).json({
+            success: false,
+            message: '密码修改失败'
+        });
+    }
+};
+exports.changePassword = changePassword;
 const updateUserProfile = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -310,6 +373,26 @@ const toggleUserActive = async (req, res) => {
     }
 };
 exports.toggleUserActive = toggleUserActive;
+const resetUserPassword = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await models_1.User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        const hashedPassword = await bcryptjs_1.default.hash(DEFAULT_PASSWORD, SALT_ROUNDS);
+        await user.update({ password: hashedPassword });
+        res.json({
+            success: true,
+            message: `密码已重置为默认密码 ${DEFAULT_PASSWORD}`
+        });
+    }
+    catch (error) {
+        console.error('Reset password error:', error);
+        res.status(500).json({ success: false, message: 'Failed to reset password' });
+    }
+};
+exports.resetUserPassword = resetUserPassword;
 const searchUsers = async (req, res) => {
     try {
         const { query, role } = req.query;

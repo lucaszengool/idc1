@@ -3,6 +3,7 @@ export interface UserAttributes {
     id: number;
     accessKey: string;
     username: string;
+    password: string;
     displayName: string;
     email?: string;
     role: 'employee' | 'pm';
@@ -14,12 +15,13 @@ export interface UserAttributes {
     createdAt: Date;
     updatedAt: Date;
 }
-export interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'email' | 'department' | 'position' | 'phone' | 'isActive' | 'lastLoginAt' | 'createdAt' | 'updatedAt'> {
+export interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'password' | 'email' | 'department' | 'position' | 'phone' | 'isActive' | 'lastLoginAt' | 'createdAt' | 'updatedAt'> {
 }
 export declare class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
     id: number;
     accessKey: string;
     username: string;
+    password: string;
     displayName: string;
     email?: string;
     role: 'employee' | 'pm';

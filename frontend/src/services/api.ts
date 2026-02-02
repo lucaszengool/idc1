@@ -174,6 +174,12 @@ export const userAPI = {
 
   toggleActive: (id: number) =>
     api.put<ApiResponse<any>>(`/auth/users/${id}/toggle-active`),
+
+  changePassword: (id: number, data: { oldPassword: string; newPassword: string }) =>
+    api.put<ApiResponse<any>>(`/auth/users/${id}/change-password`, data),
+
+  resetPassword: (id: number) =>
+    api.put<ApiResponse<any>>(`/auth/users/${id}/reset-password`),
 };
 
 export default api;

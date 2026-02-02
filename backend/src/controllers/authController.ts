@@ -2,15 +2,26 @@ import { Request, Response } from 'express';
 import { User, Group, GroupMember } from '../models';
 import { Op } from 'sequelize';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+
+const DEFAULT_PASSWORD = '123456';
+const SALT_ROUNDS = 10;
 
 export const loginWithAccessKey = async (req: Request, res: Response) => {
   try {
-    const { username, role } = req.body;
+    const { username, password } = req.body;
 
     if (!username) {
       return res.status(400).json({
         success: false,
-        message: 'Username is required'
+        message: '请输入用户名'
+      });
+    }
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: '请输入密码'
       });
     }
 
@@ -55,10 +66,13 @@ export const loginWithAccessKey = async (req: Request, res: Response) => {
         }
       }
 
+      const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
       // 创建待审批用户（isActive=false）
       user = await User.create({
         accessKey,
         username,
+        password: hashedPassword,
         displayName: username,
         role: 'employee',
         isActive: false
@@ -80,11 +94,12 @@ export const loginWithAccessKey = async (req: Request, res: Response) => {
       });
     }
 
-    // 确保用户存在后再进行操作
-    if (!user) {
-      return res.status(500).json({
+    // 验证密码
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
         success: false,
-        message: 'Failed to create or find user'
+        message: '密码错误，请重试'
       });
     }
 
@@ -101,7 +116,7 @@ export const loginWithAccessKey = async (req: Request, res: Response) => {
       department: user.department,
       position: user.position,
       phone: user.phone,
-      accessKey: user.accessKey, // 添加 accessKey
+      accessKey: user.accessKey,
       groups: [],
       managedGroups: []
     };
@@ -160,10 +175,14 @@ export const registerUser = async (req: Request, res: Response) => {
       }
     }
 
+    // 默认密码 123456
+    const hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD, SALT_ROUNDS);
+
     // 创建用户
     const user = await User.create({
       accessKey,
       username,
+      password: hashedPassword,
       displayName,
       email,
       role,
@@ -191,6 +210,60 @@ export const registerUser = async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: 'Registration failed'
+    });
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: '请输入旧密码和新密码'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: '新密码长度不能少于6位'
+      });
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // 验证旧密码
+    const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isOldPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: '旧密码不正确'
+      });
+    }
+
+    // 设置新密码
+    const hashedNewPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    await user.update({ password: hashedNewPassword });
+
+    res.json({
+      success: true,
+      message: '密码修改成功'
+    });
+
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({
+      success: false,
+      message: '密码修改失败'
     });
   }
 };
@@ -339,6 +412,25 @@ export const toggleUserActive = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Toggle user active error:', error);
     res.status(500).json({ success: false, message: 'Failed to toggle user status' });
+  }
+};
+
+export const resetUserPassword = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    const hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD, SALT_ROUNDS);
+    await user.update({ password: hashedPassword });
+    res.json({
+      success: true,
+      message: `密码已重置为默认密码 ${DEFAULT_PASSWORD}`
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ success: false, message: 'Failed to reset password' });
   }
 };
 
