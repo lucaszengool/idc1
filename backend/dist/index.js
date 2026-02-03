@@ -37,7 +37,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const path_1 = __importDefault(require("path"));
 const morgan_1 = __importDefault(require("morgan"));
 const helmet_1 = __importDefault(require("helmet"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -60,14 +59,12 @@ app.use((0, morgan_1.default)('combined'));
 // Body parsing middleware
 app.use(express_1.default.json({ limit: '10mb' }));
 app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
-// Static file serving for uploads
-app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '../uploads')));
 // Create uploads directory if it doesn't exist
-const fs_1 = __importDefault(require("fs"));
-const uploadsDir = process.env.UPLOAD_DIR || 'uploads';
-if (!fs_1.default.existsSync(uploadsDir)) {
-    fs_1.default.mkdirSync(uploadsDir, { recursive: true });
-}
+const uploads_1 = require("./config/uploads");
+const uploadsDir = (0, uploads_1.ensureUploadsDir)();
+// Static file serving for uploads - use the same directory as uploads
+app.use('/uploads', express_1.default.static(uploadsDir));
+console.log(`📁 Serving uploads from: ${uploadsDir}`);
 // Health check endpoint
 app.get('/health', async (req, res) => {
     let dbStatus = 'unknown';

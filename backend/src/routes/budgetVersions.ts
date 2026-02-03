@@ -9,13 +9,14 @@ import {
   deleteBudgetVersion,
 } from '../controllers/budgetVersionController';
 import { optionalAuth, checkDeletePermission } from '../middleware/authMiddleware';
+import { ensureUploadsDir } from '../config/uploads';
 
 const router = express.Router();
 
 // Configure multer for file uploads (budget PPT/PDF/images)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, process.env.UPLOAD_DIR || 'uploads');
+    cb(null, ensureUploadsDir());
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);

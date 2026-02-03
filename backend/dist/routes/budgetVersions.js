@@ -8,11 +8,12 @@ const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const budgetVersionController_1 = require("../controllers/budgetVersionController");
 const authMiddleware_1 = require("../middleware/authMiddleware");
+const uploads_1 = require("../config/uploads");
 const router = express_1.default.Router();
 // Configure multer for file uploads (budget PPT/PDF/images)
 const storage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, process.env.UPLOAD_DIR || 'uploads');
+        cb(null, (0, uploads_1.ensureUploadsDir)());
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -23,10 +24,13 @@ const upload = (0, multer_1.default)({
     storage,
     limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit for PPT files
     fileFilter: (req, file, cb) => {
-        const allowedTypes = /ppt|pptx|pdf|jpeg|jpg|png/;
-        const extname = allowedTypes.test(path_1.default.extname(file.originalname).toLowerCase());
-        const mimetype = /powerpoint|pdf|image/.test(file.mimetype);
-        if (mimetype && extname) {
+        const allowedExtensions = /ppt|pptx|pdf|jpeg|jpg|png/;
+        const extname = allowedExtensions.test(path_1.default.extname(file.originalname).toLowerCase());
+        // MIME types: ppt/pptx = powerpoint/presentationml, pdf = pdf, images = image/jpeg etc.
+        const allowedMimeTypes = /powerpoint|presentationml|pdf|image/;
+        const mimetype = allowedMimeTypes.test(file.mimetype);
+        // 只要扩展名或MIME类型其一匹配即可
+        if (mimetype || extname) {
             return cb(null, true);
         }
         else {

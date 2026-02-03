@@ -8,11 +8,12 @@ const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const executionController_1 = require("../controllers/executionController");
 const authMiddleware_1 = require("../middleware/authMiddleware");
+const uploads_1 = require("../config/uploads");
 const router = express_1.default.Router();
 // Configure multer for file uploads
 const storage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, process.env.UPLOAD_DIR || 'uploads');
+        cb(null, (0, uploads_1.ensureUploadsDir)());
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -23,14 +24,16 @@ const upload = (0, multer_1.default)({
     storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: (req, file, cb) => {
-        const allowedTypes = /jpeg|jpg|png|pdf/;
-        const extname = allowedTypes.test(path_1.default.extname(file.originalname).toLowerCase());
-        const mimetype = allowedTypes.test(file.mimetype);
-        if (mimetype && extname) {
+        // 支持图片、PDF、Word、Excel格式
+        const allowedExtensions = /jpeg|jpg|png|pdf|doc|docx|xls|xlsx/;
+        const allowedMimeTypes = /jpeg|jpg|png|pdf|msword|officedocument|excel|spreadsheet/;
+        const extname = allowedExtensions.test(path_1.default.extname(file.originalname).toLowerCase());
+        const mimetype = allowedMimeTypes.test(file.mimetype);
+        if (mimetype || extname) {
             return cb(null, true);
         }
         else {
-            cb(new Error('Only .png, .jpg, .jpeg and .pdf format allowed!'));
+            cb(new Error('Only image (png/jpg), document (pdf/doc/docx), and spreadsheet (xls/xlsx) formats allowed!'));
         }
     },
 });

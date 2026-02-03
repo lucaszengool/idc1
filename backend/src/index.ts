@@ -29,15 +29,13 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Static file serving for uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
 // Create uploads directory if it doesn't exist
-import fs from 'fs';
-const uploadsDir = process.env.UPLOAD_DIR || 'uploads';
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+import { ensureUploadsDir } from './config/uploads';
+const uploadsDir = ensureUploadsDir();
+
+// Static file serving for uploads - use the same directory as uploads
+app.use('/uploads', express.static(uploadsDir));
+console.log(`📁 Serving uploads from: ${uploadsDir}`);
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
