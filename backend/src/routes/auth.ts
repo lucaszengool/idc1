@@ -8,7 +8,8 @@ import {
   getAllUsers,
   toggleUserActive,
   changePassword,
-  resetUserPassword
+  resetUserPassword,
+  deleteUser
 } from '../controllers/authController';
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router.put('/profile/:userId', updateUserProfile);
 router.put('/users/:userId/toggle-active', toggleUserActive);
 router.put('/users/:userId/change-password', changePassword);
 router.put('/users/:userId/reset-password', resetUserPassword);
+router.delete('/users/:userId', deleteUser);
 router.get('/search-users', searchUsers);
 
 export default router;

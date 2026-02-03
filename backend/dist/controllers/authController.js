@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchUsers = exports.resetUserPassword = exports.toggleUserActive = exports.getAllUsers = exports.getUserProfile = exports.updateUserProfile = exports.changePassword = exports.registerUser = exports.loginWithAccessKey = void 0;
+exports.searchUsers = exports.resetUserPassword = exports.deleteUser = exports.toggleUserActive = exports.getAllUsers = exports.getUserProfile = exports.updateUserProfile = exports.changePassword = exports.registerUser = exports.loginWithAccessKey = void 0;
 const models_1 = require("../models");
 const sequelize_1 = require("sequelize");
 const crypto_1 = __importDefault(require("crypto"));
@@ -380,6 +380,25 @@ const toggleUserActive = async (req, res) => {
     }
 };
 exports.toggleUserActive = toggleUserActive;
+const deleteUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await models_1.User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        await user.destroy();
+        res.json({
+            success: true,
+            message: `用户 ${user.username} 已删除`
+        });
+    }
+    catch (error) {
+        console.error('Delete user error:', error);
+        res.status(500).json({ success: false, message: 'Failed to delete user' });
+    }
+};
+exports.deleteUser = deleteUser;
 const resetUserPassword = async (req, res) => {
     try {
         const { userId } = req.params;

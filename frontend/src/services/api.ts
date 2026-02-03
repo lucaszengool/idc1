@@ -180,6 +180,9 @@ export const userAPI = {
 
   resetPassword: (id: number) =>
     api.put<ApiResponse<any>>(`/auth/users/${id}/reset-password`),
+
+  delete: (id: number) =>
+    api.delete<ApiResponse<any>>(`/auth/users/${id}`),
 };
 
 export default api;

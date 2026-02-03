@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Typography, Table, Button, Modal, Form, Input, Select, message, Tag, Space, Badge, Tabs } from 'antd';
-import { PlusOutlined, EditOutlined, StopOutlined, CheckCircleOutlined, KeyOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, StopOutlined, CheckCircleOutlined, KeyOutlined, DeleteOutlined } from '@ant-design/icons';
 import { userAPI } from '../services/api';
 
 const { Title } = Typography;
@@ -92,6 +92,27 @@ const UserManagement: React.FC = () => {
     }
   };
 
+  const handleDelete = async (user: any) => {
+    Modal.confirm({
+      title: '确认删除',
+      content: `确定要删除用户 "${user.username}" 吗？此操作不可撤销。`,
+      okText: '删除',
+      cancelText: '取消',
+      okType: 'danger',
+      onOk: async () => {
+        try {
+          const response = await userAPI.delete(user.id);
+          if (response.data.success) {
+            message.success(`用户 ${user.username} 已删除`);
+            loadUsers();
+          }
+        } catch (error: any) {
+          message.error('删除失败');
+        }
+      },
+    });
+  };
+
   const handleApprove = async (user: any) => {
     try {
       const response = await userAPI.toggleActive(user.id);
@@ -174,6 +195,14 @@ const UserManagement: React.FC = () => {
           >
             禁用
           </Button>
+          <Button
+            size="small"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
+          >
+            删除
+          </Button>
         </Space>
       ),
     },
@@ -222,6 +251,14 @@ const UserManagement: React.FC = () => {
             }}
           >
             编辑后批准
+          </Button>
+          <Button
+            size="small"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
+          >
+            删除
           </Button>
         </Space>
       ),

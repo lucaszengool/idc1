@@ -423,6 +423,24 @@ export const toggleUserActive = async (req: Request, res: Response) => {
   }
 };
 
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    await user.destroy();
+    res.json({
+      success: true,
+      message: `用户 ${user.username} 已删除`
+    });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete user' });
+  }
+};
+
 export const resetUserPassword = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
