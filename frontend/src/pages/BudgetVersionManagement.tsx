@@ -27,8 +27,17 @@ import { budgetVersionAPI } from '../services/api';
 
 const { Title, Text } = Typography;
 
-// 获取后端 API 基础 URL（用于静态文件访问）
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
+// 运行时检测后端 URL（用于静态文件访问）
+const getBackendUrl = () => {
+  if (process.env.REACT_APP_API_BASE_URL) {
+    return process.env.REACT_APP_API_BASE_URL;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname.includes('railway.app')) {
+    return 'https://faithful-laughter-production.up.railway.app';
+  }
+  return 'http://localhost:3001';
+};
+const API_BASE_URL = getBackendUrl();
 
 const BudgetVersionManagement: React.FC = () => {
   const [versions, setVersions] = useState<any[]>([]);

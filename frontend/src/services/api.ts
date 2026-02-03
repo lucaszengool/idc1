@@ -1,9 +1,27 @@
 import axios from 'axios';
 import { Project, BudgetExecution, BudgetAdjustment, DashboardStats, ApiResponse } from '../types';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL 
-  ? `${process.env.REACT_APP_API_BASE_URL}/api`
-  : 'http://localhost:3001/api';
+// 运行时检测 API URL - 根据当前域名自动选择
+const getApiBaseUrl = () => {
+  // 优先使用环境变量
+  if (process.env.REACT_APP_API_BASE_URL) {
+    return `${process.env.REACT_APP_API_BASE_URL}/api`;
+  }
+
+  // 运行时检测：如果是 Railway 生产环境，使用对应的后端 URL
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    // Railway 前端域名 -> 后端域名映射
+    if (hostname.includes('idc1-production') || hostname.includes('railway.app')) {
+      return 'https://faithful-laughter-production.up.railway.app/api';
+    }
+  }
+
+  // 默认本地开发
+  return 'http://localhost:3001/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
