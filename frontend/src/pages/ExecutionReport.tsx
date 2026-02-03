@@ -98,7 +98,7 @@ const ExecutionReport: React.FC = () => {
   const uploadProps = {
     beforeUpload: () => false, // Prevent automatic upload
     maxCount: 1,
-    accept: '.jpg,.jpeg,.png,.pdf',
+    accept: '.jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx',
   };
 
   return (
@@ -229,7 +229,7 @@ const ExecutionReport: React.FC = () => {
         <Form.Item
           name="voucher"
           label="执行凭证"
-          help="支持上传jpg、jpeg、png、pdf格式文件，最大5MB"
+          help="支持上传图片(jpg/png)、文档(pdf/doc/docx)、表格(xls/xlsx)格式，最大5MB"
         >
           <Upload {...uploadProps}>
             <Button icon={<UploadOutlined />}>上传凭证</Button>

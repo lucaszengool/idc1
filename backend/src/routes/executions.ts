@@ -27,14 +27,16 @@ const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|pdf/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    // 支持图片、PDF、Word、Excel格式
+    const allowedExtensions = /jpeg|jpg|png|pdf|doc|docx|xls|xlsx/;
+    const allowedMimeTypes = /jpeg|jpg|png|pdf|msword|officedocument|excel|spreadsheet/;
+    const extname = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedMimeTypes.test(file.mimetype);
 
-    if (mimetype && extname) {
+    if (mimetype || extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Only .png, .jpg, .jpeg and .pdf format allowed!'));
+      cb(new Error('Only image (png/jpg), document (pdf/doc/docx), and spreadsheet (xls/xlsx) formats allowed!'));
     }
   },
 });

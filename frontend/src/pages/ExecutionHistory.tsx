@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Typography, Table, Tag, DatePicker, Select, Space, Button, message, Modal } from 'antd';
-import { SearchOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Typography, Table, Tag, DatePicker, Select, Space, Button, message, Modal, Tooltip } from 'antd';
+import { SearchOutlined, DeleteOutlined, FileOutlined, EyeOutlined, DownloadOutlined, FilePdfOutlined, FileWordOutlined, FileExcelOutlined, FileImageOutlined } from '@ant-design/icons';
 import { executionAPI } from '../services/api';
 import { BudgetExecution } from '../types';
+
+// 获取后端 API 基础 URL（用于静态文件访问）
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
 
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
@@ -134,6 +137,63 @@ const ExecutionHistory: React.FC = () => {
       render: (date: string) => new Date(date).toLocaleString(),
     },
     {
+      title: '执行凭证',
+      dataIndex: 'voucherUrl',
+      key: 'voucherUrl',
+      width: 150,
+      render: (voucherUrl: string) => {
+        if (!voucherUrl) {
+          return <span style={{ color: '#999' }}>无凭证</span>;
+        }
+        const fileUrl = `${API_BASE_URL}${voucherUrl}`;
+        const ext = voucherUrl.toLowerCase().split('.').pop() || '';
+
+        // 根据文件类型选择图标
+        let FileIcon = FileOutlined;
+        if (/^(jpg|jpeg|png|gif)$/.test(ext)) {
+          FileIcon = FileImageOutlined;
+        } else if (ext === 'pdf') {
+          FileIcon = FilePdfOutlined;
+        } else if (/^(doc|docx)$/.test(ext)) {
+          FileIcon = FileWordOutlined;
+        } else if (/^(xls|xlsx)$/.test(ext)) {
+          FileIcon = FileExcelOutlined;
+        }
+
+        return (
+          <Space>
+            <Tooltip title="查看凭证">
+              <Button
+                type="link"
+                icon={<FileIcon />}
+                onClick={() => window.open(fileUrl, '_blank')}
+                size="small"
+              >
+                查看
+              </Button>
+            </Tooltip>
+            <Tooltip title="下载凭证">
+              <Button
+                type="link"
+                icon={<DownloadOutlined />}
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = fileUrl;
+                  link.download = voucherUrl.split('/').pop() || 'voucher';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                size="small"
+              >
+                下载
+              </Button>
+            </Tooltip>
+          </Space>
+        );
+      },
+    },
+    {
       title: '操作',
       key: 'action',
       render: (_: any, record: BudgetExecution) => (
@@ -196,7 +256,7 @@ const ExecutionHistory: React.FC = () => {
           pagination={pagination}
           onChange={handleTableChange}
           rowKey="id"
-          scroll={{ x: 1200 }}
+          scroll={{ x: 1400 }}
         />
       </Card>
     </div>
