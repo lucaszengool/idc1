@@ -27,11 +27,14 @@ const upload = multer({
   storage,
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit for PPT files
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /ppt|pptx|pdf|jpeg|jpg|png/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = /powerpoint|pdf|image/.test(file.mimetype);
+    const allowedExtensions = /ppt|pptx|pdf|jpeg|jpg|png/;
+    const extname = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
+    // MIME types: ppt/pptx = powerpoint/presentationml, pdf = pdf, images = image/jpeg etc.
+    const allowedMimeTypes = /powerpoint|presentationml|pdf|image/;
+    const mimetype = allowedMimeTypes.test(file.mimetype);
 
-    if (mimetype && extname) {
+    // 只要扩展名或MIME类型其一匹配即可
+    if (mimetype || extname) {
       return cb(null, true);
     } else {
       cb(new Error('只允许上传 PPT, PDF 或图片文件！'));

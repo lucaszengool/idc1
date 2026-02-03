@@ -27,6 +27,9 @@ import { budgetVersionAPI } from '../services/api';
 
 const { Title, Text } = Typography;
 
+// 获取后端 API 基础 URL（用于静态文件访问）
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
+
 const BudgetVersionManagement: React.FC = () => {
   const [versions, setVersions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -177,7 +180,7 @@ const BudgetVersionManagement: React.FC = () => {
                     <Button
                       type="link"
                       icon={<FileImageOutlined />}
-                      onClick={() => window.open(version.fileUrl, '_blank')}
+                      onClick={() => window.open(`${API_BASE_URL}${version.fileUrl}`, '_blank')}
                     >
                       查看文件
                     </Button>
