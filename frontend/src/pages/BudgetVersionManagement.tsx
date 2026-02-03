@@ -82,8 +82,9 @@ const BudgetVersionManagement: React.FC = () => {
       formData.append('totalBudget', values.totalBudget || '');
       formData.append('uploadedBy', currentUsername || 'yangwenyu');
 
-      if (values.file && values.file.fileList && values.file.fileList.length > 0) {
-        formData.append('file', values.file.fileList[0].originFileObj);
+      // values.file is now directly the fileList array due to getValueFromEvent
+      if (values.file && values.file.length > 0) {
+        formData.append('file', values.file[0].originFileObj);
       }
 
       const response = await budgetVersionAPI.create(formData);
@@ -94,6 +95,7 @@ const BudgetVersionManagement: React.FC = () => {
         loadVersions();
       }
     } catch (error: any) {
+      console.error('Upload error:', error);
       message.error(error.response?.data?.message || '上传失败');
     } finally {
       setLoading(false);
@@ -289,6 +291,13 @@ const BudgetVersionManagement: React.FC = () => {
             name="file"
             rules={[{ required: true, message: '请上传预算文件' }]}
             extra="支持 PPT, PPTX, PDF, JPG, PNG 格式，最大50MB"
+            valuePropName="fileList"
+            getValueFromEvent={(e) => {
+              if (Array.isArray(e)) {
+                return e;
+              }
+              return e?.fileList;
+            }}
           >
             <Upload
               maxCount={1}
