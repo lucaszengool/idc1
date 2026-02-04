@@ -50,9 +50,11 @@ const BudgetVersionManagement: React.FC = () => {
   const currentUsername = localStorage.getItem('username') || '';
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // 只有杨雯宇可以上传和删除
-  const canManage = currentUsername === 'yangwenyu' || currentUser.username === 'yangwenyu' ||
-                     currentUsername === '杨雯宇' || currentUser.displayName === '杨雯宇';
+  // 允许管理的用户
+  const allowedUsers = ['yangwenyu', 'jessyyang', 'wenyuyang', '杨雯宇'];
+  const canManage = allowedUsers.includes(currentUsername) ||
+                    allowedUsers.includes(currentUser.username) ||
+                    allowedUsers.includes(currentUser.displayName);
 
   useEffect(() => {
     loadVersions();
@@ -74,9 +76,13 @@ const BudgetVersionManagement: React.FC = () => {
   };
 
   const handleUpload = async (values: any) => {
+    console.log('handleUpload called with values:', values);
     try {
       setLoading(true);
       const selectedYear = values.budgetYear || currentYear;
+      console.log('Selected year:', selectedYear);
+      console.log('File:', values.file);
+
       const formData = new FormData();
       formData.append('versionName', values.versionName);
       formData.append('budgetYear', selectedYear);
@@ -257,7 +263,16 @@ const BudgetVersionManagement: React.FC = () => {
         footer={null}
         width={600}
       >
-        <Form form={form} onFinish={handleUpload} layout="vertical" initialValues={{ budgetYear: currentYear }}>
+        <Form
+          form={form}
+          onFinish={handleUpload}
+          onFinishFailed={(errorInfo) => {
+            console.log('Form validation failed:', errorInfo);
+            message.error('请填写所有必填项并选择文件');
+          }}
+          layout="vertical"
+          initialValues={{ budgetYear: currentYear }}
+        >
           <Form.Item
             label="预算年份"
             name="budgetYear"
@@ -304,7 +319,17 @@ const BudgetVersionManagement: React.FC = () => {
           <Form.Item
             label="上传文件"
             name="file"
-            rules={[{ required: true, message: '请上传预算文件' }]}
+            rules={[
+              {
+                required: true,
+                validator: (_, value) => {
+                  if (value && value.length > 0) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('请上传预算文件'));
+                }
+              }
+            ]}
             extra="支持 PPT, PPTX, PDF, JPG, PNG 格式，最大50MB"
             valuePropName="fileList"
             getValueFromEvent={(e) => {
