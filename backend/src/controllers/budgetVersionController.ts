@@ -1,6 +1,25 @@
 import { Request, Response } from 'express';
 import BudgetVersion from '../models/BudgetVersion';
+import { TotalBudget } from '../models';
 import { Op } from 'sequelize';
+
+// Helper function to sync TotalBudget with BudgetVersion
+const syncTotalBudget = async (budgetYear: string, totalBudget: number) => {
+  if (!totalBudget || totalBudget <= 0) return;
+
+  const existing = await TotalBudget.findOne({ where: { budgetYear } });
+  if (existing) {
+    await existing.update({ totalAmount: totalBudget });
+    console.log(`Updated TotalBudget for ${budgetYear}: ${totalBudget}万`);
+  } else {
+    await TotalBudget.create({
+      budgetYear,
+      totalAmount: totalBudget,
+      createdBy: 'system'
+    });
+    console.log(`Created TotalBudget for ${budgetYear}: ${totalBudget}万`);
+  }
+};
 
 // 创建预算版本
 export const createBudgetVersion = async (req: Request, res: Response) => {
@@ -36,6 +55,11 @@ export const createBudgetVersion = async (req: Request, res: Response) => {
       isActive: true,
       totalBudget: totalBudget ? parseFloat(totalBudget) : undefined,
     });
+
+    // Sync TotalBudget when creating a new active version
+    if (totalBudget) {
+      await syncTotalBudget(budgetYear, parseFloat(totalBudget));
+    }
 
     res.status(201).json({
       success: true,
@@ -133,6 +157,11 @@ export const setActiveBudgetVersion = async (req: Request, res: Response) => {
 
     // 设置当前版本为激活
     await version.update({ isActive: true });
+
+    // Sync TotalBudget when activating a version with totalBudget
+    if (version.totalBudget) {
+      await syncTotalBudget(version.budgetYear, parseFloat(version.totalBudget.toString()));
+    }
 
     res.json({
       success: true,

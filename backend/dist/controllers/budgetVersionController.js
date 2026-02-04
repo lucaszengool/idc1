@@ -5,6 +5,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBudgetVersion = exports.setActiveBudgetVersion = exports.getActiveBudgetVersion = exports.getAllBudgetVersions = exports.createBudgetVersion = void 0;
 const BudgetVersion_1 = __importDefault(require("../models/BudgetVersion"));
+const models_1 = require("../models");
+// Helper function to sync TotalBudget with BudgetVersion
+const syncTotalBudget = async (budgetYear, totalBudget) => {
+    if (!totalBudget || totalBudget <= 0)
+        return;
+    const existing = await models_1.TotalBudget.findOne({ where: { budgetYear } });
+    if (existing) {
+        await existing.update({ totalAmount: totalBudget });
+        console.log(`Updated TotalBudget for ${budgetYear}: ${totalBudget}万`);
+    }
+    else {
+        await models_1.TotalBudget.create({
+            budgetYear,
+            totalAmount: totalBudget,
+            createdBy: 'system'
+        });
+        console.log(`Created TotalBudget for ${budgetYear}: ${totalBudget}万`);
+    }
+};
 // 创建预算版本
 const createBudgetVersion = async (req, res) => {
     try {
@@ -32,6 +51,10 @@ const createBudgetVersion = async (req, res) => {
             isActive: true,
             totalBudget: totalBudget ? parseFloat(totalBudget) : undefined,
         });
+        // Sync TotalBudget when creating a new active version
+        if (totalBudget) {
+            await syncTotalBudget(budgetYear, parseFloat(totalBudget));
+        }
         res.status(201).json({
             success: true,
             message: '预算版本创建成功',
@@ -120,6 +143,10 @@ const setActiveBudgetVersion = async (req, res) => {
         await BudgetVersion_1.default.update({ isActive: false }, { where: { budgetYear: version.budgetYear } });
         // 设置当前版本为激活
         await version.update({ isActive: true });
+        // Sync TotalBudget when activating a version with totalBudget
+        if (version.totalBudget) {
+            await syncTotalBudget(version.budgetYear, parseFloat(version.totalBudget.toString()));
+        }
         res.json({
             success: true,
             message: '激活版本设置成功',

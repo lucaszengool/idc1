@@ -80,8 +80,9 @@ const ExecutionReport: React.FC = () => {
       formData.append('executionStatus', values.executionStatus);
       formData.append('createdBy', values.createdBy);
 
-      if (values.voucher && values.voucher.fileList && values.voucher.fileList.length > 0) {
-        formData.append('voucher', values.voucher.fileList[0].originFileObj);
+      // values.voucher is now directly the fileList array
+      if (values.voucher && values.voucher.length > 0) {
+        formData.append('voucher', values.voucher[0].originFileObj);
       }
 
       await executionAPI.create(formData);
@@ -230,6 +231,13 @@ const ExecutionReport: React.FC = () => {
           name="voucher"
           label="执行凭证"
           help="支持上传图片(jpg/png)、文档(pdf/doc/docx)、表格(xls/xlsx)格式，最大5MB"
+          valuePropName="fileList"
+          getValueFromEvent={(e) => {
+            if (Array.isArray(e)) {
+              return e;
+            }
+            return e?.fileList;
+          }}
         >
           <Upload {...uploadProps}>
             <Button icon={<UploadOutlined />}>上传凭证</Button>
