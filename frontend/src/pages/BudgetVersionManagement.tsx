@@ -352,7 +352,20 @@ const BudgetVersionManagement: React.FC = () => {
             <Button onClick={() => setIsUploadModalVisible(false)} style={{ marginRight: 8 }}>
               取消
             </Button>
-            <Button type="primary" htmlType="submit" loading={loading}>
+            <Button
+              type="primary"
+              loading={loading}
+              onClick={() => {
+                form.validateFields()
+                  .then((values) => {
+                    handleUpload(values);
+                  })
+                  .catch((errorInfo) => {
+                    console.log('Validation failed:', errorInfo);
+                    message.error('请填写所有必填项并选择文件');
+                  });
+              }}
+            >
               上传
             </Button>
           </div>
