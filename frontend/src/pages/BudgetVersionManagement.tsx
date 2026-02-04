@@ -63,7 +63,8 @@ const BudgetVersionManagement: React.FC = () => {
   const loadVersions = async () => {
     try {
       setLoading(true);
-      const response = await budgetVersionAPI.getAll({ budgetYear: currentYear });
+      // 加载所有年份的版本，不限制年份
+      const response = await budgetVersionAPI.getAll({ limit: 100 });
       if (response.data.success && response.data.data) {
         setVersions(response.data.data.versions);
       }
@@ -190,6 +191,7 @@ const BudgetVersionManagement: React.FC = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 8 }}>
                   <div>
                     <Title level={5} style={{ margin: 0, marginBottom: 4 }}>
+                      <Tag color="blue" style={{ marginRight: 8 }}>{version.budgetYear}年</Tag>
                       {version.versionName}
                       {version.isActive && (
                         <Tag color="green" style={{ marginLeft: 8 }}>激活</Tag>
