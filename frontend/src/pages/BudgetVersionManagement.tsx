@@ -13,7 +13,8 @@ import {
   Tag,
   message,
   Popconfirm,
-  Image
+  Image,
+  Select
 } from 'antd';
 import {
   UploadOutlined,
@@ -75,9 +76,10 @@ const BudgetVersionManagement: React.FC = () => {
   const handleUpload = async (values: any) => {
     try {
       setLoading(true);
+      const selectedYear = values.budgetYear || currentYear;
       const formData = new FormData();
       formData.append('versionName', values.versionName);
-      formData.append('budgetYear', currentYear);
+      formData.append('budgetYear', selectedYear);
       formData.append('description', values.description || '');
       formData.append('totalBudget', values.totalBudget || '');
       formData.append('uploadedBy', currentUsername || 'yangwenyu');
@@ -89,7 +91,7 @@ const BudgetVersionManagement: React.FC = () => {
 
       const response = await budgetVersionAPI.create(formData);
       if (response.data.success) {
-        message.success('预算版本上传成功！');
+        message.success(`${selectedYear}年预算版本上传成功！`);
         setIsUploadModalVisible(false);
         form.resetFields();
         loadVersions();
@@ -255,7 +257,20 @@ const BudgetVersionManagement: React.FC = () => {
         footer={null}
         width={600}
       >
-        <Form form={form} onFinish={handleUpload} layout="vertical">
+        <Form form={form} onFinish={handleUpload} layout="vertical" initialValues={{ budgetYear: currentYear }}>
+          <Form.Item
+            label="预算年份"
+            name="budgetYear"
+            rules={[{ required: true, message: '请选择预算年份' }]}
+          >
+            <Select placeholder="选择预算年份">
+              <Select.Option value="2025">2025年</Select.Option>
+              <Select.Option value="2026">2026年</Select.Option>
+              <Select.Option value="2027">2027年</Select.Option>
+              <Select.Option value="2028">2028年</Select.Option>
+            </Select>
+          </Form.Item>
+
           <Form.Item
             label="版本名称"
             name="versionName"

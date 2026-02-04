@@ -306,7 +306,7 @@ const Dashboard: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 预算分类统计卡片 - 2026年只显示已完成验收 */}
+      {/* 预算分类统计卡片 - 2026年显示已完成验收和剩余未使用 */}
       {selectedYear === '2025' ? (
         <Row gutter={16} style={{ marginBottom: 24 }}>
           <Col span={8}>
@@ -393,9 +393,9 @@ const Dashboard: React.FC = () => {
           </Col>
         </Row>
       ) : (
-        /* 2026年只显示已完成验收预算 */
+        /* 2026年及以后：只显示已完成验收和剩余未使用（剩余 = 总预算 - 已验收） */
         <Row gutter={16} style={{ marginBottom: 24 }}>
-          <Col span={24}>
+          <Col span={12}>
             <Card
               title={
                 <span>
@@ -426,6 +426,30 @@ const Dashboard: React.FC = () => {
                     <Text type="secondary">暂无已完成验收的项目</Text>
                   </div>
                 )}
+              </div>
+            </Card>
+          </Col>
+          <Col span={12}>
+            <Card
+              title={
+                <span>
+                  <WalletOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+                  剩余未使用预算
+                </span>
+              }
+              extra={<Tag color="blue">可支配</Tag>}
+            >
+              <Statistic
+                value={(dashboardData.总预算 || 0) - (dashboardData.已完成验收预算 || 0)}
+                precision={2}
+                suffix="万元"
+                valueStyle={{ color: '#1890ff', fontSize: '28px' }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <div style={{ padding: '20px 0', textAlign: 'center' }}>
+                <Text type="secondary">
+                  总预算 {safeToFixed(dashboardData.总预算, 2)}万 - 已验收 {safeToFixed(dashboardData.已完成验收预算 || 0, 2)}万
+                </Text>
               </div>
             </Card>
           </Col>
