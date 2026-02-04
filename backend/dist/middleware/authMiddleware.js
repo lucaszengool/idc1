@@ -204,8 +204,8 @@ const checkDeletePermission = async (req, res, next) => {
                 message: '请先登录后再进行此操作'
             });
         }
-        // 只允许 yangwenyu 账号删除
-        const allowedUsernames = ['yangwenyu', '杨雯宇'];
+        // 允许删除的管理员账号
+        const allowedUsernames = ['yangwenyu', 'jessyyang', 'wenyuyang', '杨雯宇'];
         if (!allowedUsernames.includes(user.username) && !allowedUsernames.includes(user.displayName)) {
             return res.status(403).json({
                 success: false,

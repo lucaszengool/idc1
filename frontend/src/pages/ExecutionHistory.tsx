@@ -36,8 +36,11 @@ const ExecutionHistory: React.FC = () => {
   // 获取当前用户信息
   const currentUsername = localStorage.getItem('username') || '';
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-  const canDelete = currentUsername === 'yangwenyu' || currentUser.username === 'yangwenyu' ||
-                    currentUsername === '杨雯宇' || currentUser.displayName === '杨雯宇';
+  // 允许删除的用户：yangwenyu, jessyyang, 杨雯宇
+  const allowedUsers = ['yangwenyu', 'jessyyang', '杨雯宇', 'wenyuyang'];
+  const canDelete = allowedUsers.includes(currentUsername) ||
+                    allowedUsers.includes(currentUser.username) ||
+                    allowedUsers.includes(currentUser.displayName);
 
   useEffect(() => {
     loadExecutions();
