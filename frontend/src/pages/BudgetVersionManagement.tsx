@@ -77,6 +77,13 @@ const BudgetVersionManagement: React.FC = () => {
 
   const handleUpload = async (values: any) => {
     console.log('handleUpload called with values:', values);
+
+    // 检查文件是否选择
+    if (!values.file || values.file.length === 0) {
+      message.error('请选择要上传的文件');
+      return;
+    }
+
     try {
       setLoading(true);
       const selectedYear = values.budgetYear || currentYear;
@@ -87,13 +94,11 @@ const BudgetVersionManagement: React.FC = () => {
       formData.append('versionName', values.versionName);
       formData.append('budgetYear', selectedYear);
       formData.append('description', values.description || '');
-      formData.append('totalBudget', values.totalBudget || '');
+      formData.append('totalBudget', values.totalBudget?.toString() || '');
       formData.append('uploadedBy', currentUsername || 'yangwenyu');
 
-      // values.file is now directly the fileList array due to getValueFromEvent
-      if (values.file && values.file.length > 0) {
-        formData.append('file', values.file[0].originFileObj);
-      }
+      // 添加文件
+      formData.append('file', values.file[0].originFileObj);
 
       const response = await budgetVersionAPI.create(formData);
       if (response.data.success) {
@@ -319,17 +324,6 @@ const BudgetVersionManagement: React.FC = () => {
           <Form.Item
             label="上传文件"
             name="file"
-            rules={[
-              {
-                required: true,
-                validator: (_, value) => {
-                  if (value && value.length > 0) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('请上传预算文件'));
-                }
-              }
-            ]}
             extra="支持 PPT, PPTX, PDF, JPG, PNG 格式，最大50MB"
             valuePropName="fileList"
             getValueFromEvent={(e) => {
