@@ -20,13 +20,39 @@ const Dashboard: React.FC = () => {
   const [budgetForm] = Form.useForm();
   const [uploadForm] = Form.useForm();
   const [selectedYear, setSelectedYear] = useState<string>('2026');
+  const [availableYears, setAvailableYears] = useState<string[]>(['2025', '2026']);
 
   const currentYear = new Date().getFullYear().toString();
   const currentUsername = localStorage.getItem('username') || '';
 
+  // 加载可用年份
+  useEffect(() => {
+    loadAvailableYears();
+  }, []);
+
   useEffect(() => {
     loadDashboardData();
   }, [selectedYear]);
+
+  const loadAvailableYears = async () => {
+    try {
+      const response = await totalBudgetAPI.getAll();
+      if (response.data.success && response.data.data) {
+        const years = response.data.data
+          .map((b: any) => b.budgetYear)
+          .sort((a: string, b: string) => a.localeCompare(b));
+        if (years.length > 0) {
+          setAvailableYears(years);
+          // 如果当前选择的年份不在列表中，选择最新的年份
+          if (!years.includes(selectedYear)) {
+            setSelectedYear(years[years.length - 1]);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load available years:', error);
+    }
+  };
 
   const loadDashboardData = async () => {
     try {
@@ -211,8 +237,18 @@ const Dashboard: React.FC = () => {
         onChange={setSelectedYear}
         style={{ marginBottom: 24 }}
       >
-        <TabPane tab={<span><LockOutlined style={{ marginRight: 4 }} />2025年（已锁定）</span>} key="2025" />
-        <TabPane tab="2026年" key="2026" />
+        {availableYears.map(year => (
+          <TabPane
+            key={year}
+            tab={
+              LOCKED_YEARS.includes(year) ? (
+                <span><LockOutlined style={{ marginRight: 4 }} />{year}年（已锁定）</span>
+              ) : (
+                <span>{year}年</span>
+              )
+            }
+          />
+        ))}
       </Tabs>
 
       <Row gutter={16} style={{ marginBottom: 24 }}>

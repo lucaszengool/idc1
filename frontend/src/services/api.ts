@@ -152,6 +152,9 @@ export const totalBudgetAPI = {
   get: (year?: string) =>
     api.get<ApiResponse<{ id: number; budgetYear: string; totalAmount: number }>>('/total-budget', { params: { year } }),
 
+  getAll: () =>
+    api.get<ApiResponse<{ id: number; budgetYear: string; totalAmount: number }[]>>('/total-budget'),
+
   update: (year: string, totalAmount: number) =>
     api.post<ApiResponse<{ id: number; budgetYear: string; totalAmount: number }>>('/total-budget', {
       budgetYear: year,
