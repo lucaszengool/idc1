@@ -306,91 +306,131 @@ const Dashboard: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 预算分类统计卡片 */}
-      <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={8}>
-          <Card
-            title={
-              <span>
-                <ClockCircleOutlined style={{ marginRight: 8, color: '#faad14' }} />
-                预提待使用预算
-              </span>
-            }
-            extra={<Tag color="orange">{dashboardData.预提待使用项目?.length || 0} 个项目</Tag>}
-          >
-            <Statistic
-              value={dashboardData.预提待使用预算 || 0}
-              precision={2}
-              suffix="万元"
-              valueStyle={{ color: '#faad14', fontSize: '28px' }}
-            />
-            <Divider style={{ margin: '12px 0' }} />
-            <div style={{ maxHeight: 200, overflowY: 'auto' }}>
-              {dashboardData.预提待使用项目?.map((project, index) => (
-                <div key={project.id} style={{ marginBottom: 8, padding: '4px 0', borderBottom: index < (dashboardData.预提待使用项目?.length || 0) - 1 ? '1px solid #f0f0f0' : 'none' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text ellipsis style={{ maxWidth: '60%' }}>{project.projectName}</Text>
-                    <Text strong style={{ color: '#faad14' }}>{safeToFixed(project.budgetAmount, 2)}万</Text>
+      {/* 预算分类统计卡片 - 2026年只显示已完成验收 */}
+      {selectedYear === '2025' ? (
+        <Row gutter={16} style={{ marginBottom: 24 }}>
+          <Col span={8}>
+            <Card
+              title={
+                <span>
+                  <ClockCircleOutlined style={{ marginRight: 8, color: '#faad14' }} />
+                  预提待使用预算
+                </span>
+              }
+              extra={<Tag color="orange">{dashboardData.预提待使用项目?.length || 0} 个项目</Tag>}
+            >
+              <Statistic
+                value={dashboardData.预提待使用预算 || 0}
+                precision={2}
+                suffix="万元"
+                valueStyle={{ color: '#faad14', fontSize: '28px' }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                {dashboardData.预提待使用项目?.map((project, index) => (
+                  <div key={project.id} style={{ marginBottom: 8, padding: '4px 0', borderBottom: index < (dashboardData.预提待使用项目?.length || 0) - 1 ? '1px solid #f0f0f0' : 'none' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Text ellipsis style={{ maxWidth: '60%' }}>{project.projectName}</Text>
+                      <Text strong style={{ color: '#faad14' }}>{safeToFixed(project.budgetAmount, 2)}万</Text>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card
-            title={
-              <span>
-                <CheckSquareOutlined style={{ marginRight: 8, color: '#52c41a' }} />
-                已完成验收预算
-              </span>
-            }
-            extra={<Tag color="green">{dashboardData.已完成验收项目?.length || 0} 个项目</Tag>}
-          >
-            <Statistic
-              value={dashboardData.已完成验收预算 || 0}
-              precision={2}
-              suffix="万元"
-              valueStyle={{ color: '#52c41a', fontSize: '28px' }}
-            />
-            <Divider style={{ margin: '12px 0' }} />
-            <div style={{ maxHeight: 200, overflowY: 'auto' }}>
-              {dashboardData.已完成验收项目?.map((project, index) => (
-                <div key={project.id} style={{ marginBottom: 8, padding: '4px 0', borderBottom: index < (dashboardData.已完成验收项目?.length || 0) - 1 ? '1px solid #f0f0f0' : 'none' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text ellipsis style={{ maxWidth: '60%' }}>{project.projectName}</Text>
-                    <Text strong style={{ color: '#52c41a' }}>{safeToFixed(project.executedAmount, 4)}万</Text>
+                ))}
+              </div>
+            </Card>
+          </Col>
+          <Col span={8}>
+            <Card
+              title={
+                <span>
+                  <CheckSquareOutlined style={{ marginRight: 8, color: '#52c41a' }} />
+                  已完成验收预算
+                </span>
+              }
+              extra={<Tag color="green">{dashboardData.已完成验收项目?.length || 0} 个项目</Tag>}
+            >
+              <Statistic
+                value={dashboardData.已完成验收预算 || 0}
+                precision={2}
+                suffix="万元"
+                valueStyle={{ color: '#52c41a', fontSize: '28px' }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                {dashboardData.已完成验收项目?.map((project, index) => (
+                  <div key={project.id} style={{ marginBottom: 8, padding: '4px 0', borderBottom: index < (dashboardData.已完成验收项目?.length || 0) - 1 ? '1px solid #f0f0f0' : 'none' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Text ellipsis style={{ maxWidth: '60%' }}>{project.projectName}</Text>
+                      <Text strong style={{ color: '#52c41a' }}>{safeToFixed(project.executedAmount, 4)}万</Text>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card
-            title={
-              <span>
-                <WalletOutlined style={{ marginRight: 8, color: '#1890ff' }} />
-                剩余未使用预算
-              </span>
-            }
-            extra={<Tag color="blue">可支配</Tag>}
-          >
-            <Statistic
-              value={dashboardData.剩余未使用预算 || 0}
-              precision={2}
-              suffix="万元"
-              valueStyle={{ color: '#1890ff', fontSize: '28px' }}
-            />
-            <Divider style={{ margin: '12px 0' }} />
-            <div style={{ padding: '20px 0', textAlign: 'center' }}>
-              <Text type="secondary">
-                总预算 {safeToFixed(dashboardData.总预算, 2)}万 - 预提待使用 {safeToFixed(dashboardData.预提待使用预算 || 0, 2)}万 - 已验收 {safeToFixed(dashboardData.已完成验收预算 || 0, 2)}万
-              </Text>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+                ))}
+              </div>
+            </Card>
+          </Col>
+          <Col span={8}>
+            <Card
+              title={
+                <span>
+                  <WalletOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+                  剩余未使用预算
+                </span>
+              }
+              extra={<Tag color="blue">可支配</Tag>}
+            >
+              <Statistic
+                value={dashboardData.剩余未使用预算 || 0}
+                precision={2}
+                suffix="万元"
+                valueStyle={{ color: '#1890ff', fontSize: '28px' }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <div style={{ padding: '20px 0', textAlign: 'center' }}>
+                <Text type="secondary">
+                  总预算 {safeToFixed(dashboardData.总预算, 2)}万 - 预提待使用 {safeToFixed(dashboardData.预提待使用预算 || 0, 2)}万 - 已验收 {safeToFixed(dashboardData.已完成验收预算 || 0, 2)}万
+                </Text>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      ) : (
+        /* 2026年只显示已完成验收预算 */
+        <Row gutter={16} style={{ marginBottom: 24 }}>
+          <Col span={24}>
+            <Card
+              title={
+                <span>
+                  <CheckSquareOutlined style={{ marginRight: 8, color: '#52c41a' }} />
+                  已完成验收预算
+                </span>
+              }
+              extra={<Tag color="green">{dashboardData.已完成验收项目?.length || 0} 个项目</Tag>}
+            >
+              <Statistic
+                value={dashboardData.已完成验收预算 || 0}
+                precision={2}
+                suffix="万元"
+                valueStyle={{ color: '#52c41a', fontSize: '28px' }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                {dashboardData.已完成验收项目?.map((project, index) => (
+                  <div key={project.id} style={{ marginBottom: 8, padding: '4px 0', borderBottom: index < (dashboardData.已完成验收项目?.length || 0) - 1 ? '1px solid #f0f0f0' : 'none' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Text ellipsis style={{ maxWidth: '60%' }}>{project.projectName}</Text>
+                      <Text strong style={{ color: '#52c41a' }}>{safeToFixed(project.executedAmount, 4)}万</Text>
+                    </div>
+                  </div>
+                ))}
+                {(!dashboardData.已完成验收项目 || dashboardData.已完成验收项目.length === 0) && (
+                  <div style={{ padding: '20px 0', textAlign: 'center' }}>
+                    <Text type="secondary">暂无已完成验收的项目</Text>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      )}
 
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={24}>
