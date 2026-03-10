@@ -475,7 +475,9 @@ router.post('/cleanup-test-data', async (req, res) => {
       where: {
         [Op.or]: [
           { fromUserId: { [Op.in]: pendingUserIds } },
-          { toUserId: { [Op.in]: pendingUserIds } }
+          { toUserId: { [Op.in]: pendingUserIds } },
+          { requesterId: { [Op.in]: pendingUserIds } },
+          { approverId: { [Op.in]: pendingUserIds } }
         ]
       }
     });
