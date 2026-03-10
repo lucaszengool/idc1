@@ -466,8 +466,9 @@ router.post('/cleanup-test-data', async (req, res) => {
     await sequelize.query(`DELETE FROM approvals WHERE "requesterId" IN (${pendingUserIds.join(',')}) OR "approverId" IN (${pendingUserIds.join(',')})`);
     await sequelize.query(`DELETE FROM project_transfers WHERE "fromUserId" IN (${pendingUserIds.join(',')}) OR "toUserId" IN (${pendingUserIds.join(',')}) OR "requesterId" IN (${pendingUserIds.join(',')}) OR "approverId" IN (${pendingUserIds.join(',')})`);
     await sequelize.query(`DELETE FROM group_members WHERE "userId" IN (${pendingUserIds.join(',')})`);
-    await sequelize.query(`UPDATE groups SET "pmId" = NULL WHERE "pmId" IN (${pendingUserIds.join(',')})`);
-    await sequelize.query(`UPDATE groups SET "createdBy" = NULL WHERE "createdBy" IN (${pendingUserIds.join(',')})`);
+    // 将groups中引用待删除用户的字段改为jessyyang(ID=3,活跃管理员)
+    await sequelize.query(`UPDATE groups SET "pmId" = 3 WHERE "pmId" IN (${pendingUserIds.join(',')})`);
+    await sequelize.query(`UPDATE groups SET "createdBy" = 3 WHERE "createdBy" IN (${pendingUserIds.join(',')})`);
     console.log('✅ 已清理所有关联记录');
 
     const deletedUsers = await User.destroy({
