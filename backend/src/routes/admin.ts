@@ -489,4 +489,23 @@ router.post('/cleanup-test-data', async (req, res) => {
   }
 });
 
+// 重置jessyyang密码为123456
+router.post('/reset-jessyyang-password', async (req, res) => {
+  try {
+    const bcrypt = await import('bcryptjs');
+    const hashedPassword = await bcrypt.hash('123456', 10);
+    const [updated] = await User.update(
+      { password: hashedPassword },
+      { where: { username: 'jessyyang' } }
+    );
+    if (updated > 0) {
+      res.json({ success: true, message: 'jessyyang密码已重置为123456' });
+    } else {
+      res.json({ success: false, message: '未找到jessyyang用户' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: String(error) });
+  }
+});
+
 export default router;
