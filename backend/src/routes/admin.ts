@@ -1,5 +1,5 @@
 import express from 'express';
-import { Project, BudgetAdjustment, BudgetExecution, User } from '../models';
+import { Project, BudgetAdjustment, BudgetExecution, User, Approval, ProjectTransfer } from '../models';
 import { Op } from 'sequelize';
 
 const router = express.Router();
@@ -458,7 +458,30 @@ router.post('/cleanup-test-data', async (req, res) => {
     console.log('✅ 已恢复电池全容量核容工具: budgetOccupied=30');
 
     // 5. 删除待审批的测试用户 (isActive=false)
+    // 先删除关联的审批记录和项目转移记录
     const pendingUserIds = [1, 2, 4, 5, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19];
+    const deletedApprovals = await Approval.destroy({
+      where: {
+        [Op.or]: [
+          { requesterId: { [Op.in]: pendingUserIds } },
+          { approverId: { [Op.in]: pendingUserIds } }
+        ]
+      }
+    });
+    results.deletedApprovals = deletedApprovals;
+    console.log(`🗑️ 已删除 ${deletedApprovals} 条关联审批记录`);
+
+    const deletedTransfers = await ProjectTransfer.destroy({
+      where: {
+        [Op.or]: [
+          { fromUserId: { [Op.in]: pendingUserIds } },
+          { toUserId: { [Op.in]: pendingUserIds } }
+        ]
+      }
+    });
+    results.deletedTransfers = deletedTransfers;
+    console.log(`🗑️ 已删除 ${deletedTransfers} 条关联转移记录`);
+
     const deletedUsers = await User.destroy({
       where: { id: { [Op.in]: pendingUserIds } }
     });
