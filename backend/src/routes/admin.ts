@@ -1,5 +1,5 @@
 import express from 'express';
-import { Project, BudgetAdjustment } from '../models';
+import { Project, BudgetAdjustment, BudgetExecution, User } from '../models';
 import { Op } from 'sequelize';
 
 const router = express.Router();
@@ -374,6 +374,106 @@ router.post('/fix-2025-data', async (req, res) => {
   } catch (error) {
     console.error('修复2025年数据失败:', error);
     res.status(500).json({ success: false, message: '修复失败', error: String(error) });
+  }
+});
+
+// 清理前端测试数据 - 仅删除截图中红圈标注的测试数据
+router.post('/cleanup-test-data', async (req, res) => {
+  try {
+    console.log('🧹 开始清理前端测试数据...');
+    const results: any = {};
+
+    // 1. 删除4条执行记录 (执行历史中的测试数据)
+    // ID 15: 视觉技术 ¥4.00 by xxxxx
+    // ID 16: 水质检测工具模块 ¥5.00 by test
+    // ID 17: 氟-水CDU ¥12.00 by jessy
+    // ID 18: 视觉技术 ¥0.80 by jessyyang
+    const executionIds = [15, 16, 17, 18];
+    const deletedExecutions = await BudgetExecution.destroy({
+      where: { id: { [Op.in]: executionIds } }
+    });
+    results.deletedExecutions = deletedExecutions;
+    console.log(`🗑️ 已删除 ${deletedExecutions} 条执行记录`);
+
+    // 2. 删除6条预算调整记录
+    // ID 3: TEG-2025-暖通-分体氟泵SHU项目 → test ¥20.00
+    // ID 5: TEG-2025-数据中心PDU → ccccccc ¥9.00
+    // ID 6: 视觉技术 → xxxxx ¥16.00
+    // ID 7: 直流一体柜及其配套设备 → xxxxxxxtest ¥20.00
+    // ID 8: 氟-水CDU → test1 ¥20.00
+    // ID 9: 电池全容量核容工具pro版 → hhhhh ¥10.00
+    const adjustmentIds = [3, 5, 6, 7, 8, 9];
+    const deletedAdjustments = await BudgetAdjustment.destroy({
+      where: { id: { [Op.in]: adjustmentIds } }
+    });
+    results.deletedAdjustments = deletedAdjustments;
+    console.log(`🗑️ 已删除 ${deletedAdjustments} 条预算调整记录`);
+
+    // 3. 删除4个测试项目 (IDC-架构研发分类下的测试项目 + hhhhh)
+    // ID 58: xxxxx (IDC-架构研发, 16万, owner: jessy)
+    // ID 59: xxxxxxxtest (IDC-架构研发, 20万, owner: test)
+    // ID 60: test1 (IDC-架构研发, 20万, owner: test1)
+    // ID 61: hhhhh (IDC运营-研发, 10万, owner: hhh)
+    const testProjectIds = [58, 59, 60, 61];
+    const deletedProjects = await Project.destroy({
+      where: { id: { [Op.in]: testProjectIds } }
+    });
+    results.deletedProjects = deletedProjects;
+    console.log(`🗑️ 已删除 ${deletedProjects} 个测试项目`);
+
+    // 4. 恢复被预算调整修改过的原项目的预算占用金额
+    // 视觉技术 (ID 57): budgetOccupied 从4改回20, budgetExecuted 从4.80改回0
+    await Project.update(
+      { budgetOccupied: 20, budgetExecuted: 0 },
+      { where: { id: 57 } }
+    );
+    console.log('✅ 已恢复视觉技术项目预算: budgetOccupied=20, budgetExecuted=0');
+
+    // 氟-水CDU (ID 51): budgetOccupied 从40改回60, budgetExecuted 从12改回0
+    await Project.update(
+      { budgetOccupied: 60, budgetExecuted: 0 },
+      { where: { id: 51 } }
+    );
+    console.log('✅ 已恢复氟-水CDU项目预算: budgetOccupied=60, budgetExecuted=0');
+
+    // 水质检测工具模块 (ID 53): budgetExecuted 从5改回0
+    await Project.update(
+      { budgetExecuted: 0 },
+      { where: { id: 53 } }
+    );
+    console.log('✅ 已恢复水质检测工具模块: budgetExecuted=0');
+
+    // 直流一体柜及其配套设备 (ID 50): budgetOccupied 从10改回30
+    await Project.update(
+      { budgetOccupied: 30 },
+      { where: { id: 50 } }
+    );
+    console.log('✅ 已恢复直流一体柜项目预算: budgetOccupied=30');
+
+    // 电池全容量核容工具pro版 (ID 10): budgetOccupied 从20改回30
+    await Project.update(
+      { budgetOccupied: 30 },
+      { where: { id: 10 } }
+    );
+    console.log('✅ 已恢复电池全容量核容工具: budgetOccupied=30');
+
+    // 5. 删除待审批的测试用户 (isActive=false)
+    const pendingUserIds = [1, 2, 4, 5, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19];
+    const deletedUsers = await User.destroy({
+      where: { id: { [Op.in]: pendingUserIds } }
+    });
+    results.deletedUsers = deletedUsers;
+    console.log(`🗑️ 已删除 ${deletedUsers} 个待审批测试用户`);
+
+    console.log('✅ 前端测试数据清理完成!');
+    res.json({
+      success: true,
+      message: '前端测试数据已清理完成',
+      data: results
+    });
+  } catch (error) {
+    console.error('清理测试数据失败:', error);
+    res.status(500).json({ success: false, message: '清理失败', error: String(error) });
   }
 });
 
